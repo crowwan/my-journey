@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Journey — 여행의 기록</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0f1c;--card:#111827;--card2:#1a2236;--glass:rgba(255,255,255,.04);
+  --accent:#f97316;--accent2:#fb923c;--blue:#3b82f6;--cyan:#22d3ee;
+  --green:#10b981;--pink:#f472b6;--purple:#a78bfa;--red:#ef4444;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,.08);
+  --radius:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+
+/* Hero */
+.hero{position:relative;min-height:360px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;padding:80px 20px 60px}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#0a0f1c 0%,#1e1b4b 30%,#312e81 60%,#0a0f1c 100%);z-index:0}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,rgba(249,115,22,.15) 0%,transparent 60%),radial-gradient(circle at 70% 60%,rgba(59,130,246,.12) 0%,transparent 50%);z-index:1}
+.hero-content{position:relative;z-index:2}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.6rem,6vw,4rem);font-weight:900;background:linear-gradient(135deg,#fff 0%,#f97316 50%,#fb923c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px;margin-bottom:10px}
+.hero-sub{font-size:1.05rem;color:var(--text2);font-weight:300;letter-spacing:2px;margin-bottom:24px}
+.hero-stats{display:inline-flex;align-items:center;gap:8px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);padding:8px 20px;border-radius:24px;font-size:.88rem;color:var(--accent2);font-weight:500}
+.hero-stats .num{font-weight:900;font-size:1.1rem;color:#fff}
+
+/* 카드 그리드 */
+.content{max-width:1100px;margin:0 auto;padding:40px 16px 80px;flex:1}
+.section-title{display:flex;align-items:center;gap:10px;margin-bottom:24px;font-size:1.1rem;font-weight:700;color:#fff}
+.section-title .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:rgba(249,115,22,.15)}
+.trip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.trip-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:border-color .3s,transform .2s;text-decoration:none;color:inherit;display:block;cursor:pointer}
+.trip-card:hover{border-color:rgba(249,115,22,.4);transform:translateY(-4px)}
+.trip-card .trip-emoji{font-size:2rem;margin-bottom:12px;display:block}
+.trip-card .trip-title{font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:8px}
+.trip-card .trip-date{font-size:.82rem;color:var(--accent2);font-weight:600;margin-bottom:4px}
+.trip-card .trip-duration{font-size:.78rem;color:var(--text2);margin-bottom:14px}
+.trip-tags{display:flex;gap:6px;flex-wrap:wrap}
+.trip-tag{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text2);padding:3px 10px;border-radius:14px;font-size:.72rem;font-weight:500}
+.trip-card:hover .trip-tag{border-color:rgba(249,115,22,.2);color:var(--accent2)}
+
+/* 빈 상태 (여행이 없을 때 주석 해제) */
+/*
+.empty-state{text-align:center;padding:80px 20px;color:var(--text3)}
+.empty-state .empty-icon{font-size:3rem;margin-bottom:16px;opacity:.5}
+.empty-state .empty-text{font-size:1rem;font-weight:500}
+.empty-state .empty-sub{font-size:.85rem;margin-top:8px;color:var(--text3)}
+*/
+
+/* 푸터 */
+.footer{text-align:center;padding:36px 20px;color:var(--text3);font-size:.75rem;border-top:1px solid var(--border)}
+
+/* 반응형 */
+@media(max-width:640px){
+  .trip-grid{grid-template-columns:1fr}
+  .hero{min-height:280px;padding:60px 20px 40px}
+  .hero h1{font-size:2.2rem}
+}
+
+/* 스크롤바 */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>My Journey</h1>
+    <p class="hero-sub">여행의 기록, 웹으로 만나다</p>
+    <div class="hero-stats">
+      <span>총</span>
+      <span class="num">1</span>
+      <span>개 여행</span>
+    </div>
+  </div>
+</section>
+
+<div class="content">
+  <div class="section-title"><div class="ic">🗺️</div>여행 목록</div>
+  <div class="trip-grid">
+
+    <a class="trip-card" href="trips/2025-osaka/index.html">
+      <span class="trip-emoji">🌸</span>
+      <div class="trip-title">오사카 여행 완전판</div>
+      <div class="trip-date">2025. 3. 2 ~ 3. 6</div>
+      <div class="trip-duration">4박 5일 · 혼자 여행</div>
+      <div class="trip-tags">
+        <span class="trip-tag">🏯 오사카</span>
+        <span class="trip-tag">⛩️ 교토</span>
+        <span class="trip-tag">🦌 나라</span>
+        <span class="trip-tag">🥩 고베</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- 빈 상태: 여행이 없을 때 아래 주석을 해제하고 trip-grid를 숨기세요
+  <div class="empty-state">
+    <div class="empty-icon">✈️</div>
+    <div class="empty-text">아직 등록된 여행이 없습니다</div>
+    <div class="empty-sub">새 여행을 추가해보세요</div>
+  </div>
+  -->
+</div>
+
+<div class="footer">Made with Claude · GitHub Pages</div>
+
+</body>
+</html>

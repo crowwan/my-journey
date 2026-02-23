@@ -1,0 +1,668 @@
+<!--
+=============================================================================
+  여행 페이지 템플릿 (trip-page.html)
+=============================================================================
+
+  사용법:
+  1. 이 파일을 trips/{year}-{destination}/index.html 로 복사
+  2. 아래 플레이스홀더를 실제 데이터로 교체
+  3. 반복 블록(<!-- [REPEAT] -->)은 필요한 만큼 복사하여 사용
+
+  ─── 플레이스홀더 목록 ───
+
+  [기본 정보]
+  {TRIP_TITLE}           — 여행 제목 (예: 오사카 여행 완전판)
+  {TRIP_EMOJI}           — 제목 앞 이모지 (예: 🌸)
+  {TRIP_DATES}           — 기간 표시 (예: 2025. 3. 2 (일) — 3. 6 (목))
+  {TRIP_DURATION}        — N박 M일 (예: 4박 5일)
+  {TRIP_TYPE}            — 여행 유형 (예: 혼자 여행, 커플 여행, 가족 여행)
+  {TRIP_DATE_SHORT}      — 짧은 날짜 (예: 2025.3.2~3.6)
+  {TRIP_YEAR}            — 연도 (예: 2025)
+
+  [목적지 태그] — hero-tags 영역
+  {DEST_TAG_EMOJI_N}     — 태그 이모지 (예: 🏯)
+  {DEST_TAG_NAME_N}      — 태그 이름 (예: 오사카)
+
+  [항공편]
+  {FLIGHT_DEP_LABEL}     — 출발 라벨 (예: 출발 (인천→간사이))
+  {FLIGHT_DEP_DATE}      — 출발 일시 (예: 3월 2일 (일) 08:30)
+  {FLIGHT_DEP_DESC}      — 출발 상세 (예: 인천공항 출발 → 11:30 간사이공항 도착)
+  {FLIGHT_RET_LABEL}     — 귀국 라벨 (예: 귀국 (간사이→인천))
+  {FLIGHT_RET_DATE}      — 귀국 일시 (예: 3월 6일 (목) 11:30)
+  {FLIGHT_RET_DESC}      — 귀국 상세
+
+  [숙소]
+  {ACCOM_ADDRESS}        — 숙소 주소
+  {ACCOM_DESC}           — 숙소 설명 (접근성 등)
+
+  [날씨]
+  {WEATHER_TIP}          — 옷차림 팁
+
+  [일정 개요] — DAY별 한줄 요약
+  {DAY_N_LABEL}          — DAY N · 날짜 (예: DAY 1 · 3/2 일)
+  {DAY_N_TITLE}          — 제목 (예: 오사카 도착 & 우메다)
+  {DAY_N_SUMMARY}        — 한줄 요약 경로
+  {DAY_N_COLOR}          — CSS 색상 변수 (예: var(--accent))
+
+  [일정 상세] — Day 카드 내부
+  {DAY_N_GRADIENT}       — 그라데이션 (예: #f97316,#f59e0b)
+  {DAY_N_FULL_TITLE}     — Day 카드 제목
+  {DAY_N_DATE_ROUTE}     — 날짜 · 경로 요약
+
+  [타임라인 아이템] — tl-item
+  {TL_TIME}              — 시각 (예: 08:30)
+  {TL_TITLE}             — 제목
+  {TL_DESC}              — 설명 (선택)
+  {TL_TYPE}              — 분류: spot / food / move / (빈값=기타)
+  {TL_BADGE_TEXT}         — 뱃지 텍스트 (예: 비행 3h, 점심, 저녁)
+  {TL_BADGE_CLASS}       — 뱃지 클래스 (badge-food / badge-move)
+
+  [맛집]
+  {REST_DAY_LABEL}       — 섹션 제목 (예: DAY 1 — 우메다)
+  {REST_TYPE}            — 음식 분류 (예: 초밥, 라멘)
+  {REST_NAME}            — 식당 이름
+  {REST_RATING}          — 평점 (예: ⭐ 4.6)
+  {REST_DETAIL}          — 설명
+  {REST_PRICE}           — 가격대 (예: ¥1,200~)
+
+  [교통]
+  {TRANSPORT_ROUTE}      — 구간 (예: 간사이공항→오사카역)
+  {TRANSPORT_METHOD}     — 교통수단
+  {TRANSPORT_TIME}       — 소요시간
+  {TRANSPORT_FARE}       — 요금
+
+  [예산]
+  {BUDGET_ICON}          — 이모지 (예: 🚃)
+  {BUDGET_LABEL}         — 항목명 (예: 교통비)
+  {BUDGET_DETAIL}        — 상세
+  {BUDGET_BAR_WIDTH}     — 막대 너비 % (예: 18%)
+  {BUDGET_BAR_COLOR}     — 막대 색상 (예: var(--blue))
+  {BUDGET_AMOUNT}        — 금액 (예: ¥8,000)
+  {BUDGET_TOTAL}         — 총 예산 (예: ¥36,000 ~ ¥47,000)
+  {BUDGET_TOTAL_KRW}     — 원화 환산 (예: 32만원 ~ 42만원)
+
+  [지도]
+  {MAP_CENTER_LAT}       — 지도 중심 위도
+  {MAP_CENTER_LNG}       — 지도 중심 경도
+  {MAP_ZOOM}             — 줌 레벨
+  {MAP_COLOR}            — 경로/마커 색상
+  {SPOT_LAT}             — 장소 위도
+  {SPOT_LNG}             — 장소 경도
+  {SPOT_NAME}            — 장소 이름
+  {SPOT_TIME}            — 시각
+  {SPOT_ICON}            — 이모지 아이콘
+
+  ─── 반복 블록 표기법 ───
+
+  <!-- [REPEAT: 블록이름] --> ~ <!-- [/REPEAT: 블록이름] -->
+  사이의 내용을 필요한 만큼 복사하여 사용합니다.
+  예시가 1개씩 포함되어 있으니 구조 참고용으로 활용하세요.
+
+=============================================================================
+-->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{TRIP_TITLE} | {TRIP_DATE_SHORT}</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0f1c;--card:#111827;--card2:#1a2236;--glass:rgba(255,255,255,.04);
+  --accent:#f97316;--accent2:#fb923c;--blue:#3b82f6;--cyan:#22d3ee;
+  --green:#10b981;--pink:#f472b6;--purple:#a78bfa;--red:#ef4444;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,.08);
+  --radius:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+.hero{position:relative;min-height:320px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;padding:56px 20px 36px}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#0a0f1c 0%,#1e1b4b 30%,#312e81 60%,#0a0f1c 100%);z-index:0}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,rgba(249,115,22,.15) 0%,transparent 60%),radial-gradient(circle at 70% 60%,rgba(59,130,246,.12) 0%,transparent 50%);z-index:1}
+.hero-content{position:relative;z-index:2}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,5vw,3.4rem);font-weight:900;background:linear-gradient(135deg,#fff 0%,#f97316 50%,#fb923c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px;margin-bottom:8px}
+.hero-sub{font-size:1rem;color:var(--text2);font-weight:300;letter-spacing:1px}
+.hero-tags{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.hero-tag{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);color:var(--accent2);padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:500}
+.tab-wrap{position:sticky;top:0;z-index:100;background:rgba(10,15,28,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 12px}
+.tabs{display:flex;gap:2px;max-width:1100px;margin:0 auto;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:13px 14px;font-size:.82rem;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .25s;user-select:none}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab .ti{margin-right:4px}
+.content{max-width:1100px;margin:0 auto;padding:28px 16px 80px}
+.panel{display:none;animation:fadeUp .4s ease}
+.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.st{display:flex;align-items:center;gap:10px;margin:32px 0 16px;font-size:1.1rem;font-weight:700;color:#fff}
+.st:first-child{margin-top:0}
+.st .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:border-color .3s,transform .2s}
+.info-card:hover{border-color:rgba(249,115,22,.3);transform:translateY(-2px)}
+.info-card .label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:600}
+.info-card .value{font-size:1rem;font-weight:600;color:#fff}
+.info-card .sub{font-size:.8rem;color:var(--text2);margin-top:4px}
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:visible}
+.day-header{padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background .2s}
+.day-header:hover{background:var(--glass)}
+.day-num{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:#fff;flex-shrink:0}
+.day-meta h3{font-size:1rem;font-weight:700;color:#fff}
+.day-meta p{font-size:.8rem;color:var(--text2);margin-top:2px}
+.day-body{padding:0 20px 20px;display:none}
+.day-card.open .day-body{display:block;animation:fadeUp .3s ease}
+.day-card.open .chv{transform:rotate(180deg)}
+.chv{margin-left:auto;color:var(--text3);transition:transform .3s;font-size:.85rem;flex-shrink:0}
+.map-toggle{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:var(--blue);font-size:.82rem;font-weight:600;cursor:pointer;margin-bottom:14px;transition:all .2s;user-select:none}
+.map-toggle:hover{background:rgba(59,130,246,.18)}
+.map-toggle.active{background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4)}
+.map-wrap{height:0;overflow:hidden;border-radius:12px;margin-bottom:14px;transition:height .4s ease;position:relative;z-index:1}
+.map-wrap.show{height:65vh;min-height:480px;max-height:700px;border:1px solid var(--border);overflow:visible;clip-path:none}
+.day-map{width:100%;height:100%;z-index:1;border-radius:12px}
+.leaflet-control-zoom a{background:#fff!important;color:#333!important;border-color:#ccc!important}
+.leaflet-control-attribution{background:rgba(255,255,255,.8)!important;color:#666!important;font-size:.6rem!important}
+.leaflet-control-attribution a{color:#666!important}
+.leaflet-popup-content-wrapper{border-radius:10px!important;box-shadow:0 4px 16px rgba(0,0,0,.15)!important}
+.leaflet-container{border-radius:12px}
+.custom-marker{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;font-size:.72rem;font-weight:800;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35);border:2.5px solid #fff}
+.marker-popup{font-family:'Noto Sans KR',sans-serif;padding:4px}
+.marker-popup .popup-title{font-weight:700;font-size:.88rem;color:#1a1a2e;margin-bottom:2px}
+.marker-popup .popup-desc{font-size:.78rem;color:#555}
+.marker-popup .popup-time{font-size:.72rem;color:var(--accent);font-weight:700}
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--accent),var(--blue),var(--purple));border-radius:2px;opacity:.35}
+.tl-item{position:relative;margin-bottom:16px}
+.tl-item::before{content:'';position:absolute;left:-21px;top:8px;width:9px;height:9px;border-radius:50%;border:2px solid var(--accent);background:var(--bg)}
+.tl-item.food::before{border-color:var(--pink);background:var(--pink)}
+.tl-item.move::before{border-color:var(--blue);background:var(--blue)}
+.tl-item.spot::before{border-color:var(--green)}
+.tl-time{font-size:.75rem;color:var(--accent);font-weight:600;margin-bottom:2px}
+.tl-title{font-size:.88rem;font-weight:600;color:#fff}
+.tl-desc{font-size:.8rem;color:var(--text2);margin-top:2px}
+.tl-badge{display:inline-block;font-size:.66rem;padding:2px 7px;border-radius:6px;font-weight:600;margin-left:5px;vertical-align:middle}
+.badge-food{background:rgba(244,114,182,.15);color:var(--pink)}
+.badge-move{background:rgba(59,130,246,.15);color:var(--blue)}
+.rest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-top:10px}
+.rest-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:15px 16px;transition:border-color .3s,transform .2s}
+.rest-card:hover{border-color:rgba(244,114,182,.3);transform:translateY(-2px)}
+.rest-card .name{font-weight:700;color:#fff;font-size:.9rem}
+.rest-card .type{font-size:.7rem;color:var(--pink);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.rest-card .rating{color:var(--accent);font-weight:700;font-size:.82rem;margin:5px 0 3px}
+.rest-card .detail{font-size:.78rem;color:var(--text2);line-height:1.6}
+.rest-card .price{display:inline-block;background:rgba(249,115,22,.1);color:var(--accent2);padding:2px 9px;border-radius:8px;font-size:.72rem;font-weight:600;margin-top:5px}
+.ttable{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:10px;font-size:.84rem}
+.ttable th{background:rgba(249,115,22,.12);color:var(--accent2);font-size:.75rem;font-weight:600;text-align:left;padding:11px 14px;text-transform:uppercase;letter-spacing:.5px}
+.ttable td{padding:11px 14px;border-top:1px solid var(--border);color:var(--text)}
+.ttable tr:hover td{background:var(--glass)}
+.ttable .route{font-weight:600;color:#fff}
+.ttable .method{color:var(--blue);font-weight:500}
+.ttable .tc{color:var(--text2)}
+.check-category{display:flex;align-items:center;gap:8px;font-size:.92rem;font-weight:700;color:#fff;margin-bottom:10px;padding:9px 13px;background:var(--card2);border-radius:10px}
+.check-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:7px;margin-bottom:18px}
+.check-item{display:flex;align-items:flex-start;gap:9px;padding:9px 13px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;user-select:none}
+.check-item:hover{border-color:rgba(249,115,22,.3)}
+.check-item.checked{opacity:.45;text-decoration:line-through}
+.check-item .cb{width:17px;height:17px;border:2px solid var(--text3);border-radius:5px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:.65rem;color:transparent}
+.check-item.checked .cb{background:var(--green);border-color:var(--green);color:#fff}
+.check-item .item-text{font-size:.83rem;color:var(--text)}
+.check-item .item-note{font-size:.73rem;color:var(--text3);display:block;margin-top:2px;text-decoration:none!important}
+.pretodo-item{display:flex;gap:13px;align-items:flex-start;padding:15px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);transition:border-color .3s;margin-bottom:10px}
+.pretodo-item:hover{border-color:rgba(34,211,238,.3)}
+.pretodo-num{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.pretodo-content .title{font-weight:600;color:#fff;font-size:.9rem}
+.pretodo-content .desc{font-size:.8rem;color:var(--text2);margin-top:3px}
+.weather-bar{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-top:10px}
+.weather-day{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:130px;text-align:center;flex-shrink:0}
+.weather-day .wd{font-size:.8rem;color:var(--text2);font-weight:500}
+.weather-day .wicon{font-size:1.6rem;margin:6px 0}
+.weather-day .wtemp{font-size:.95rem;font-weight:700;color:#fff}
+.weather-day .wrange{font-size:.75rem;color:var(--text3);margin-top:2px}
+.tip{display:flex;gap:11px;padding:13px 16px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:11px;margin:12px 0;font-size:.82rem;color:var(--green);align-items:flex-start}
+.tip .ti2{flex-shrink:0;font-size:1rem;margin-top:1px}
+.warn{background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.2);color:var(--accent2)}
+.step-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin:14px 0;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
+.step-item{display:flex;align-items:center;gap:8px;padding:6px 0}
+.step-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.step-text{font-size:.82rem;color:#fff;font-weight:500}
+.step-text small{display:block;font-size:.72rem;color:var(--text3);font-weight:400}
+.step-arrow{color:var(--accent);margin:0 10px;font-size:.9rem;flex-shrink:0}
+.station-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px}
+.station-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
+.station-card .kr{font-weight:700;color:#fff;font-size:.9rem}
+.station-card .jp{font-size:.8rem;color:var(--accent2);margin:3px 0}
+.station-card .en{font-size:.75rem;color:var(--text3)}
+.icoca-steps{display:grid;gap:12px;margin-top:12px}
+.icoca-step{display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius)}
+.icoca-step .num{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;flex-shrink:0}
+.icoca-step .step-content{flex:1}
+.icoca-step .step-title{font-weight:600;color:#fff;font-size:.9rem}
+.icoca-step .step-desc{font-size:.8rem;color:var(--text2);margin-top:3px}
+.budget-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px}
+.budget-icon{font-size:1.4rem;flex-shrink:0}
+.budget-info{flex:1;min-width:0}
+.budget-label{font-size:.85rem;font-weight:600;color:#fff}
+.budget-detail{font-size:.75rem;color:var(--text3);margin-top:2px}
+.budget-bar-wrap{height:6px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:6px;overflow:hidden}
+.budget-bar{height:100%;border-radius:3px;transition:width .6s ease}
+.budget-amount{font-size:.95rem;font-weight:700;color:var(--accent);flex-shrink:0;text-align:right;min-width:80px}
+.pass-verdict{display:flex;align-items:center;gap:12px;padding:16px 18px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:var(--radius);margin:14px 0}
+.pass-verdict .verdict-icon{font-size:2rem;flex-shrink:0}
+.pass-verdict .verdict-text{font-size:.9rem;font-weight:600;color:var(--green)}
+.pass-verdict .verdict-sub{font-size:.8rem;color:var(--text2);margin-top:3px;font-weight:400}
+.footer{text-align:center;padding:36px 20px;color:var(--text3);font-size:.75rem;border-top:1px solid var(--border)}
+@media(max-width:640px){.info-grid,.check-list,.rest-grid,.station-grid{grid-template-columns:1fr}.tab{padding:11px 11px;font-size:.78rem}.hero h1{font-size:1.9rem}.step-flow{flex-direction:column;align-items:flex-start}.step-arrow{transform:rotate(90deg);margin:4px 18px}.map-wrap.show{height:55vh;min-height:360px}}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ===== 히어로 섹션 ===== -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>{TRIP_EMOJI} {TRIP_TITLE}</h1>
+    <p class="hero-sub">{TRIP_DATES} · {TRIP_DURATION} · {TRIP_TYPE}</p>
+    <div class="hero-tags">
+      <!-- [REPEAT: 목적지 태그] 필요한 만큼 추가 -->
+      <span class="hero-tag">{DEST_TAG_EMOJI_1} {DEST_TAG_NAME_1}</span>
+      <!-- [/REPEAT: 목적지 태그] -->
+    </div>
+  </div>
+</section>
+
+<!-- ===== 탭 네비게이션 (7탭 고정) ===== -->
+<div class="tab-wrap">
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="overview"><span class="ti">📋</span>개요</div>
+    <div class="tab" data-tab="schedule"><span class="ti">📅</span>일정</div>
+    <div class="tab" data-tab="restaurants"><span class="ti">🍜</span>맛집</div>
+    <div class="tab" data-tab="transport"><span class="ti">🚃</span>교통</div>
+    <div class="tab" data-tab="budget"><span class="ti">💰</span>예산</div>
+    <div class="tab" data-tab="packing"><span class="ti">🧳</span>준비물</div>
+    <div class="tab" data-tab="pretodo"><span class="ti">✅</span>사전 준비</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ===================================================================== -->
+<!-- 탭 1: 개요 (overview)                                                  -->
+<!-- ===================================================================== -->
+<div class="panel active" id="panel-overview">
+
+  <!-- 항공편 -->
+  <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">✈️</div>항공편</div>
+  <div class="info-grid">
+    <div class="info-card"><div class="label">{FLIGHT_DEP_LABEL}</div><div class="value">{FLIGHT_DEP_DATE}</div><div class="sub">{FLIGHT_DEP_DESC}</div></div>
+    <div class="info-card"><div class="label">{FLIGHT_RET_LABEL}</div><div class="value">{FLIGHT_RET_DATE}</div><div class="sub">{FLIGHT_RET_DESC}</div></div>
+  </div>
+
+  <!-- 숙소 -->
+  <div class="st"><div class="ic" style="background:rgba(59,130,246,.15)">🏨</div>숙소</div>
+  <div class="info-grid">
+    <div class="info-card" style="grid-column:1/-1"><div class="label">숙소 위치</div><div class="value">{ACCOM_ADDRESS}</div><div class="sub">{ACCOM_DESC}</div></div>
+  </div>
+
+  <!-- 날씨 -->
+  <div class="st"><div class="ic" style="background:rgba(34,211,238,.15)">🌤️</div>날씨 & 옷차림</div>
+  <div class="weather-bar">
+    <!-- [REPEAT: 날씨] 여행 일수만큼 추가 -->
+    <div class="weather-day"><div class="wd">{WEATHER_DATE}</div><div class="wicon">{WEATHER_ICON}</div><div class="wtemp">{WEATHER_TEMP}</div><div class="wrange">{WEATHER_RANGE}</div></div>
+    <!-- [/REPEAT: 날씨] -->
+  </div>
+  <div class="tip"><span class="ti2">💡</span>{WEATHER_TIP}</div>
+
+  <!-- 일정 한눈에 보기 -->
+  <div class="st"><div class="ic" style="background:rgba(167,139,250,.15)">🗺️</div>일정 한눈에 보기</div>
+  <div class="info-grid">
+    <!-- [REPEAT: 일정 개요 카드] Day 수만큼 추가 -->
+    <div class="info-card"><div class="label" style="color:{DAY_N_COLOR}">{DAY_N_LABEL}</div><div class="value">{DAY_N_TITLE}</div><div class="sub">{DAY_N_SUMMARY}</div></div>
+    <!-- [/REPEAT: 일정 개요 카드] -->
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 탭 2: 일정 (schedule)                                                  -->
+<!-- 각 Day는 day-card로 구성. 첫 번째 Day만 open 클래스 추가.              -->
+<!-- ===================================================================== -->
+<div class="panel" id="panel-schedule">
+
+  <!-- [REPEAT: Day 카드] Day 수만큼 추가. 첫 번째에만 class="day-card open" -->
+  <div class="day-card open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-num" style="background:linear-gradient(135deg,{DAY_N_GRADIENT})">D{N}</div>
+      <div class="day-meta">
+        <h3>{DAY_N_FULL_TITLE}</h3>
+        <p>{DAY_N_DATE_ROUTE}</p>
+      </div>
+      <span class="chv">▼</span>
+    </div>
+    <div class="day-body">
+      <!-- 지도 토글: map{N} 형식으로 ID 부여 -->
+      <div class="map-toggle" onclick="toggleMap('map{N}',this)">🗺️ 지도로 경로 보기</div>
+      <div class="map-wrap" id="map{N}-wrap"><div class="day-map" id="map{N}"></div></div>
+
+      <div class="timeline">
+        <!-- [REPEAT: 타임라인 아이템] 일정별로 추가 -->
+        <!--
+          tl-item 클래스 분류:
+          - tl-item spot  : 관광지 (초록 점)
+          - tl-item food  : 식사/간식 (핑크 점)
+          - tl-item move  : 이동 (파랑 점)
+          - tl-item       : 기타 (오렌지 테두리)
+
+          뱃지 (선택):
+          - <span class="tl-badge badge-move">비행 3h</span>
+          - <span class="tl-badge badge-food">점심</span>
+        -->
+        <div class="tl-item {TL_TYPE}">
+          <div class="tl-time">{TL_TIME}</div>
+          <div class="tl-title">{TL_TITLE}</div>
+          <div class="tl-desc">{TL_DESC}</div>
+        </div>
+        <!-- [/REPEAT: 타임라인 아이템] -->
+      </div>
+    </div>
+  </div>
+  <!-- [/REPEAT: Day 카드] -->
+
+</div>
+
+<!-- ===================================================================== -->
+<!-- 탭 3: 맛집 (restaurants)                                               -->
+<!-- Day별 섹션 제목 + rest-grid 안에 rest-card 반복                        -->
+<!-- ===================================================================== -->
+<div class="panel" id="panel-restaurants">
+
+  <!-- [REPEAT: 맛집 Day 섹션] Day 수만큼 추가 -->
+  <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">{REST_DAY_ICON}</div>{REST_DAY_LABEL}</div>
+  <div class="rest-grid">
+    <!-- [REPEAT: 맛집 카드] 식당 수만큼 추가 -->
+    <div class="rest-card">
+      <div class="type">{REST_TYPE}</div>
+      <div class="name">{REST_NAME}</div>
+      <div class="rating">{REST_RATING}</div>
+      <div class="detail">{REST_DETAIL}</div>
+      <div class="price">{REST_PRICE}</div>
+    </div>
+    <!-- [/REPEAT: 맛집 카드] -->
+  </div>
+  <!-- [/REPEAT: 맛집 Day 섹션] -->
+
+  <div class="tip"><span class="ti2">💡</span>{RESTAURANT_TIP}</div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 탭 4: 교통 (transport)                                                 -->
+<!-- 공항→숙소 경로, IC카드, 역 이름, 도시 간 이동, 패스 비교               -->
+<!-- ===================================================================== -->
+<div class="panel" id="panel-transport">
+
+  <!-- 공항에서 숙소까지 (step-flow) -->
+  <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">🏠</div>공항에서 숙소까지</div>
+  <div class="step-flow">
+    <!-- [REPEAT: 이동 단계] 단계 수만큼 추가, 사이에 step-arrow -->
+    <div class="step-item">
+      <div class="step-icon" style="background:{STEP_ICON_BG}">{STEP_EMOJI}</div>
+      <div class="step-text">{STEP_LABEL}<small>{STEP_SUB}</small></div>
+    </div>
+    <span class="step-arrow">→</span>
+    <!-- [/REPEAT: 이동 단계] -->
+  </div>
+  <div class="tip"><span class="ti2">💡</span>{AIRPORT_TIP}</div>
+
+  <!-- IC카드 만드는 법 -->
+  <div class="st"><div class="ic" style="background:rgba(34,211,238,.15)">💳</div>{IC_CARD_NAME} 카드 만드는 법</div>
+  <div class="icoca-steps">
+    <!-- [REPEAT: IC카드 단계] -->
+    <div class="icoca-step">
+      <div class="num">{STEP_NUM}</div>
+      <div class="step-content">
+        <div class="step-title">{IC_STEP_TITLE}</div>
+        <div class="step-desc">{IC_STEP_DESC}</div>
+      </div>
+    </div>
+    <!-- [/REPEAT: IC카드 단계] -->
+  </div>
+  <div class="tip"><span class="ti2">💡</span>{IC_CARD_TIP}</div>
+
+  <!-- 알아두면 좋은 역 이름 -->
+  <div class="st"><div class="ic" style="background:rgba(244,114,182,.15)">🚉</div>알아두면 좋은 역 이름</div>
+  <div class="station-grid">
+    <!-- [REPEAT: 역 카드] -->
+    <div class="station-card"><div class="kr">{STATION_KR}</div><div class="jp">{STATION_JP}</div><div class="en">{STATION_EN}</div></div>
+    <!-- [/REPEAT: 역 카드] -->
+  </div>
+
+  <!-- 도시 간 이동 -->
+  <div class="st"><div class="ic" style="background:rgba(59,130,246,.15)">🚄</div>도시 간 이동</div>
+  <table class="ttable"><thead><tr><th>구간</th><th>교통수단</th><th>소요</th><th>요금</th></tr></thead><tbody>
+    <!-- [REPEAT: 교통 노선] -->
+    <tr><td class="route">{TRANSPORT_ROUTE}</td><td class="method">{TRANSPORT_METHOD}</td><td>{TRANSPORT_TIME}</td><td class="tc">{TRANSPORT_FARE}</td></tr>
+    <!-- [/REPEAT: 교통 노선] -->
+  </tbody></table>
+
+  <!-- 교통 패스 비교 (선택) -->
+  <div class="st"><div class="ic" style="background:rgba(167,139,250,.15)">🎫</div>교통 패스 — 필요할까?</div>
+  <table class="ttable"><thead><tr><th>패스</th><th>가격</th><th>이 일정에서</th></tr></thead><tbody>
+    <!-- [REPEAT: 패스 비교] -->
+    <tr><td class="route">{PASS_NAME}</td><td>{PASS_PRICE}</td><td style="color:{PASS_VERDICT_COLOR};font-weight:600">{PASS_VERDICT}</td></tr>
+    <!-- [/REPEAT: 패스 비교] -->
+  </tbody></table>
+  <div class="pass-verdict"><div class="verdict-icon">{PASS_CONCLUSION_ICON}</div><div><div class="verdict-text">{PASS_CONCLUSION_TITLE}</div><div class="verdict-sub">{PASS_CONCLUSION_DESC}</div></div></div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 탭 5: 예산 (budget)                                                    -->
+<!-- ===================================================================== -->
+<div class="panel" id="panel-budget">
+  <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">💰</div>예상 예산 (숙소·비행기 제외)</div>
+
+  <!-- [REPEAT: 예산 항목] -->
+  <div class="budget-item">
+    <div class="budget-icon">{BUDGET_ICON}</div>
+    <div class="budget-info">
+      <div class="budget-label">{BUDGET_LABEL}</div>
+      <div class="budget-detail">{BUDGET_DETAIL}</div>
+      <div class="budget-bar-wrap"><div class="budget-bar" style="width:{BUDGET_BAR_WIDTH};background:{BUDGET_BAR_COLOR}"></div></div>
+    </div>
+    <div class="budget-amount">{BUDGET_AMOUNT}</div>
+  </div>
+  <!-- [/REPEAT: 예산 항목] -->
+
+  <!-- 총 예산 요약 -->
+  <div style="margin-top:20px;padding:20px;background:var(--card);border:2px solid var(--accent);border-radius:var(--radius);text-align:center">
+    <div style="font-size:.82rem;color:var(--accent2);font-weight:600;letter-spacing:1px">총 예상 예산</div>
+    <div style="font-size:2rem;font-weight:900;color:#fff;margin:8px 0">{BUDGET_TOTAL}</div>
+    <div style="font-size:1rem;color:var(--text2)">약 <b style="color:#fff">{BUDGET_TOTAL_KRW}</b></div>
+  </div>
+
+  <!-- 스타일별 가이드 (선택) -->
+  <div class="st"><div class="ic" style="background:rgba(16,185,129,.15)">📊</div>스타일별 가이드</div>
+  <div class="info-grid">
+    <!-- [REPEAT: 예산 스타일] -->
+    <div class="info-card"><div class="label" style="color:{STYLE_COLOR}">{STYLE_LABEL}</div><div class="value">{STYLE_AMOUNT}</div><div class="sub">{STYLE_DESC}</div></div>
+    <!-- [/REPEAT: 예산 스타일] -->
+  </div>
+  <div class="tip"><span class="ti2">💡</span>{BUDGET_TIP}</div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 탭 6: 준비물 (packing)                                                 -->
+<!-- 카테고리별 체크리스트                                                    -->
+<!-- ===================================================================== -->
+<div class="panel" id="panel-packing">
+  <div class="tip"><span class="ti2">✅</span>항목을 클릭하면 체크됩니다!</div>
+
+  <!-- [REPEAT: 준비물 카테고리] -->
+  <div class="check-category">{PACKING_CATEGORY}</div>
+  <div class="check-list">
+    <!-- [REPEAT: 준비물 아이템] -->
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="cb">✓</div>
+      <div>
+        <span class="item-text">{PACKING_ITEM}</span>
+        <!-- item-note는 선택사항. 부연 설명이 있을 때만 추가 -->
+        <span class="item-note">{PACKING_NOTE}</span>
+      </div>
+    </div>
+    <!-- [/REPEAT: 준비물 아이템] -->
+  </div>
+  <!-- [/REPEAT: 준비물 카테고리] -->
+</div>
+
+<!-- ===================================================================== -->
+<!-- 탭 7: 사전 준비 (pretodo)                                              -->
+<!-- ===================================================================== -->
+<div class="panel" id="panel-pretodo">
+  <div class="st"><div class="ic" style="background:rgba(34,211,238,.15)">📌</div>출발 전 반드시!</div>
+
+  <!-- [REPEAT: 사전 준비 항목] -->
+  <div class="pretodo-item">
+    <div class="pretodo-num">{PRETODO_NUM}</div>
+    <div class="pretodo-content">
+      <div class="title">{PRETODO_TITLE}</div>
+      <div class="desc">{PRETODO_DESC}</div>
+    </div>
+  </div>
+  <!-- [/REPEAT: 사전 준비 항목] -->
+
+  <div class="tip"><span class="ti2">💡</span>{PRETODO_TIP}</div>
+</div>
+
+</div>
+
+<div class="footer">{TRIP_TITLE} · {TRIP_DATE_SHORT} · Made with Claude</div>
+
+<!-- ===================================================================== -->
+<!-- JavaScript: 탭 전환, Day 토글, 체크리스트, Leaflet 지도                 -->
+<!-- ===================================================================== -->
+<script>
+/* 탭 전환 */
+document.querySelectorAll('.tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');document.getElementById('panel-'+tab.dataset.tab).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})})});
+
+/* Day 카드 토글 */
+function toggleDay(h){h.closest('.day-card').classList.toggle('open')}
+
+/* 체크리스트 토글 */
+function toggleCheck(i){i.classList.toggle('checked')}
+
+/*
+  ─── Leaflet 지도 데이터 ───
+
+  각 Day의 지도 데이터를 정의합니다.
+  dayColors 배열: Day별 테마 컬러 (Day 수만큼)
+  mapData 객체: map1, map2, ... 형태로 Day별 데이터
+
+  spots 배열 내 각 항목:
+  - lat, lng: 위도/경도
+  - name: 장소 이름
+  - time: 시각
+  - icon: 이모지 아이콘
+
+  아래 예시를 참고하여 실제 데이터로 교체하세요.
+*/
+
+/* Day별 테마 컬러 배열 */
+const dayColors = ['{DAY_1_COLOR}', '{DAY_2_COLOR}' /* ... Day 수만큼 */];
+
+const mapData = {
+  /* [REPEAT: 지도 데이터] Day 수만큼 추가 */
+  map1: {
+    center: [{MAP_CENTER_LAT}, {MAP_CENTER_LNG}], zoom: {MAP_ZOOM},
+    spots: [
+      /* [REPEAT: 지도 스팟] 장소 수만큼 추가 */
+      {lat:{SPOT_LAT},lng:{SPOT_LNG},name:'{SPOT_NAME}',time:'{SPOT_TIME}',icon:'{SPOT_ICON}'}
+      /* [/REPEAT: 지도 스팟] */
+    ],color:'{MAP_COLOR}'
+  }
+  /* [/REPEAT: 지도 데이터] */
+};
+
+/* ─── 이하 지도 로직은 수정 불필요 ─── */
+
+const mapInstances = {};
+
+function toggleMap(mapId, btn) {
+  const wrap = document.getElementById(mapId + '-wrap');
+  const isShowing = wrap.classList.contains('show');
+  btn.classList.toggle('active');
+  btn.textContent = isShowing ? '🗺️ 지도로 경로 보기' : '🗺️ 지도 닫기';
+  wrap.classList.toggle('show');
+  if (!isShowing && !mapInstances[mapId]) {
+    setTimeout(() => initMap(mapId), 100);
+  } else if (mapInstances[mapId]) {
+    setTimeout(() => mapInstances[mapId].invalidateSize(), 100);
+  }
+}
+
+function initMap(mapId) {
+  const data = mapData[mapId];
+  const map = L.map(mapId, {
+    zoomControl: true,
+    attributionControl: true,
+    scrollWheelZoom: true
+  }).setView(data.center, data.zoom);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OSM &copy; CARTO',
+    maxZoom: 19
+  }).addTo(map);
+
+  const coords = [];
+  data.spots.forEach((spot, i) => {
+    const latlng = [spot.lat, spot.lng];
+    coords.push(latlng);
+    const markerIcon = L.divIcon({
+      className: '',
+      html: '<div class="custom-marker" style="background:'+data.color+'">'+(i+1)+'</div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+    L.marker(latlng, { icon: markerIcon })
+      .addTo(map)
+      .bindPopup('<div class="marker-popup"><div class="popup-time">'+spot.time+'</div><div class="popup-title">'+spot.icon+' '+spot.name+'</div></div>');
+  });
+
+  if (coords.length > 1) {
+    L.polyline(coords, {
+      color: data.color,
+      weight: 4,
+      opacity: 0.2,
+      dashArray: null
+    }).addTo(map);
+    L.polyline(coords, {
+      color: data.color,
+      weight: 3.5,
+      opacity: 0.85,
+      dashArray: '10, 8',
+      lineCap: 'round'
+    }).addTo(map);
+
+    for (let i = 0; i < coords.length - 1; i++) {
+      const mid = [(coords[i][0]+coords[i+1][0])/2, (coords[i][1]+coords[i+1][1])/2];
+      const angle = Math.atan2(coords[i+1][1]-coords[i][1], coords[i+1][0]-coords[i][0]) * 180 / Math.PI;
+      L.marker(mid, {
+        icon: L.divIcon({
+          className: '',
+          html: '<div style="color:'+data.color+';font-size:14px;transform:rotate('+(90-angle)+'deg);text-shadow:0 0 3px #fff, 0 0 6px #fff">▶</div>',
+          iconSize: [14, 14],
+          iconAnchor: [7, 7]
+        })
+      }).addTo(map);
+    }
+  }
+
+  if (coords.length > 1) {
+    map.fitBounds(coords, { padding: [40, 40] });
+  }
+
+  mapInstances[mapId] = map;
+}
+</script>
+</body>
+</html>
