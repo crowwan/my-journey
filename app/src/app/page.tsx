@@ -20,7 +20,7 @@ export default function Home() {
   const trips = getTripSummaries();
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-[var(--bottom-nav-h)]">
       <Header title="My Journey" />
       <main className="max-w-[1100px] mx-auto px-4 py-6">
         <div className="flex flex-col gap-3">

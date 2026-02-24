@@ -7,6 +7,22 @@ interface BudgetTabProps {
 }
 
 export function BudgetTab({ budget }: BudgetTabProps) {
+  const items = budget.items ?? [];
+  const tips = budget.tips ?? [];
+  const total = budget.total ?? { min: '', max: '', minKRW: '', maxKRW: '' };
+
+  // 예산 데이터가 전혀 없으면 빈 상태 표시
+  if (items.length === 0 && !total.min && !total.max) {
+    return (
+      <div className="animate-fade-up">
+        <div className="text-center py-12 text-text-tertiary">
+          <div className="text-3xl mb-2">💰</div>
+          <p className="text-sm">AI가 이 섹션을 아직 생성하지 않았습니다</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-fade-up">
       <SectionTitle icon="💰" bgColor="#f97316">
@@ -15,7 +31,7 @@ export function BudgetTab({ budget }: BudgetTabProps) {
 
       {/* 예산 아이템 리스트 */}
       <div className="space-y-3 mb-6">
-        {budget.items.map((item) => (
+        {items.map((item) => (
           <div
             key={item.label}
             className="bg-card border border-border rounded-[14px] p-4 hover:border-accent/20 transition-colors"
@@ -52,21 +68,21 @@ export function BudgetTab({ budget }: BudgetTabProps) {
             예상 범위
           </div>
           <div className="text-2xl font-black text-white mb-1">
-            {budget.total.min} ~ {budget.total.max}
+            {total.min} ~ {total.max}
           </div>
           <div className="text-base text-trip-green font-semibold">
-            {budget.total.minKRW} ~ {budget.total.maxKRW}
+            {total.minKRW} ~ {total.maxKRW}
           </div>
         </div>
       </div>
 
       {/* 예산 팁 */}
-      {budget.tips.length > 0 && (
+      {tips.length > 0 && (
         <>
           <SectionTitle icon="💡" bgColor="#f97316">
             예산 팁
           </SectionTitle>
-          {budget.tips.map((tip) => (
+          {tips.map((tip) => (
             <div key={tip} className="mb-2">
               <Tip>{tip}</Tip>
             </div>

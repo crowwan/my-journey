@@ -9,7 +9,11 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ trip }: OverviewTabProps) {
-  const { flights, accommodation, weather, tips } = trip.overview;
+  const flights = trip.overview?.flights ?? [];
+  const accommodation = trip.overview?.accommodation;
+  const weather = trip.overview?.weather ?? [];
+  const tips = trip.overview?.tips ?? [];
+  const days = trip.days ?? [];
 
   return (
     <div className="animate-fade-up">
@@ -17,6 +21,11 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       <SectionTitle icon="✈️" bgColor="#3b82f6">
         항공편
       </SectionTitle>
+      {flights.length === 0 && (
+        <div className="text-center py-6 text-text-tertiary mb-3">
+          <p className="text-sm">항공편 정보가 아직 없습니다</p>
+        </div>
+      )}
       {flights.map((flight) => (
         <div
           key={flight.direction}
@@ -40,30 +49,36 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       <SectionTitle icon="🏨" bgColor="#a78bfa">
         숙소
       </SectionTitle>
-      <div className="bg-card border border-border rounded-[14px] p-5 mb-3">
-        <InfoGrid>
-          <InfoCard label="숙소명" value={accommodation.name} />
-          <InfoCard label="지역" value={accommodation.area} />
-          <InfoCard label="주소" value={accommodation.address} />
-        </InfoGrid>
-        {accommodation.nearbyStations.length > 0 && (
-          <div className="mt-3">
-            <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-1">
-              주변 역
+      {accommodation ? (
+        <div className="bg-card border border-border rounded-[14px] p-5 mb-3">
+          <InfoGrid>
+            <InfoCard label="숙소명" value={accommodation.name} />
+            <InfoCard label="지역" value={accommodation.area} />
+            <InfoCard label="주소" value={accommodation.address} />
+          </InfoGrid>
+          {(accommodation.nearbyStations ?? []).length > 0 && (
+            <div className="mt-3">
+              <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-1">
+                주변 역
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(accommodation.nearbyStations ?? []).map((station) => (
+                  <span
+                    key={station}
+                    className="text-sm bg-trip-blue/10 text-trip-blue px-2.5 py-1 rounded-lg"
+                  >
+                    {station}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {accommodation.nearbyStations.map((station) => (
-                <span
-                  key={station}
-                  className="text-sm bg-trip-blue/10 text-trip-blue px-2.5 py-1 rounded-lg"
-                >
-                  {station}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-6 text-text-tertiary mb-3">
+          <p className="text-sm">숙소 정보가 아직 없습니다</p>
+        </div>
+      )}
 
       {/* 날씨 */}
       <SectionTitle icon="🌤️" bgColor="#22d3ee">
@@ -90,9 +105,9 @@ export function OverviewTab({ trip }: OverviewTabProps) {
         일정 요약
       </SectionTitle>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3">
-        {trip.days.map((day) => (
+        {days.map((day, index) => (
           <div
-            key={day.dayNumber}
+            key={`day-${day.dayNumber ?? index}`}
             className="rounded-[14px] p-4 border border-border transition-all hover:-translate-y-0.5"
             style={{ background: `${day.color}10`, borderColor: `${day.color}30` }}
           >

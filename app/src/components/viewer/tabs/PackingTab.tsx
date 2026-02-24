@@ -14,6 +14,18 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
   const togglePackingItem = useTripStore((state) => state.togglePackingItem);
   const checked = storage.getPackingChecked(tripId);
 
+  // 빈 상태 처리
+  if (!packing || packing.length === 0) {
+    return (
+      <div className="animate-fade-up">
+        <div className="text-center py-12 text-text-tertiary">
+          <div className="text-3xl mb-2">🧳</div>
+          <p className="text-sm">AI가 이 섹션을 아직 생성하지 않았습니다</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-fade-up">
       {packing.map((category) => {

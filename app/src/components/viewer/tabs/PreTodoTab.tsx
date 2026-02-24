@@ -6,6 +6,18 @@ interface PreTodoTabProps {
 }
 
 export function PreTodoTab({ preTodos }: PreTodoTabProps) {
+  // 빈 상태 처리
+  if (!preTodos || preTodos.length === 0) {
+    return (
+      <div className="animate-fade-up">
+        <div className="text-center py-12 text-text-tertiary">
+          <div className="text-3xl mb-2">✅</div>
+          <p className="text-sm">AI가 이 섹션을 아직 생성하지 않았습니다</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-fade-up">
       <SectionTitle icon="✅" bgColor="#10b981">

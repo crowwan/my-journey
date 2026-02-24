@@ -19,6 +19,9 @@
   --color-text-tertiary: #64748b;
   --color-border: rgba(255, 255, 255, 0.08);
 
+  /* Layout */
+  --bottom-nav-h: 60px;
+
   /* Border Radius */
   --radius-card: 14px;
 

@@ -6,6 +6,18 @@ interface RestaurantTabProps {
 }
 
 export function RestaurantTab({ restaurants }: RestaurantTabProps) {
+  // 빈 상태 처리
+  if (!restaurants || restaurants.length === 0) {
+    return (
+      <div className="animate-fade-up">
+        <div className="text-center py-12 text-text-tertiary">
+          <div className="text-3xl mb-2">🍜</div>
+          <p className="text-sm">AI가 이 섹션을 아직 생성하지 않았습니다</p>
+        </div>
+      </div>
+    );
+  }
+
   // dayNumber별 그룹핑
   const grouped = new Map<number, Restaurant[]>();
   restaurants.forEach((r) => {

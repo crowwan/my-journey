@@ -8,8 +8,8 @@ interface ScheduleTabProps {
 export function ScheduleTab({ days }: ScheduleTabProps) {
   return (
     <div className="animate-fade-up">
-      {days.map((day) => (
-        <DayCard key={day.dayNumber} day={day} defaultOpen={day.dayNumber === 1} />
+      {days.map((day, index) => (
+        <DayCard key={`day-${day.dayNumber ?? index}`} day={day} defaultOpen={index === 0} />
       ))}
     </div>
   );
