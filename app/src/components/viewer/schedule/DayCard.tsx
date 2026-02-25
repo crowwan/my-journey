@@ -27,7 +27,7 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
           {day.dayNumber ?? '?'}
         </div>
         <div>
-          <h3 className="text-base font-bold text-white">{day.title}</h3>
+          <h3 className="text-base font-bold text-text">{day.title}</h3>
           <p className="text-sm text-text-secondary mt-0.5">
             {(day.date ?? '').replace(/-/g, '.')} · {day.subtitle}
           </p>

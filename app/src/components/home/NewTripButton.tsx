@@ -8,9 +8,9 @@ export function NewTripButton() {
   return (
     <button
       onClick={() => router.push('/chat')}
-      className="w-full py-4 rounded-[14px] border-2 border-dashed border-border text-text-tertiary hover:border-accent/40 hover:text-accent transition-all text-sm font-medium"
+      className="shrink-0 bg-accent text-white rounded-full px-4 py-2 text-sm font-medium hover:bg-accent/90 transition-colors"
     >
-      + 새 여행 만들기
+      + 새 여행
     </button>
   );
 }

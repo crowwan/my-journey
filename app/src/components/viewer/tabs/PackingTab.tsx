@@ -53,7 +53,7 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${
                       isChecked
                         ? 'bg-trip-green/10 border border-trip-green/20'
-                        : 'bg-card border border-border hover:border-accent/20'
+                        : 'bg-card border border-border hover:border-border'
                     }`}
                   >
                     {/* 체크박스 */}
@@ -72,7 +72,7 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
                     <div className="flex-1">
                       <span
                         className={`text-sm font-medium ${
-                          isChecked ? 'text-text-secondary line-through' : 'text-white'
+                          isChecked ? 'text-text-secondary line-through' : 'text-text'
                         }`}
                       >
                         {item.name}

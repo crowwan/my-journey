@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import type { Trip } from '@/types/trip';
 import type { TabId } from '@/lib/constants';
+import { storage } from '@/lib/storage';
+import { getPackingProgress } from '@/lib/trip-utils';
 import { HeroSection } from './HeroSection';
 import { TabBar } from './TabBar';
 import { OverviewTab } from './tabs/OverviewTab';
@@ -19,10 +21,12 @@ interface TripViewerProps {
 
 export function TripViewer({ trip }: TripViewerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const checkedMap = storage.getPackingChecked(trip.id);
+  const packingProgress = getPackingProgress(trip.packing, checkedMap);
 
   return (
     <div>
-      <HeroSection trip={trip} />
+      <HeroSection trip={trip} packingProgress={packingProgress} />
       <TabBar activeTab={activeTab} onChange={setActiveTab} />
       <div className="max-w-[1100px] mx-auto px-4 py-7">
         {activeTab === 'overview' && <OverviewTab trip={trip} />}

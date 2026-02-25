@@ -18,7 +18,7 @@ export function TimelineItemComponent({ item }: TimelineItemProps) {
   return (
     <div className={`tl-item ${typeClass}`}>
       <div className={`text-xs font-semibold mb-0.5 ${timeColor}`}>{item.time}</div>
-      <div className="text-sm font-semibold text-white">
+      <div className="text-sm font-semibold text-text">
         {item.title}
         {item.badge && (
           <span

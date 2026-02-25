@@ -92,7 +92,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
           >
             <div className="text-xs text-text-tertiary font-semibold">{w.dayOfWeek}</div>
             <div className="text-2xl my-1.5">{w.icon}</div>
-            <div className="text-base font-bold text-white">{w.tempAvg}°</div>
+            <div className="text-base font-bold text-text">{w.tempAvg}°</div>
             <div className="text-xs text-text-secondary">
               {w.tempLow}° ~ {w.tempHigh}°
             </div>
@@ -117,7 +117,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
             >
               {day.dayNumber}
             </div>
-            <div className="text-sm font-bold text-white">{day.title}</div>
+            <div className="text-sm font-bold text-text">{day.title}</div>
             <div className="text-xs text-text-secondary mt-0.5">{day.subtitle}</div>
           </div>
         ))}

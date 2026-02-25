@@ -58,7 +58,7 @@ export function RestaurantTab({ restaurants }: RestaurantTabProps) {
                   </span>
                 </div>
                 {/* 가게명 */}
-                <h4 className="text-base font-bold text-white mb-1">{restaurant.name}</h4>
+                <h4 className="text-base font-bold text-text mb-1">{restaurant.name}</h4>
                 {/* 설명 */}
                 <p className="text-sm text-text-secondary leading-relaxed mb-2">
                   {restaurant.description}

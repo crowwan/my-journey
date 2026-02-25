@@ -51,7 +51,7 @@ export function TransportTab({ transport }: TransportTabProps) {
                 <div key={idx} className="flex items-center gap-2">
                   <div className="bg-card-secondary rounded-xl px-4 py-3 text-center min-w-[90px]">
                     <div className="text-lg mb-0.5">{step.icon}</div>
-                    <div className="text-sm font-semibold text-white">{step.title}</div>
+                    <div className="text-sm font-semibold text-text">{step.title}</div>
                     <div className="text-xs text-text-secondary">{step.subtitle}</div>
                   </div>
                   {idx < homeToHotel.length - 1 && (
@@ -87,8 +87,8 @@ export function TransportTab({ transport }: TransportTabProps) {
                     key={idx}
                     className="border-b border-border last:border-b-0 hover:bg-glass transition-colors"
                   >
-                    <td className="px-4 py-3 text-white font-medium">{route.from}</td>
-                    <td className="px-4 py-3 text-white font-medium">{route.to}</td>
+                    <td className="px-4 py-3 text-text font-medium">{route.from}</td>
+                    <td className="px-4 py-3 text-text font-medium">{route.to}</td>
                     <td className="px-4 py-3 text-trip-blue">{route.method}</td>
                     <td className="px-4 py-3 text-text-secondary">{route.duration}</td>
                     <td className="px-4 py-3 text-accent text-right font-semibold">{route.cost}</td>
@@ -115,7 +115,7 @@ export function TransportTab({ transport }: TransportTabProps) {
                   className={`${color.bg} border ${color.border} rounded-[14px] p-5`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-base font-bold text-white">{pass.name}</h4>
+                    <h4 className="text-base font-bold text-text">{pass.name}</h4>
                     <span className={`text-xs px-2 py-0.5 rounded-md font-semibold ${color.badge}`}>
                       {pass.recommendation === 'recommended'
                         ? '추천'

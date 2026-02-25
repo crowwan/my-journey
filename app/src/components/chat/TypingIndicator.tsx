@@ -2,19 +2,19 @@
 export function TypingIndicator() {
   return (
     <div className="flex justify-start mb-3">
-      <div className="bg-card rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2">
+      <div className="bg-card border border-border rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2">
         {/* 3개의 bounce dot */}
         <div className="flex items-center gap-1">
           <span
-            className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce"
+            className="w-1.5 h-1.5 bg-text-tertiary rounded-full animate-bounce"
             style={{ animationDelay: '0ms', animationDuration: '1s' }}
           />
           <span
-            className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce"
+            className="w-1.5 h-1.5 bg-text-tertiary rounded-full animate-bounce"
             style={{ animationDelay: '200ms', animationDuration: '1s' }}
           />
           <span
-            className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce"
+            className="w-1.5 h-1.5 bg-text-tertiary rounded-full animate-bounce"
             style={{ animationDelay: '400ms', animationDuration: '1s' }}
           />
         </div>

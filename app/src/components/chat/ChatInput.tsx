@@ -41,7 +41,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="shrink-0 bg-card/95 backdrop-blur-lg border-t border-border px-4 py-3">
+    <div className="shrink-0 bg-white border-t border-border px-4 py-3">
       <div className="max-w-[1100px] mx-auto flex items-end gap-2">
         <textarea
           ref={textareaRef}
@@ -54,12 +54,12 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="여행 계획을 알려주세요..."
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-card-secondary text-text text-sm rounded-xl px-4 py-2.5 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-accent/50 transition-colors"
+          className="flex-1 bg-card text-text text-sm rounded-xl px-4 py-2.5 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-accent transition-all duration-200"
         />
         <button
           onClick={handleSend}
           disabled={disabled || !text.trim()}
-          className="bg-accent text-white rounded-xl px-4 py-2.5 text-sm font-medium hover:bg-accent-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          className="bg-accent text-white rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-accent/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
         >
           전송
         </button>

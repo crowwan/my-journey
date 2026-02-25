@@ -35,7 +35,7 @@ export function PreTodoTab({ preTodos }: PreTodoTabProps) {
                 {todo.order}
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white mb-1">{todo.title}</h4>
+                <h4 className="text-sm font-bold text-text mb-1">{todo.title}</h4>
                 <p className="text-sm text-text-secondary leading-relaxed">
                   {todo.description}
                 </p>

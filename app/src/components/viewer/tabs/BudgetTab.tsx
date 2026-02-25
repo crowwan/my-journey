@@ -34,13 +34,13 @@ export function BudgetTab({ budget }: BudgetTabProps) {
         {items.map((item) => (
           <div
             key={item.label}
-            className="bg-card border border-border rounded-[14px] p-4 hover:border-accent/20 transition-colors"
+            className="bg-card border border-border rounded-[14px] p-4 hover:border-border transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-xl">{item.icon}</span>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-white">{item.label}</span>
+                  <span className="text-sm font-bold text-text">{item.label}</span>
                   <span className="text-sm font-bold text-accent">{item.amount}</span>
                 </div>
                 <div className="text-xs text-text-secondary mt-0.5">{item.detail}</div>
@@ -67,7 +67,7 @@ export function BudgetTab({ budget }: BudgetTabProps) {
           <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
             예상 범위
           </div>
-          <div className="text-2xl font-black text-white mb-1">
+          <div className="text-2xl font-black text-text mb-1">
             {total.min} ~ {total.max}
           </div>
           <div className="text-base text-trip-green font-semibold">

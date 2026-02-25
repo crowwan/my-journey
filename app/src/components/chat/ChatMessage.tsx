@@ -36,8 +36,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
         <div
           className={`px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
-              ? 'bg-accent/20 text-white rounded-2xl rounded-br-md'
-              : 'bg-card text-text rounded-2xl rounded-bl-md'
+              ? 'bg-accent text-white rounded-2xl rounded-br-md'
+              : 'bg-card text-text rounded-2xl rounded-bl-md border border-border shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
           }`}
         >
           {content}

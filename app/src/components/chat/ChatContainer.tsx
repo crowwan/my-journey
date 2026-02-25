@@ -53,19 +53,23 @@ export function ChatContainer({ mode = 'create' }: ChatContainerProps) {
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
         {isEmpty ? (
           // 빈 상태 안내
-          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-            <div className="text-5xl mb-4">🌏</div>
-            <h2 className="text-xl font-bold text-white mb-2">AI 여행 플래너</h2>
-            <p className="text-text-secondary text-sm mb-8">어디로 여행을 떠나고 싶으세요?</p>
+          <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
+            <div className="text-4xl mb-3">✈️</div>
+            <h2 className="text-xl font-bold text-text mb-1">
+              어디로 떠나볼까요?
+            </h2>
+            <p className="text-text-secondary text-sm mb-6 max-w-xs">
+              여행지와 기간을 알려주시면 AI가 맞춤 일정을 만들어 드려요
+            </p>
 
-            {/* 예시 질문 칩 */}
-            <div className="flex flex-wrap justify-center gap-2 max-w-sm">
+            {/* 예시 질문 칩 — 글래스 카드 스타일 */}
+            <div className="flex flex-wrap justify-center gap-2.5 max-w-md">
               {EXAMPLE_PROMPTS.map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => handleSend(prompt)}
                   disabled={isLoading}
-                  className="text-xs bg-card-secondary text-text-secondary border border-border rounded-full px-4 py-2 hover:border-accent/50 hover:text-accent transition-colors disabled:opacity-50"
+                  className="text-xs bg-card text-text-secondary border border-border rounded-full px-4 py-2.5 hover:border-accent hover:text-accent transition-all duration-200 disabled:opacity-50"
                 >
                   {prompt}
                 </button>
@@ -89,7 +93,7 @@ export function ChatContainer({ mode = 'create' }: ChatContainerProps) {
           <button
             onClick={handleCreateTrip}
             disabled={isLoading}
-            className="flex items-center gap-2 bg-accent/20 text-accent border border-accent/40 rounded-full px-5 py-2.5 text-sm font-medium hover:bg-accent/30 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 bg-accent text-white rounded-full px-5 py-2.5 text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
           >
             <span>🗺️</span>
             여행 계획 생성하기

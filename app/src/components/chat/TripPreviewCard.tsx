@@ -27,10 +27,10 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
   };
 
   return (
-    <div className="bg-card-secondary border border-accent/30 rounded-[14px] p-4 space-y-3">
+    <div className="bg-card border border-border rounded-[14px] p-4 space-y-3">
       {/* 제목 + 목적지 */}
       <div>
-        <h3 className="text-white font-bold text-sm">{trip.title}</h3>
+        <h3 className="text-text font-bold text-sm">{trip.title}</h3>
         <p className="text-text-secondary text-xs mt-0.5">
           {trip.destination} &middot; {formatDateRange(trip.startDate, trip.endDate)} &middot; {trip.days.length}일
         </p>
