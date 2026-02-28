@@ -45,7 +45,7 @@ export function TransportTab({ transport }: TransportTabProps) {
           <SectionTitle icon="🛫" bgColor="#3b82f6">
             집 → 호텔 경로
           </SectionTitle>
-          <div className="bg-card border border-border rounded-[14px] p-5 mb-3">
+          <div className="bg-card border border-border rounded-[16px] p-5 mb-3">
             <div className="flex flex-wrap items-center gap-2">
               {homeToHotel.map((step, idx) => (
                 <div key={idx} className="flex items-center gap-2">
@@ -70,7 +70,7 @@ export function TransportTab({ transport }: TransportTabProps) {
           <SectionTitle icon="🚃" bgColor="#3b82f6">
             도시간 노선
           </SectionTitle>
-          <div className="bg-card border border-border rounded-[14px] overflow-hidden mb-3">
+          <div className="bg-card border border-border rounded-[16px] overflow-hidden mb-3">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-text-tertiary text-xs uppercase tracking-wider">
@@ -85,7 +85,7 @@ export function TransportTab({ transport }: TransportTabProps) {
                 {intercityRoutes.map((route, idx) => (
                   <tr
                     key={idx}
-                    className="border-b border-border last:border-b-0 hover:bg-glass transition-colors"
+                    className="border-b border-border last:border-b-0 hover:bg-accent-bg/50 transition-colors"
                   >
                     <td className="px-4 py-3 text-text font-medium">{route.from}</td>
                     <td className="px-4 py-3 text-text font-medium">{route.to}</td>
@@ -106,13 +106,13 @@ export function TransportTab({ transport }: TransportTabProps) {
           <SectionTitle icon="🎫" bgColor="#a78bfa">
             패스 비교
           </SectionTitle>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3 mb-3">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 mb-4">
             {passes.map((pass) => {
               const color = getPassColor(pass.recommendation);
               return (
                 <div
                   key={pass.name}
-                  className={`${color.bg} border ${color.border} rounded-[14px] p-5`}
+                  className={`${color.bg} border ${color.border} rounded-[16px] p-5`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-base font-bold text-text">{pass.name}</h4>
@@ -142,7 +142,7 @@ export function TransportTab({ transport }: TransportTabProps) {
           <SectionTitle icon="💳" bgColor="#22d3ee">
             ICOCA 가이드
           </SectionTitle>
-          <div className="bg-card border border-border rounded-[14px] p-5 mb-3">
+          <div className="bg-card border border-border rounded-[16px] p-5 mb-3">
             <ul className="space-y-2">
               {icocaGuide.map((guide, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm">

@@ -11,7 +11,7 @@ export function Header({ title = 'My Journey', showBack = false }: HeaderProps) 
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border px-4 py-3.5 flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border px-4 py-4 flex items-center gap-3 shadow-none">
       {showBack && (
         <button
           onClick={() => router.back()}
@@ -20,7 +20,7 @@ export function Header({ title = 'My Journey', showBack = false }: HeaderProps) 
           &larr;
         </button>
       )}
-      <h1 className="font-sans text-lg font-semibold text-text tracking-wide">
+      <h1 className="font-sans text-lg font-bold text-text tracking-wide">
         {title}
       </h1>
     </header>

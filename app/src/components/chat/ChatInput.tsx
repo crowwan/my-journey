@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface ChatInputProps {
   onSend: (text: string) => void;
@@ -16,7 +17,6 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
     const textarea = textareaRef.current;
     if (!textarea) return;
     textarea.style.height = 'auto';
-    // 1줄 약 20px, 최대 4줄 = 80px + padding
     const maxHeight = 96;
     textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
   }, []);
@@ -26,14 +26,12 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setText('');
-    // 높이 리셋
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
   }, [text, disabled, onSend]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter로 전송, Shift+Enter로 줄바꿈
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -54,15 +52,15 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="여행 계획을 알려주세요..."
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-card text-text text-sm rounded-xl px-4 py-2.5 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-accent transition-all duration-200"
+          className="flex-1 bg-card text-text text-sm rounded-xl px-4 py-3 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200"
         />
-        <button
+        <Button
           onClick={handleSend}
           disabled={disabled || !text.trim()}
-          className="bg-accent text-white rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-accent/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+          className="rounded-xl px-5 py-3 bg-accent text-white hover:bg-accent/90 shadow-sm hover:shadow-md shrink-0"
         >
           전송
-        </button>
+        </Button>
       </div>
     </div>
   );

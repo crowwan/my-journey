@@ -1,5 +1,7 @@
 import type { PreTodoItem } from '@/types/trip';
 import { SectionTitle } from '../shared/SectionTitle';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface PreTodoTabProps {
   preTodos: PreTodoItem[];
@@ -23,25 +25,30 @@ export function PreTodoTab({ preTodos }: PreTodoTabProps) {
       <SectionTitle icon="✅" bgColor="#10b981">
         출발 전 할 일
       </SectionTitle>
-      <div className="space-y-3">
+      <div className="space-y-4">
         {preTodos.map((todo) => (
-          <div
+          <Card
             key={todo.order}
-            className="bg-card border border-border rounded-[14px] p-5 hover:border-trip-green/30 transition-colors"
+            className="rounded-[16px] py-0 gap-0 hover:border-trip-green/30 transition-colors"
           >
-            <div className="flex items-start gap-3">
-              {/* 번호 뱃지 */}
-              <div className="w-8 h-8 rounded-lg bg-trip-green/20 flex items-center justify-center text-sm font-black text-trip-green shrink-0">
-                {todo.order}
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3">
+                {/* 번호 뱃지 */}
+                <Badge
+                  variant="secondary"
+                  className="w-8 h-8 rounded-lg bg-trip-green/20 text-sm font-black text-trip-green shrink-0 p-0"
+                >
+                  {todo.order}
+                </Badge>
+                <div>
+                  <h4 className="text-sm font-bold text-text mb-1">{todo.title}</h4>
+                  <p className="text-sm text-text-secondary leading-relaxed">
+                    {todo.description}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-sm font-bold text-text mb-1">{todo.title}</h4>
-                <p className="text-sm text-text-secondary leading-relaxed">
-                  {todo.description}
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

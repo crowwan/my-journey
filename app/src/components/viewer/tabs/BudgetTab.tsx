@@ -30,11 +30,11 @@ export function BudgetTab({ budget }: BudgetTabProps) {
       </SectionTitle>
 
       {/* 예산 아이템 리스트 */}
-      <div className="space-y-3 mb-6">
+      <div className="space-y-4 mb-8">
         {items.map((item) => (
           <div
             key={item.label}
-            className="bg-card border border-border rounded-[14px] p-4 hover:border-border transition-colors"
+            className="bg-card border border-border rounded-[16px] p-4 hover:border-border transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-xl">{item.icon}</span>
@@ -62,7 +62,7 @@ export function BudgetTab({ budget }: BudgetTabProps) {
       <SectionTitle icon="🧮" bgColor="#10b981">
         예상 총 비용
       </SectionTitle>
-      <div className="bg-card border border-trip-green/30 rounded-[14px] p-6 mb-6">
+      <div className="bg-card border border-trip-green/30 rounded-[16px] p-7 mb-8">
         <div className="text-center">
           <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
             예상 범위

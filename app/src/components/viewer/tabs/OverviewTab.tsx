@@ -29,7 +29,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       {flights.map((flight) => (
         <div
           key={flight.direction}
-          className="bg-card border border-border rounded-[14px] p-5 mb-3"
+          className="bg-card border border-border rounded-[16px] p-5 mb-3"
         >
           <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
             {flight.direction === 'outbound' ? '가는 편' : '오는 편'}
@@ -50,7 +50,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
         숙소
       </SectionTitle>
       {accommodation ? (
-        <div className="bg-card border border-border rounded-[14px] p-5 mb-3">
+        <div className="bg-card border border-border rounded-[16px] p-5 mb-3">
           <InfoGrid>
             <InfoCard label="숙소명" value={accommodation.name} />
             <InfoCard label="지역" value={accommodation.area} />
@@ -84,11 +84,11 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       <SectionTitle icon="🌤️" bgColor="#22d3ee">
         날씨 예보
       </SectionTitle>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
         {weather.map((w) => (
           <div
             key={w.date}
-            className="bg-card border border-border rounded-[14px] p-4 min-w-[110px] text-center shrink-0 hover:border-trip-cyan/30 transition-colors"
+            className="bg-card border border-border rounded-[16px] p-4 min-w-[120px] text-center shrink-0 hover:border-trip-cyan/30 transition-colors"
           >
             <div className="text-xs text-text-tertiary font-semibold">{w.dayOfWeek}</div>
             <div className="text-2xl my-1.5">{w.icon}</div>
@@ -104,11 +104,11 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       <SectionTitle icon="📅" bgColor="#f97316">
         일정 요약
       </SectionTitle>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
         {days.map((day, index) => (
           <div
             key={`day-${day.dayNumber ?? index}`}
-            className="rounded-[14px] p-4 border border-border transition-all hover:-translate-y-0.5"
+            className="rounded-[16px] p-5 border border-border transition-all hover:-translate-y-0.5"
             style={{ background: `${day.color}10`, borderColor: `${day.color}30` }}
           >
             <div

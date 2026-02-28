@@ -28,7 +28,7 @@ export function TripViewer({ trip }: TripViewerProps) {
     <div>
       <HeroSection trip={trip} packingProgress={packingProgress} />
       <TabBar activeTab={activeTab} onChange={setActiveTab} />
-      <div className="max-w-[1100px] mx-auto px-4 py-7">
+      <div className="max-w-[1100px] mx-auto px-5 py-8">
         {activeTab === 'overview' && <OverviewTab trip={trip} />}
         {activeTab === 'schedule' && <ScheduleTab days={trip.days} />}
         {activeTab === 'restaurant' && <RestaurantTab restaurants={trip.restaurants} />}

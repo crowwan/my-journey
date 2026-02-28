@@ -36,18 +36,18 @@ export function RestaurantTab({ restaurants }: RestaurantTabProps) {
           <SectionTitle icon="🍜" bgColor="#f472b6">
             Day {dayNumber}
           </SectionTitle>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
             {dayRestaurants.map((restaurant) => (
               <div
                 key={`${dayNumber}-${restaurant.name}`}
-                className="bg-card-secondary border border-border rounded-[14px] p-5 transition-all hover:border-trip-pink/30 hover:-translate-y-0.5"
+                className="bg-white border border-border rounded-[16px] p-5 transition-all hover:border-trip-pink/30 hover:-translate-y-0.5"
               >
                 {/* 카테고리 + 평점 */}
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs bg-trip-pink/15 text-trip-pink px-2 py-0.5 rounded-md font-semibold">
                     {restaurant.category}
                   </span>
-                  <span className="text-sm text-accent font-semibold">
+                  <span className="text-sm text-amber-500 font-semibold">
                     {'★'.repeat(Math.round(restaurant.rating))}{' '}
                     <span className="text-text-secondary">{restaurant.rating}</span>
                     {restaurant.reviewCount && (

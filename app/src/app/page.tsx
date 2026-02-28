@@ -27,18 +27,18 @@ export default function Home() {
       <Header title="My Journey" />
 
       {/* 컴팩트 헤더 */}
-      <section className="max-w-[1100px] mx-auto px-4 pt-4 pb-3">
+      <section className="max-w-[1100px] mx-auto px-5 pt-6 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
-            <h2 className="text-xl font-bold text-text">내 여행</h2>
+            <h2 className="text-2xl font-bold text-text">내 여행</h2>
             <span className="text-sm text-text-tertiary">{summaries.length}</span>
           </div>
           <NewTripButton />
         </div>
       </section>
 
-      <main className="max-w-[1100px] mx-auto px-4 pb-6">
-        <div className="flex flex-col gap-3">
+      <main className="max-w-[1100px] mx-auto px-5 pb-8">
+        <div className="flex flex-col gap-4">
           {summaries.map((summary, index) => {
             const fullTrip = trips.get(summary.id);
             const checkedMap = storage.getPackingChecked(summary.id);

@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation';
 import type { Trip } from '@/types/trip';
 import { useTripStore } from '@/stores/useTripStore';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface TripPreviewCardProps {
   trip: Trip;
@@ -27,36 +30,39 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
   };
 
   return (
-    <div className="bg-card border border-border rounded-[14px] p-4 space-y-3">
-      {/* 제목 + 목적지 */}
-      <div>
-        <h3 className="text-text font-bold text-sm">{trip.title}</h3>
-        <p className="text-text-secondary text-xs mt-0.5">
-          {trip.destination} &middot; {formatDateRange(trip.startDate, trip.endDate)} &middot; {trip.days.length}일
-        </p>
-      </div>
-
-      {/* 태그 */}
-      {trip.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {trip.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-[0.65rem] px-2 py-0.5 bg-accent/10 text-accent rounded-full"
-            >
-              {tag}
-            </span>
-          ))}
+    <Card className="rounded-[16px] py-0 gap-0 shadow-[var(--shadow-card)]">
+      <CardContent className="p-4 space-y-3">
+        {/* 제목 + 목적지 */}
+        <div>
+          <h3 className="text-text font-bold text-sm">{trip.title}</h3>
+          <p className="text-text-secondary text-xs mt-0.5">
+            {trip.destination} &middot; {formatDateRange(trip.startDate, trip.endDate)} &middot; {trip.days.length}일
+          </p>
         </div>
-      )}
 
-      {/* 저장 버튼 */}
-      <button
-        onClick={handleSave}
-        className="w-full bg-accent text-white text-sm font-medium py-2 rounded-xl hover:bg-accent-light transition-colors"
-      >
-        여행 저장하기
-      </button>
-    </div>
+        {/* 태그 */}
+        {trip.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {trip.tags.map((tag) => (
+              <Badge
+                key={tag}
+                variant="secondary"
+                className="text-[0.65rem] px-2 py-0.5 bg-accent/10 text-accent"
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/* 저장 버튼 */}
+        <Button
+          onClick={handleSave}
+          className="w-full rounded-xl bg-accent text-white hover:bg-accent-warm shadow-sm hover:shadow-md"
+        >
+          여행 저장하기
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
