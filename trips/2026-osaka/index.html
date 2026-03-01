@@ -203,7 +203,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="tip"><span class="ti2">💡</span>3월 초는 환절기! 히트텍 + 니트 + 경량패딩 레이어링 필수. 접이식 우산 꼭 챙기세요.</div>
   <div class="st"><div class="ic" style="background:rgba(167,139,250,.15)">🗺️</div>일정 한눈에 보기</div>
   <div class="info-grid">
-    <div class="info-card"><div class="label" style="color:var(--accent)">DAY 1 · 3/2 월</div><div class="value">오사카 도착 & 우메다</div><div class="sub">나카노시마 → 텐진바시스지 → 스카이빌딩</div></div>
+    <div class="info-card"><div class="label" style="color:var(--accent)">DAY 1 · 3/2 월</div><div class="value">오사카 도착 & 키타하마</div><div class="sub">키타하마 → 텐만구 → 텐진바시스지 → 나카자키초</div></div>
     <div class="info-card"><div class="label" style="color:var(--blue)">DAY 2 · 3/3 화</div><div class="value">교토 아라시야마 & 북부</div><div class="sub">텐류지 → 대나무숲 → 기오지 → 금각사</div></div>
     <div class="info-card"><div class="label" style="color:var(--green)">DAY 3 · 3/4 수</div><div class="value">나라 & 오사카 남부</div><div class="sub">나라공원 → 도다이지 → 신세카이 → 호젠지</div></div>
     <div class="info-card"><div class="label" style="color:var(--purple)">DAY 4 · 3/5 목</div><div class="value">고베 항구 & 이진칸</div><div class="sub">이진칸 → 허브원 → 고베규 → 하버랜드</div></div>
@@ -216,28 +216,29 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <!-- DAY 1 -->
   <div class="day-card open">
-    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#f97316,#f59e0b)">D1</div><div class="day-meta"><h3>오사카 도착 & 우메다 산책</h3><p>3/2 (월) · 나카노시마 → 텐진바시스지 → 스카이빌딩</p></div><span class="chv">▼</span></div>
+    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#f97316,#f59e0b)">D1</div><div class="day-meta"><h3>오사카 도착 & 키타하마 · 나카자키초</h3><p>3/2 (월) · 키타하마 → 텐만구 → 텐진바시스지 → 나카자키초</p></div><span class="chv">▼</span></div>
     <div class="day-body">
       <div class="map-toggle" onclick="toggleMap('map1',this)">🗺️ 지도로 경로 보기</div>
       <div class="map-wrap" id="map1-wrap"><div class="day-map" id="map1"></div></div>
       <div class="timeline">
-        <div class="tl-item move"><div class="tl-time">05:10</div><div class="tl-title">어린이대공원역 출발</div><div class="tl-desc">7호선 → 군자역 환승 → 5호선(방화 방면) 김포공항 · 약 1시간 20분 · ₩1,400</div></div>
-        <div class="tl-item"><div class="tl-time">06:30</div><div class="tl-title">김포공항 도착 · 체크인</div><div class="tl-desc">국제선 터미널 · 출발 1.5시간 전 도착 목표</div></div>
+        <div class="tl-item move"><div class="tl-time">05:31</div><div class="tl-title">어린이대공원역 출발 (첫차)</div><div class="tl-desc">7호선 → 군자역 환승 → 5호선(방화 방면) 김포공항 · 약 1시간 20분 · ₩1,400</div></div>
+        <div class="tl-item"><div class="tl-time">06:50</div><div class="tl-title">김포공항 도착 · 체크인</div><div class="tl-desc">국제선 터미널 · 출발 1시간 40분 전 도착</div></div>
         <div class="tl-item move"><div class="tl-time">08:30</div><div class="tl-title">김포공항 출발 <span class="tl-badge badge-move">비행 2h</span></div></div>
         <div class="tl-item move"><div class="tl-time">10:30</div><div class="tl-title">간사이공항 도착</div><div class="tl-desc">입국심사 + 수하물 수령 약 40분</div></div>
         <div class="tl-item"><div class="tl-time">11:10</div><div class="tl-title">ICOCA 구매</div><div class="tl-desc">2층 JR 개찰구 앞 발매기 · ¥2,000 (보증금 ¥500 + 충전 ¥1,500) · 한국어 지원 · 현금만 가능</div></div>
         <div class="tl-item move"><div class="tl-time">11:44</div><div class="tl-title">HARUKA No.20 탑승 → JR 오사카역 직통</div><div class="tl-desc">WEST QR 티켓 · 8호차 8D (창가석) · 약 47분 · 오사카역 직통 (환승 없음)</div></div>
         <div class="tl-item"><div class="tl-time">12:31</div><div class="tl-title">JR 오사카역 도착</div><div class="tl-desc">하루카 오사카역 직통 하차</div></div>
         <div class="tl-item"><div class="tl-time">12:45</div><div class="tl-title">숙소 도착 · 짐 맡기기</div><div class="tl-desc">JR 오사카역에서 도보 10분 · 체크인 전이면 프론트 보관</div></div>
-        <div class="tl-item spot"><div class="tl-time">13:00</div><div class="tl-title">나카노시마 공원 산책</div><div class="tl-desc">숙소에서 도보 15분. 중앙공회당 외관 · 도서관 · 강변 산책로 (미술관/과학관은 월요일 휴관)</div></div>
-        <div class="tl-item move"><div class="tl-time">14:00</div><div class="tl-title">나카노시마 → 텐진바시스지 상점가</div><div class="tl-desc">도보 15~20분 북쪽으로 이동</div></div>
-        <div class="tl-item food"><div class="tl-time">14:15</div><div class="tl-title">🍢 나카무라야 코로케 <span class="tl-badge badge-food">간식</span></div><div class="tl-desc">텐진바시 2초메. 코로케 ¥90~! 현금만. 월요일 영업</div></div>
-        <div class="tl-item spot"><div class="tl-time">14:30</div><div class="tl-title">텐진바시스지 상점가 탐방</div><div class="tl-desc">일본 최장 2.6km 아케이드 · 타코야키 타마야 등 간식 탐방</div></div>
-        <div class="tl-item"><div class="tl-time">15:00</div><div class="tl-title">💊 드럭스토어 — 오타이산 구매</div><div class="tl-desc">① 太田胃散 가루형 (¥900~) 효과 빠름 ② 太田胃散A 정제 (¥600~) 휴대 편리 · 상점가 내 마츠모토키요시/다이코쿠 등 · 면세 가능 (¥5,000 이상 시)</div></div>
-        <div class="tl-item"><div class="tl-time">15:30</div><div class="tl-title">숙소 체크인</div><div class="tl-desc">텐진바시스지에서 도보로 숙소 복귀</div></div>
-        <div class="tl-item move"><div class="tl-time">16:30</div><div class="tl-title">우메다 스카이빌딩으로 이동</div><div class="tl-desc">숙소에서 도보 15분 · JR 오사카역 북서쪽</div></div>
-        <div class="tl-item spot"><div class="tl-time">17:00</div><div class="tl-title">우메다 스카이빌딩 공중정원 전망대</div><div class="tl-desc">입장 ¥1,800 (Klook 사전구매 할인). 일몰 17:47 감상 → 야경 전환까지 체류</div></div>
-        <div class="tl-item move"><div class="tl-time">18:15</div><div class="tl-title">스카이빌딩 → INOGATE 오사카</div><div class="tl-desc">도보 15분 · JR 오사카역 직결</div></div>
+        <div class="tl-item move"><div class="tl-time">13:00</div><div class="tl-title">키타하마로 이동</div><div class="tl-desc">숙소에서 도보 20분 · 토사보리강 따라 남쪽으로</div></div>
+        <div class="tl-item food"><div class="tl-time">13:20</div><div class="tl-title">🍛 OXYMORON 키타하마 <span class="tl-badge badge-food">점심</span></div><div class="tl-desc">다이쇼시대 나가야 리노베이션 카페 · 와풍 키마카레 ¥1,490 · 카운터 3석 · 수요일 휴무 · 키타하마역 2분</div></div>
+        <div class="tl-item move"><div class="tl-time">14:15</div><div class="tl-title">키타하마 → 오사카 텐만구</div><div class="tl-desc">도보 10분 · 키타하마에서 북쪽으로</div></div>
+        <div class="tl-item spot"><div class="tl-time">14:30</div><div class="tl-title">오사카 텐만구 참배</div><div class="tl-desc">학문의 신 스가와라노 미치자네 · 무료 입장 · 3월 초 매화(梅) 만개 · 별빛연못 소원 던지기 · 9:00~17:00</div></div>
+        <div class="tl-item spot"><div class="tl-time">15:00</div><div class="tl-title">텐진바시스지 상점가 탐방</div><div class="tl-desc">텐만구 바로 옆! 일본 최장 2.6km 아케이드 · 타코야키 타마야 등 간식 탐방</div></div>
+        <div class="tl-item food"><div class="tl-time">15:15</div><div class="tl-title">🍢 나카무라야 코로케 <span class="tl-badge badge-food">간식</span></div><div class="tl-desc">텐진바시 2초메. 코로케 ¥90~! 현금만. 월요일 영업</div></div>
+        <div class="tl-item"><div class="tl-time">15:30</div><div class="tl-title">💊 드럭스토어 — 오타이산 구매</div><div class="tl-desc">① 太田胃散 가루형 (¥900~) 효과 빠름 ② 太田胃散A 정제 (¥600~) 휴대 편리 · 상점가 내 마츠모토키요시/다이코쿠 등 · 면세 가능 (¥5,000 이상 시)</div></div>
+        <div class="tl-item move"><div class="tl-time">15:45</div><div class="tl-title">텐진바시스지 → 나카자키초</div><div class="tl-desc">도보 15분 · 상점가 북쪽에서 서쪽으로</div></div>
+        <div class="tl-item spot"><div class="tl-time">16:00</div><div class="tl-title">나카자키초 레트로 거리 산책</div><div class="tl-desc">쇼와시대 목조 나가야 리노베이션 · 빈티지숍 · 독립 카페 · 갤러리 · 포토스팟 가득한 힙한 골목</div></div>
+        <div class="tl-item"><div class="tl-time">17:00</div><div class="tl-title">숙소 체크인</div><div class="tl-desc">나카자키초에서 도보 10분 · 숙소 복귀 후 휴식</div></div>
         <div class="tl-item food"><div class="tl-time">18:30</div><div class="tl-title">🍜 라멘 카모토네기 <span class="tl-badge badge-food">저녁</span></div><div class="tl-desc">INOGATE 3F. 오리육수 라멘 ¥1,080~ · 카운터석 혼밥 적합 · 월~23:00</div></div>
         <div class="tl-item"><div class="tl-time">19:30</div><div class="tl-title">숙소 복귀</div><div class="tl-desc">도보 10분</div></div>
       </div>
@@ -324,14 +325,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 <!-- ===== 맛집 ===== -->
 <div class="panel" id="panel-restaurants">
-  <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">🍜</div>DAY 1 — 우메다 / 텐진바시스지</div>
+  <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">🍜</div>DAY 1 — 키타하마 / 텐진바시스지 / 나카자키초</div>
   <div class="rest-grid">
+    <div class="rest-card"><div class="type">카레 카페</div><div class="name">OXYMORON 키타하마</div><div class="rating">⭐ 3.59 (타베로그)</div><div class="detail">다이쇼시대 나가야 리노베이션. 와풍 키마카레. 수 휴무</div><div class="price">¥1,490~</div></div>
+    <div class="rest-card"><div class="type">우골 라멘</div><div class="name">ぶっこ志 키타하마</div><div class="rating">⭐ 3.60 (타베로그)</div><div class="detail">소뼈 백탕 라멘. 카운터 11석. 일 휴무</div><div class="price">¥1,000~</div></div>
     <div class="rest-card"><div class="type">초밥</div><div class="name">Harukoma 본점</div><div class="rating">⭐ 4.2 (3,500+)</div><div class="detail">텐진바시스지 내. 신선한 초밥 저렴하게!</div><div class="price">¥1,000~</div></div>
     <div class="rest-card"><div class="type">코로케</div><div class="name">Nakamuraya</div><div class="rating">⭐ 4.2</div><div class="detail">텐진바시스지 간식. 코로케 90엔! 현금만</div><div class="price">¥90~</div></div>
-    <div class="rest-card"><div class="type">양식</div><div class="name">Grill Lamp-tei</div><div class="rating">⭐ 4.2</div><div class="detail">현지인 줄 서는 양식집. 오무라이스+함바그</div><div class="price">¥900~</div></div>
     <div class="rest-card"><div class="type">오리 라멘</div><div class="name">라멘 카모토네기</div><div class="rating">⭐ 4.6</div><div class="detail">이노게이트 3F. 오리육수. 23시까지</div><div class="price">¥1,200~</div></div>
     <div class="rest-card"><div class="type">닭백탕</div><div class="name">코무기노멘신 KITTE</div><div class="rating">⭐ 4.5</div><div class="detail">KITTE 4F. 닭백탕·마제소바</div><div class="price">¥1,000~</div></div>
-    <div class="rest-card"><div class="type">미소 라멘</div><div class="name">Ramen Lamp</div><div class="rating">⭐ 4.5</div><div class="detail">우메다 서쪽. 로컬 분위기</div><div class="price">¥1,000~</div></div>
   </div>
   <div class="st"><div class="ic" style="background:rgba(59,130,246,.15)">🍵</div>DAY 2 — 교토</div>
   <div class="rest-grid">
@@ -426,7 +427,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">💰</div>예상 예산 (숙소·비행기 제외)</div>
   <div class="budget-item"><div class="budget-icon">🚃</div><div class="budget-info"><div class="budget-label">교통비</div><div class="budget-detail">ICOCA + 하루카 왕복</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:18%;background:var(--blue)"></div></div></div><div class="budget-amount">¥8,000</div></div>
   <div class="budget-item"><div class="budget-icon">🍜</div><div class="budget-info"><div class="budget-label">식비 (5일)</div><div class="budget-detail">점심 ¥1,000~1,500 + 저녁 ¥1,500~2,500 + 간식</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:42%;background:var(--pink)"></div></div></div><div class="budget-amount">¥15,000~20,000</div></div>
-  <div class="budget-item"><div class="budget-icon">🎫</div><div class="budget-info"><div class="budget-label">관광지 입장료</div><div class="budget-detail">스카이빌딩·텐류지·금각사·도다이지·허브원 등</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:9%;background:var(--purple)"></div></div></div><div class="budget-amount">¥3,000~4,000</div></div>
+  <div class="budget-item"><div class="budget-icon">🎫</div><div class="budget-info"><div class="budget-label">관광지 입장료</div><div class="budget-detail">텐류지·금각사·도다이지·허브원 등 (텐만구 무료)</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:7%;background:var(--purple)"></div></div></div><div class="budget-amount">¥2,000~3,000</div></div>
   <div class="budget-item"><div class="budget-icon">☕</div><div class="budget-info"><div class="budget-label">간식·음료</div><div class="budget-detail">편의점 커피, 자판기 (¥500/일)</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:6%;background:var(--cyan)"></div></div></div><div class="budget-amount">¥2,500</div></div>
   <div class="budget-item"><div class="budget-icon">🛍️</div><div class="budget-info"><div class="budget-label">쇼핑·기념품</div><div class="budget-detail">돈키호테, 면세점 등</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:20%;background:var(--accent)"></div></div></div><div class="budget-amount">¥5,000~10,000</div></div>
   <div class="budget-item"><div class="budget-icon">🆘</div><div class="budget-info"><div class="budget-label">기타·예비비</div><div class="budget-detail">택시, 코인락커 등</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:7%;background:var(--text3)"></div></div></div><div class="budget-amount">¥3,000</div></div>
@@ -498,7 +499,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="pretodo-item"><div class="pretodo-num">5</div><div class="pretodo-content"><div class="title">구글 번역기 + 일본어 오프라인 팩</div><div class="desc">메뉴판 카메라 촬영 → 바로 번역</div></div></div>
   <div class="pretodo-item"><div class="pretodo-num">6</div><div class="pretodo-content"><div class="title">엔화 환전 (2~3만엔)</div><div class="desc">시중은행 또는 김포공항. 100엔 동전도 준비</div></div></div>
   <div class="pretodo-item"><div class="pretodo-num">7</div><div class="pretodo-content"><div class="title">신용카드 해외 결제 활성화</div><div class="desc">카드사 앱에서 해외 결제 ON 확인</div></div></div>
-  <div class="pretodo-item"><div class="pretodo-num">8</div><div class="pretodo-content"><div class="title">우메다 스카이빌딩 Klook 예약</div><div class="desc">Day 1 일몰 타임 추천</div></div></div>
+  <div class="pretodo-item"><div class="pretodo-num">8</div><div class="pretodo-content"><div class="title">OXYMORON 키타하마 영업 확인</div><div class="desc">월요일 영업 · 수요일 휴무 · 11:30~17:30</div></div></div>
   <div class="pretodo-item"><div class="pretodo-num">9</div><div class="pretodo-content"><div class="title">여권 유효기간 확인</div><div class="desc">출국일 기준 6개월 이상</div></div></div>
   <div class="pretodo-item"><div class="pretodo-num">10</div><div class="pretodo-content"><div class="title">항공권 & 숙소 스크린샷 저장</div><div class="desc">인쇄본 1부도 챙기면 안심</div></div></div>
   <div class="pretodo-item"><div class="pretodo-num">11</div><div class="pretodo-content"><div class="title">여행자 보험 가입</div><div class="desc">신용카드 부가 보험 확인 또는 별도 가입</div></div></div>
@@ -520,12 +521,12 @@ const mapData = {
   map1: {
     center: [34.700, 135.498], zoom: 13,
     spots: [
-      {lat:34.6995,lng:135.5008,name:'숙소 (소네자키)',time:'13:00',icon:'🏨'},
-      {lat:34.6937,lng:135.4930,name:'나카노시마 공원',time:'14:00',icon:'🌳'},
-      {lat:34.7040,lng:135.5110,name:'텐진바시스지 상점가',time:'15:30',icon:'🏮'},
-      {lat:34.7048,lng:135.5095,name:'Nakamuraya 코로케',time:'16:00',icon:'🍢'},
-      {lat:34.7052,lng:135.4903,name:'우메다 스카이빌딩',time:'17:30',icon:'🌇'},
-      {lat:34.7035,lng:135.4965,name:'라멘 카모토네기',time:'19:00',icon:'🍜'}
+      {lat:34.6995,lng:135.5008,name:'숙소 (소네자키)',time:'12:45',icon:'🏨'},
+      {lat:34.6912,lng:135.5065,name:'OXYMORON 키타하마',time:'13:20',icon:'🍛'},
+      {lat:34.6936,lng:135.5131,name:'오사카 텐만구',time:'14:30',icon:'⛩️'},
+      {lat:34.7040,lng:135.5110,name:'텐진바시스지 상점가',time:'15:00',icon:'🏮'},
+      {lat:34.7075,lng:135.5080,name:'나카자키초 레트로 거리',time:'16:00',icon:'🏘️'},
+      {lat:34.7035,lng:135.4965,name:'라멘 카모토네기',time:'18:30',icon:'🍜'}
     ],color:'#f97316'
   },
   map2: {
