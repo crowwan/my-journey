@@ -206,7 +206,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="st"><div class="ic" style="background:rgba(167,139,250,.15)">🗺️</div>일정 한눈에 보기</div>
   <div class="info-grid">
     <div class="info-card"><div class="label" style="color:var(--accent)">DAY 1 · 3/2 월</div><div class="value">오사카 도착 & 키타하마</div><div class="sub">나카노시마 → 키타하마 → 텐만구 → 텐진바시스지 → 나카자키초</div></div>
-    <div class="info-card"><div class="label" style="color:var(--blue)">DAY 2 · 3/3 화</div><div class="value">쿠니마루 미소라멘 & 난바 · 도톤보리</div><div class="sub">쿠니마루 → 난바 파크스 → 난바시티 → 도톤보리 → TORA鶏YA</div></div>
+    <div class="info-card"><div class="label" style="color:var(--blue)">DAY 2 · 3/3 화</div><div class="value">난바 쇼핑 & 호젠지 · Cafe mog · TORA鶏YA</div><div class="sub">쿠니마루 → 난바 쇼핑 → 호젠지 → 도톤보리 → Cafe mog → 대욕탕 → TORA鶏YA</div></div>
     <div class="info-card"><div class="label" style="color:var(--green)">DAY 3 · 3/4 수</div><div class="value">교토 히가시야마 산책</div><div class="sub">기요미즈데라 → 산넨자카 → 야사카신사 → 기온 → 니시키시장</div></div>
     <div class="info-card"><div class="label" style="color:var(--purple)">DAY 4 · 3/5 목</div><div class="value">스미요시타이샤 & 이코마 호잔지</div><div class="sub">스미요시타이샤 → 이코마 호잔지 → 아베노하루카스 → 신세카이</div></div>
     <div class="info-card"><div class="label" style="color:var(--pink)">DAY 5 · 3/6 금</div><div class="value">아침 산책 & 귀국</div><div class="sub">오사카성 → 간사이공항</div></div>
@@ -250,26 +250,23 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <!-- DAY 2 -->
   <div class="day-card">
-    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">D2</div><div class="day-meta"><h3>쿠니마루 미소라멘 & 난바 · 도톤보리</h3><p>3/3 (화) · 쿠니마루 → 난바 파크스 → 난바시티 → 도톤보리 → TORA鶏YA</p></div><span class="chv">▼</span></div>
+    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">D2</div><div class="day-meta"><h3>난바 쇼핑 & 호젠지 · Cafe mog · TORA鶏YA</h3><p>3/3 (화) · 쿠니마루 → 난바 쇼핑 → 호젠지 → 타코야키 → Cafe mog → 대욕탕 → TORA鶏YA</p></div><span class="chv">▼</span></div>
     <div class="day-body">
       <div class="map-toggle" onclick="toggleMap('map2',this)">🗺️ 지도로 경로 보기</div>
       <div class="map-wrap" id="map2-wrap"><div class="day-map" id="map2"></div></div>
       <div class="timeline">
         <div class="tl-item food"><div class="tl-time">11:00</div><div class="tl-title">🍜 멘야 쿠니마루 梅田店 <span class="tl-badge badge-food">점심</span> <a href="https://www.google.com/maps/search/?api=1&query=麺屋國丸+梅田店" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">中崎西2-1-4 · 미소 라멘 전문점 · 중崎초역 4번 출구 도보 1분 · ⭐3.52 · 숙소에서 도보 10분</div></div>
         <div class="tl-item move"><div class="tl-time">12:00</div><div class="tl-title">우메다 → 난바</div><div class="tl-desc">미도스지선 10분 (¥240)</div></div>
-        <div class="tl-item"><div class="tl-time">12:15</div><div class="tl-title">🛍️ 난바 파크스 4F <span class="tl-badge badge-spot">쇼핑</span> <a href="https://www.google.com/maps/search/?api=1&query=なんばパークス" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">Nanbanaka 2-10-70 なんばパークス 4F</div></div>
-        <div class="tl-item"><div class="tl-time">12:50</div><div class="tl-title">🛍️ 난바시티 본관 B1F <span class="tl-badge badge-spot">쇼핑</span> <a href="https://www.google.com/maps/search/?api=1&query=なんばCITY" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">Namba 5-1-60 なんばCITY 本館 B1F</div></div>
-        <div class="tl-item"><div class="tl-time">13:15</div><div class="tl-title">💊 썬드럭 난바점 <span class="tl-badge badge-spot">쇼핑</span> <a href="https://www.google.com/maps/search/?api=1&query=サンドラッグ+なんば店" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">Namba 3-6-11 なんば池田ビル · 오타이산 구매 (어제 못 산 것)</div></div>
-        <div class="tl-item spot"><div class="tl-time">13:30</div><div class="tl-title">난바 야사카 신사 <a href="https://www.google.com/maps/search/?api=1&query=難波八阪神社" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">거대 사자 머리 본전 · 승운의 파워스팟 · 포토존</div></div>
-        <div class="tl-item spot"><div class="tl-time">13:45</div><div class="tl-title">호젠지 요코초 산책 <a href="https://www.google.com/maps/search/?api=1&query=法善寺横丁+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">이끼 낀 부동명왕상 · 돌바닥 골목 · 분위기 있는 포토스팟</div></div>
-        <div class="tl-item food"><div class="tl-time">14:15</div><div class="tl-title">🐙 오타코 본점 <span class="tl-badge badge-food">간식</span> <a href="https://www.google.com/maps/search/?api=1&query=大たこ+道頓堀" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">1-4-16 Dotonbori · 글리코 간판 포토타임</div></div>
-        <div class="tl-item spot"><div class="tl-time">15:15</div><div class="tl-title">신사이바시스지 아케이드 <a href="https://www.google.com/maps/search/?api=1&query=心斎橋筋商店街" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">600m 쇼핑 아케이드 · 의류 · 기념품</div></div>
-        <div class="tl-item spot"><div class="tl-time">16:00</div><div class="tl-title">아메리카무라 <a href="https://www.google.com/maps/search/?api=1&query=アメリカ村+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">빈티지/스트릿 패션 거리 · 카페 휴식</div></div>
-        <div class="tl-item spot"><div class="tl-time">16:45</div><div class="tl-title">난바 파크스 옥상정원 <a href="https://www.google.com/maps/search/?api=1&query=なんばパークス+屋上庭園" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">8층 테라스 가든 · 도심 속 녹지 · 전망 포인트</div></div>
-        <div class="tl-item spot"><div class="tl-time">17:30</div><div class="tl-title">도톤보리 야경 산책 <a href="https://www.google.com/maps/search/?api=1&query=道頓堀" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">네온사인 리버워크 · 야간 글리코 간판 · 강변 산책</div></div>
-        <div class="tl-item move"><div class="tl-time">18:30</div><div class="tl-title">도톤보리 → 우메다</div><div class="tl-desc">미도스지선 난바→우메다 10분 (¥240) · 도보 5분</div></div>
-        <div class="tl-item food"><div class="tl-time">19:30</div><div class="tl-title">🍗 TORA鶏YA 우메다점 (토라토리야) <span class="tl-badge badge-food">저녁</span> <a href="https://www.google.com/maps/search/?api=1&query=TORA鶏YA+梅田店" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">焼き鳥 備長炭と宮崎地鶏専門 · 카운터석 예약 완료 · 단품 주문 · ¥3,000~4,000 · ⭐4.7</div></div>
-        <div class="tl-item"><div class="tl-time">21:00</div><div class="tl-title">숙소 복귀</div><div class="tl-desc">우메다 도보 이동 · 숙소까지 도보 10분</div></div>
+        <div class="tl-item"><div class="tl-time">12:15</div><div class="tl-title">🛍️ 난바 파크스 · 난바시티 쇼핑 <span class="tl-badge badge-spot">쇼핑</span> <a href="https://www.google.com/maps/search/?api=1&query=なんばパークス" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">옷가게 방문 · 엄마 선물 구매 · 난바 파크스 4F + 난바시티 본관 B1F · 꽤 오래 둘러봄</div></div>
+        <div class="tl-item"><div class="tl-time">13:15</div><div class="tl-title">💊 썬드럭 난바점 — 오타이산 구매 <span class="tl-badge badge-spot">쇼핑</span> <a href="https://www.google.com/maps/search/?api=1&query=サンドラッグ+なんば店" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">Namba 3-6-11 · 오타이산 구매 완료</div></div>
+        <div class="tl-item spot"><div class="tl-time">13:30</div><div class="tl-title">호젠지 요코초 산책 <a href="https://www.google.com/maps/search/?api=1&query=法善寺横丁+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">이끼 낀 부동명왕상 · 돌바닥 골목 · 분위기 있는 포토스팟</div></div>
+        <div class="tl-item food"><div class="tl-time">14:00</div><div class="tl-title">🐙 오타코 본점 + 도톤보리 <span class="tl-badge badge-food">간식</span> <a href="https://www.google.com/maps/search/?api=1&query=大たこ+道頓堀" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">1-4-16 Dotonbori · 바삭+트로트로 타코야키 · 글리코 간판 포토타임</div></div>
+        <div class="tl-item spot"><div class="tl-time">14:30</div><div class="tl-title">신사이바시스지 아케이드 <a href="https://www.google.com/maps/search/?api=1&query=心斎橋筋商店街" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">600m 아케이드 · 걷기만 함 · 비가 와서 아메리카무라는 패스</div></div>
+        <div class="tl-item food"><div class="tl-time">15:00</div><div class="tl-title">🥞 Cafe mog 난바점 <span class="tl-badge badge-food">카페</span> <a href="https://www.google.com/maps/search/?api=1&query=cafe+mog+難波" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">수플레 팬케이크 · 푹신푹신 맛있었다!</div></div>
+        <div class="tl-item move"><div class="tl-time">16:00</div><div class="tl-title">난바 → 숙소 귀환</div><div class="tl-desc">비 + 많이 걸어서 피로 · 미도스지선 난바→우메다 10분 (¥240)</div></div>
+        <div class="tl-item"><div class="tl-time">16:30</div><div class="tl-title">🛁 대욕탕 힐링타임</div><div class="tl-desc">숙소 대욕탕 · 하루 피로 싹 풀림 · 너무 힐링!</div></div>
+        <div class="tl-item food"><div class="tl-time">19:20</div><div class="tl-title">🍗 TORA鶏YA 우메다점 (토라토리야) <span class="tl-badge badge-food">저녁</span> <a href="https://www.google.com/maps/search/?api=1&query=TORA鶏YA+梅田店" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">焼き鳥 備長炭と宮崎地鶏専門 · 카운터석 예약 · 너무 맛있었다! · ¥3,000~4,000 · ⭐4.7</div></div>
+        <div class="tl-item"><div class="tl-time">21:00</div><div class="tl-title">숙소 복귀</div><div class="tl-desc">우메다 도보 이동 · 알찬 하루 마무리</div></div>
       </div>
     </div>
   </div>
@@ -353,7 +350,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="rest-grid">
     <div class="rest-card"><div class="type">미소 라멘 · 나카자키초</div><div class="name">멘야 쿠니마루 梅田店 (麺屋·國丸)</div><div class="rating">⭐ 3.52 (타베로그)</div><div class="detail">中崎西2-1-4. 미소 라멘 전문점. 북해도 백년 미소라멘 · 매운 미소라멘 추천. 중崎초역 1분</div><div class="price">¥900~1,300</div></div>
     <div class="rest-card"><div class="type">타코야키</div><div class="name">오타코 본점</div><div class="rating">⭐ 4.2</div><div class="detail">1-4-16 Dotonbori. 바삭+트로트로 식감. 테이크아웃</div><div class="price">¥500~</div></div>
-    <div class="rest-card"><div class="type">야키토리 · 우메다</div><div class="name">TORA鶏YA 우메다점 (토라토리야)</div><div class="rating">⭐ 4.7 (4,023) · 예약 완료</div><div class="detail">焼き鳥 備長炭と宮崎地鶏専門. 미야자키 지토리 + 비장탄 숯구이. 19:30 카운터석 예약. 단품 주문</div><div class="price">¥3,000~4,000</div></div>
+    <div class="rest-card"><div class="type">수플레 팬케이크 · 난바</div><div class="name">Cafe mog 난바점</div><div class="rating">⭐ 4.3</div><div class="detail">수플레 팬케이크 전문. 푹신푹신 맛있었다! 난바 주변</div><div class="price">¥1,200~</div></div>
+    <div class="rest-card"><div class="type">야키토리 · 우메다</div><div class="name">TORA鶏YA 우메다점 (토라토리야)</div><div class="rating">⭐ 4.7 (4,023) · 예약 완료</div><div class="detail">焼き鳥 備長炭と宮崎地鶏専門. 미야자키 지토리 + 비장탄 숯구이. 19:20 카운터석 예약. 너무 맛있었다!</div><div class="price">¥3,000~4,000</div></div>
   </div>
   <div class="st"><div class="ic" style="background:rgba(16,185,129,.15)">🍵</div>DAY 3 — 교토 히가시야마</div>
   <div class="rest-grid">
@@ -544,17 +542,13 @@ const mapData = {
     center: [34.675, 135.503], zoom: 13,
     spots: [
       {lat:34.7065,lng:135.5020,name:'멘야 쿠니마루 梅田店',time:'11:00',icon:'🍜'},
-      {lat:34.6595,lng:135.5020,name:'난바 파크스 4F',time:'12:15',icon:'🛍️'},
-      {lat:34.6655,lng:135.5010,name:'난바시티 본관 B1F',time:'12:50',icon:'🛍️'},
+      {lat:34.6595,lng:135.5020,name:'난바 파크스·난바시티',time:'12:15',icon:'🛍️'},
       {lat:34.6648,lng:135.5015,name:'썬드럭 난바점',time:'13:15',icon:'💊'},
-      {lat:34.6656,lng:135.4988,name:'난바 야사카 신사',time:'13:30',icon:'🦁'},
-      {lat:34.6690,lng:135.5045,name:'호젠지 요코초',time:'13:45',icon:'🪨'},
-      {lat:34.6687,lng:135.5024,name:'도톤보리 타코야키',time:'14:15',icon:'🐙'},
-      {lat:34.6740,lng:135.5015,name:'신사이바시스지',time:'15:00',icon:'🛍️'},
-      {lat:34.6722,lng:135.4985,name:'아메리카무라',time:'16:00',icon:'👕'},
-      {lat:34.6600,lng:135.5020,name:'난바 파크스',time:'16:45',icon:'🌿'},
-      {lat:34.6687,lng:135.5030,name:'도톤보리 야경',time:'17:30',icon:'🌃'},
-      {lat:34.7030,lng:135.4993,name:'TORA鶏YA 우메다점',time:'19:30',icon:'🍗'}
+      {lat:34.6690,lng:135.5045,name:'호젠지 요코초',time:'13:30',icon:'🪨'},
+      {lat:34.6687,lng:135.5024,name:'오타코 + 글리코 간판',time:'14:00',icon:'🐙'},
+      {lat:34.6740,lng:135.5015,name:'신사이바시스지',time:'14:30',icon:'🛍️'},
+      {lat:34.6670,lng:135.5010,name:'Cafe mog',time:'15:00',icon:'🥞'},
+      {lat:34.7030,lng:135.4993,name:'TORA鶏YA 우메다점',time:'19:20',icon:'🍗'}
     ],color:'#6366f1'
   },
   map3: {
