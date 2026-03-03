@@ -207,7 +207,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="info-grid">
     <div class="info-card"><div class="label" style="color:var(--accent)">DAY 1 · 3/2 월</div><div class="value">오사카 도착 & 키타하마</div><div class="sub">나카노시마 → 키타하마 → 텐만구 → 텐진바시스지 → 나카자키초</div></div>
     <div class="info-card"><div class="label" style="color:var(--blue)">DAY 2 · 3/3 화</div><div class="value">쿠니마루 미소라멘 & 난바 · 도톤보리</div><div class="sub">쿠니마루 → 난바 파크스 → 난바시티 → 도톤보리 → TORA鶏YA</div></div>
-    <div class="info-card"><div class="label" style="color:var(--green)">DAY 3 · 3/4 수</div><div class="value">교토 아라시야마 & 북부</div><div class="sub">텐류지 → 대나무숲 → 기오지 → 금각사</div></div>
+    <div class="info-card"><div class="label" style="color:var(--green)">DAY 3 · 3/4 수</div><div class="value">교토 히가시야마 산책</div><div class="sub">기요미즈데라 → 산넨자카 → 야사카신사 → 기온 → 니시키시장</div></div>
     <div class="info-card"><div class="label" style="color:var(--purple)">DAY 4 · 3/5 목</div><div class="value">스미요시타이샤 & 이코마 호잔지</div><div class="sub">스미요시타이샤 → 이코마 호잔지 → 아베노하루카스 → 신세카이</div></div>
     <div class="info-card"><div class="label" style="color:var(--pink)">DAY 5 · 3/6 금</div><div class="value">아침 산책 & 귀국</div><div class="sub">오사카성 → 간사이공항</div></div>
   </div>
@@ -276,20 +276,22 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <!-- DAY 3 -->
   <div class="day-card">
-    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#10b981,#059669)">D3</div><div class="day-meta"><h3>교토 아라시야마 & 북부 사찰</h3><p>3/4 (수) · 텐류지 → 대나무숲 → 기오지 → 금각사</p></div><span class="chv">▼</span></div>
+    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#10b981,#059669)">D3</div><div class="day-meta"><h3>교토 히가시야마 산책</h3><p>3/4 (수) · 기요미즈데라 → 산넨자카 → 야사카신사 → 기온 → 니시키시장</p></div><span class="chv">▼</span></div>
     <div class="day-body">
       <div class="map-toggle" onclick="toggleMap('map3',this)">🗺️ 지도로 경로 보기</div>
       <div class="map-wrap" id="map3-wrap"><div class="day-map" id="map3"></div></div>
       <div class="timeline">
-        <div class="tl-item move"><div class="tl-time">07:30</div><div class="tl-title">한큐 우메다역 출발</div><div class="tl-desc">한큐 교토선+아라시야마선 (40분, ¥410)</div></div>
-        <div class="tl-item spot"><div class="tl-time">09:00</div><div class="tl-title">텐류지 정원 <a href="https://www.google.com/maps/search/?api=1&query=天龍寺+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">세계문화유산 · 소겐치 정원 · 입장료 ¥500</div></div>
-        <div class="tl-item spot"><div class="tl-time">10:00</div><div class="tl-title">아라시야마 대나무숲 <a href="https://www.google.com/maps/search/?api=1&query=嵐山+竹林の小径" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">텐류지 북문에서 바로 연결 · 무료</div></div>
-        <div class="tl-item spot"><div class="tl-time">11:00</div><div class="tl-title">기오지 (이끼 사원) <a href="https://www.google.com/maps/search/?api=1&query=祇王寺+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">도보 20분 · 조용한 힐링 스팟 · 입장 ¥300</div></div>
-        <div class="tl-item food"><div class="tl-time">11:40</div><div class="tl-title">🍲 Yudofu Sagano <span class="tl-badge badge-food">점심</span> <a href="https://www.google.com/maps/search/?api=1&query=嵯峨野+湯どうふ+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">텐류지 옆 · 정원 뷰 타타미석 두부 코스 ⭐4.3 · 수요일 영업</div></div>
-        <div class="tl-item spot"><div class="tl-time">13:30</div><div class="tl-title">기타노텐만구 <a href="https://www.google.com/maps/search/?api=1&query=北野天満宮+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">버스 40분 · 매화 시즌!</div></div>
-        <div class="tl-item spot"><div class="tl-time">15:00</div><div class="tl-title">금각사 <a href="https://www.google.com/maps/search/?api=1&query=金閣寺+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">도보 15분 · 연못 반영 포토스팟 · 입장 ¥500</div></div>
-        <div class="tl-item food"><div class="tl-time">15:40</div><div class="tl-title">☕ Sabo Kinkaku-an <span class="tl-badge badge-food">카페</span> <a href="https://www.google.com/maps/search/?api=1&query=金閣寺+カフェ+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">금각사 5분 · 자가재배 차 · 숨은 맛집 ⭐4.8 · 화/수 휴무 주의</div></div>
-        <div class="tl-item move"><div class="tl-time">16:30</div><div class="tl-title">교토 → 오사카 귀환</div><div class="tl-desc">JR(30분, ¥580) 또는 한큐(40분, ¥410)</div></div>
+        <div class="tl-item move"><div class="tl-time">08:00</div><div class="tl-title">JR 오사카역 출발</div><div class="tl-desc">JR 신쾌속 (30분, ¥580)</div></div>
+        <div class="tl-item move"><div class="tl-time">08:40</div><div class="tl-title">교토역 → 기요미즈데라</div><div class="tl-desc">버스 100/206번 (15분, ¥230) + 도보 10분</div></div>
+        <div class="tl-item spot"><div class="tl-time">09:15</div><div class="tl-title">기요미즈데라 (清水寺) <a href="https://www.google.com/maps/search/?api=1&query=清水寺+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">세계문화유산 · 청수의 무대 절경 · 입장 ¥400 · 아침 일찍이 한적</div></div>
+        <div class="tl-item spot"><div class="tl-time">10:30</div><div class="tl-title">산넨자카 · 니넨자카 <a href="https://www.google.com/maps/search/?api=1&query=三年坂+二年坂+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">돌계단 골목길 산책 · 기념품 가게 · 포토스팟</div></div>
+        <div class="tl-item spot"><div class="tl-time">11:00</div><div class="tl-title">야사카노토 (법관사 오층탑) <a href="https://www.google.com/maps/search/?api=1&query=八坂の塔+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">히가시야마 랜드마크 · 인생샷 포인트</div></div>
+        <div class="tl-item food"><div class="tl-time">11:30</div><div class="tl-title">🍜 히가시야마 점심 <span class="tl-badge badge-food">점심</span> <a href="https://www.google.com/maps/search/?api=1&query=東山+ランチ+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">히가시야마 주변 맛집</div></div>
+        <div class="tl-item spot"><div class="tl-time">13:00</div><div class="tl-title">⛩️ 야사카신사 <a href="https://www.google.com/maps/search/?api=1&query=八坂神社+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">기온의 상징 · 마루야마 공원 연결 · 무료</div></div>
+        <div class="tl-item spot"><div class="tl-time">13:45</div><div class="tl-title">기온 하나미코지 <a href="https://www.google.com/maps/search/?api=1&query=花見小路+祇園+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">전통 마치야 거리 · 게이샤 문화 · 포토 주의</div></div>
+        <div class="tl-item food"><div class="tl-time">14:30</div><div class="tl-title">🍵 카페 휴식 <span class="tl-badge badge-food">카페</span> <a href="https://www.google.com/maps/search/?api=1&query=祇園+カフェ+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">기온 주변 말차 카페 · 잠시 쉬어가기</div></div>
+        <div class="tl-item spot"><div class="tl-time">15:15</div><div class="tl-title">니시키시장 (錦市場) <a href="https://www.google.com/maps/search/?api=1&query=錦市場+京都" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">교토의 부엌 · 390m 아케이드 · 먹거리 탐방</div></div>
+        <div class="tl-item move"><div class="tl-time">16:30</div><div class="tl-title">교토 → 오사카 귀환</div><div class="tl-desc">JR 교토역 → 오사카역 (30분, ¥580) 또는 한큐 가와라마치→우메다 (45분, ¥410)</div></div>
       </div>
     </div>
   </div>
@@ -353,12 +355,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="rest-card"><div class="type">타코야키</div><div class="name">오타코 본점</div><div class="rating">⭐ 4.2</div><div class="detail">1-4-16 Dotonbori. 바삭+트로트로 식감. 테이크아웃</div><div class="price">¥500~</div></div>
     <div class="rest-card"><div class="type">야키토리 · 우메다</div><div class="name">TORA鶏YA 우메다점 (토라토리야)</div><div class="rating">⭐ 4.7 (4,023) · 예약 완료</div><div class="detail">焼き鳥 備長炭と宮崎地鶏専門. 미야자키 지토리 + 비장탄 숯구이. 19:30 카운터석 예약. 단품 주문</div><div class="price">¥3,000~4,000</div></div>
   </div>
-  <div class="st"><div class="ic" style="background:rgba(16,185,129,.15)">🍵</div>DAY 3 — 교토</div>
+  <div class="st"><div class="ic" style="background:rgba(16,185,129,.15)">🍵</div>DAY 3 — 교토 히가시야마</div>
   <div class="rest-grid">
-    <div class="rest-card"><div class="type">유두부</div><div class="name">Yudofu Sagano</div><div class="rating">⭐ 4.3</div><div class="detail">텐류지 옆. 정원 뷰 타타미석 두부 코스. 수요일 영업</div><div class="price">¥3,500~</div></div>
-    <div class="rest-card"><div class="type">두부</div><div class="name">Seizan Sodo</div><div class="rating">⭐ 4.3</div><div class="detail">대나무숲 근처. 채식 두부 코스. 수 휴무</div><div class="price">¥3,850</div></div>
-    <div class="rest-card"><div class="type">유두부·소바</div><div class="name">Yudofu Takemura</div><div class="rating">⭐ 4.1</div><div class="detail">대나무숲 옆. 가성비 좋음. 목 휴무</div><div class="price">¥2,000~</div></div>
-    <div class="rest-card"><div class="type">차·소바</div><div class="name">Sabo Kinkaku-an</div><div class="rating">⭐ 4.8</div><div class="detail">금각사 5분. 자가재배 차. 화/수 휴무 주의</div><div class="price">¥1,500~</div></div>
+    <div class="rest-card"><div class="type">히가시야마 점심</div><div class="name">히가시야마 주변 맛집</div><div class="rating">—</div><div class="detail">기요미즈데라~야사카 구간 맛집. 오반자이·소바·우동 등</div><div class="price">¥1,000~2,000</div></div>
+    <div class="rest-card"><div class="type">니시키시장 간식</div><div class="name">니시키시장 먹거리</div><div class="rating">—</div><div class="detail">교토의 부엌. 다시마키타마고·츠게모노·두유도넛 등</div><div class="price">¥300~500/개</div></div>
   </div>
   <div class="st"><div class="ic" style="background:rgba(167,139,250,.15)">🍢</div>DAY 4 — 이코마 & 신세카이</div>
   <div class="rest-grid">
@@ -406,14 +406,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="station-card"><div class="kr">스미요시타이샤</div><div class="jp">住吉大社駅</div><div class="en">Sumiyoshitaisha</div></div>
     <div class="station-card"><div class="kr">텐노지</div><div class="jp">天王寺駅</div><div class="en">Tennoji</div></div>
     <div class="station-card"><div class="kr">간사이공항</div><div class="jp">関西空港駅</div><div class="en">Kansai Airport</div></div>
-    <div class="station-card"><div class="kr">아라시야마</div><div class="jp">嵐山駅</div><div class="en">Arashiyama</div></div>
+    <div class="station-card"><div class="kr">가와라마치</div><div class="jp">河原町駅</div><div class="en">Kawaramachi (한큐)</div></div>
     <div class="station-card"><div class="kr">교토역</div><div class="jp">京都駅</div><div class="en">Kyoto (JR)</div></div>
   </div>
 
   <div class="st"><div class="ic" style="background:rgba(59,130,246,.15)">🚄</div>도시 간 이동</div>
   <table class="ttable"><thead><tr><th>구간</th><th>교통수단</th><th>소요</th><th>요금</th></tr></thead><tbody>
     <tr><td class="route">간사이공항→오사카역</td><td class="method">하루카 특급</td><td>50분</td><td class="tc">¥1,800</td></tr>
-    <tr><td class="route">우메다→아라시야마</td><td class="method">한큐 교토선+아라시야마선</td><td>40분</td><td class="tc">¥410</td></tr>
+    <tr><td class="route">오사카역→교토역</td><td class="method">JR 신쾌속</td><td>30분</td><td class="tc">¥580</td></tr>
     <tr><td class="route">난바→스미요시타이샤</td><td class="method">난카이 본선</td><td>10분</td><td class="tc">¥220</td></tr>
     <tr><td class="route">난바→이코마</td><td class="method">킨테츠 나라선</td><td>25분</td><td class="tc">¥370</td></tr>
     <tr><td class="route">우메다→난바</td><td class="method">미도스지선</td><td>10분</td><td class="tc">¥240</td></tr>
@@ -437,7 +437,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="st"><div class="ic" style="background:rgba(249,115,22,.15)">💰</div>예상 예산 (숙소·비행기 제외)</div>
   <div class="budget-item"><div class="budget-icon">🚃</div><div class="budget-info"><div class="budget-label">교통비</div><div class="budget-detail">ICOCA + 하루카 왕복</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:18%;background:var(--blue)"></div></div></div><div class="budget-amount">¥8,000</div></div>
   <div class="budget-item"><div class="budget-icon">🍜</div><div class="budget-info"><div class="budget-label">식비 (5일)</div><div class="budget-detail">점심 ¥1,000~1,500 + 저녁 ¥1,500~2,500 + 간식</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:42%;background:var(--pink)"></div></div></div><div class="budget-amount">¥15,000~20,000</div></div>
-  <div class="budget-item"><div class="budget-icon">🎫</div><div class="budget-info"><div class="budget-label">관광지 입장료</div><div class="budget-detail">텐류지·금각사·하루카스 전망대·이코마 케이블카 등 (텐만구·스미요시·호잔지 무료)</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:7%;background:var(--purple)"></div></div></div><div class="budget-amount">¥2,000~3,000</div></div>
+  <div class="budget-item"><div class="budget-icon">🎫</div><div class="budget-info"><div class="budget-label">관광지 입장료</div><div class="budget-detail">기요미즈데라·하루카스 전망대·이코마 케이블카 등 (야사카신사·스미요시·호잔지 무료)</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:7%;background:var(--purple)"></div></div></div><div class="budget-amount">¥2,000~3,000</div></div>
   <div class="budget-item"><div class="budget-icon">☕</div><div class="budget-info"><div class="budget-label">간식·음료</div><div class="budget-detail">편의점 커피, 자판기 (¥500/일)</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:6%;background:var(--cyan)"></div></div></div><div class="budget-amount">¥2,500</div></div>
   <div class="budget-item"><div class="budget-icon">🛍️</div><div class="budget-info"><div class="budget-label">쇼핑·기념품</div><div class="budget-detail">돈키호테, 면세점 등</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:20%;background:var(--accent)"></div></div></div><div class="budget-amount">¥5,000~10,000</div></div>
   <div class="budget-item"><div class="budget-icon">🆘</div><div class="budget-info"><div class="budget-label">기타·예비비</div><div class="budget-detail">택시, 코인락커 등</div><div class="budget-bar-wrap"><div class="budget-bar" style="width:7%;background:var(--text3)"></div></div></div><div class="budget-amount">¥3,000</div></div>
@@ -558,15 +558,15 @@ const mapData = {
     ],color:'#6366f1'
   },
   map3: {
-    center: [35.023, 135.700], zoom: 12,
+    center: [34.998, 135.775], zoom: 14,
     spots: [
-      {lat:35.0155,lng:135.6745,name:'텐류지 정원',time:'09:00',icon:'⛩️'},
-      {lat:35.0170,lng:135.6720,name:'대나무숲',time:'10:00',icon:'🎋'},
-      {lat:35.0260,lng:135.6630,name:'기오지 (이끼 사원)',time:'11:00',icon:'🍃'},
-      {lat:35.0150,lng:135.6750,name:'Yudofu Sagano',time:'11:40',icon:'🍲'},
-      {lat:35.0310,lng:135.7350,name:'기타노텐만구',time:'13:30',icon:'🌸'},
-      {lat:35.0394,lng:135.7292,name:'금각사',time:'15:00',icon:'✨'},
-      {lat:35.0380,lng:135.7260,name:'Sabo Kinkaku-an',time:'15:40',icon:'☕'}
+      {lat:34.9949,lng:135.7850,name:'기요미즈데라',time:'09:15',icon:'⛩️'},
+      {lat:34.9967,lng:135.7810,name:'산넨자카·니넨자카',time:'10:30',icon:'🏘️'},
+      {lat:34.9978,lng:135.7808,name:'야사카노토',time:'11:00',icon:'🗼'},
+      {lat:34.9988,lng:135.7800,name:'히가시야마 점심',time:'11:30',icon:'🍜'},
+      {lat:35.0036,lng:135.7785,name:'야사카신사',time:'13:00',icon:'⛩️'},
+      {lat:35.0020,lng:135.7750,name:'기온 하나미코지',time:'13:45',icon:'🎭'},
+      {lat:35.0050,lng:135.7645,name:'니시키시장',time:'15:15',icon:'🛒'}
     ],color:'#10b981'
   },
   map4: {
