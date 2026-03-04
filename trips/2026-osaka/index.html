@@ -295,23 +295,20 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <!-- DAY 4 -->
   <div class="day-card">
-    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6)">D4</div><div class="day-meta"><h3>스미요시타이샤 & 이코마 호잔지</h3><p>3/5 (목) · 스미요시타이샤 → 이코마 호잔지 → 아베노하루카스 → 신세카이</p></div><span class="chv">▼</span></div>
+    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6)">D4</div><div class="day-meta"><h3>스미요시타이샤 & 이코마 호잔지</h3><p>3/5 (목) · 스미요시타이샤 → 이코마 케이블카 → 호잔지</p></div><span class="chv">▼</span></div>
     <div class="day-body">
       <div class="map-toggle" onclick="toggleMap('map4',this)">🗺️ 지도로 경로 보기</div>
       <div class="map-wrap" id="map4-wrap"><div class="day-map" id="map4"></div></div>
       <div class="timeline">
-        <div class="tl-item move"><div class="tl-time">08:30</div><div class="tl-title">미도스지선 우메다→난바</div><div class="tl-desc">미도스지선 (10분, ¥240)</div></div>
-        <div class="tl-item move"><div class="tl-time">08:45</div><div class="tl-title">난카이 본선 난바역→스미요시타이샤역</div><div class="tl-desc">난카이 본선 (10분, ¥220)</div></div>
-        <div class="tl-item spot"><div class="tl-time">09:00</div><div class="tl-title">⛩️ 스미요시타이샤 <a href="https://www.google.com/maps/search/?api=1&query=住吉大社+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">오사카 최고(最古) 신사 · 태고교(반달다리) · 오마모리 기념품 · 무료</div></div>
-        <div class="tl-item move"><div class="tl-time">10:15</div><div class="tl-title">스미요시타이샤→이코마역</div><div class="tl-desc">난카이→난바 환승 → 킨테츠 나라선 (약 40분, ¥490)</div></div>
-        <div class="tl-item move"><div class="tl-time">11:00</div><div class="tl-title">🚃 이코마 케이블카 탑승</div><div class="tl-desc">이코마역→호잔지역 · 일본 최초 케이블카 (6분, 편도 ¥300)</div></div>
-        <div class="tl-item spot"><div class="tl-time">11:15</div><div class="tl-title">🏔️ 호잔지 (宝山寺) <a href="https://www.google.com/maps/search/?api=1&query=宝山寺+生駒" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">상업의 신 · 암벽에 지어진 본당 · 참배길 석등 · 무료</div></div>
-        <div class="tl-item food"><div class="tl-time">12:30</div><div class="tl-title">🍜 점심: 이코마역 주변 <span class="tl-badge badge-food">점심</span> <a href="https://www.google.com/maps/search/?api=1&query=生駒駅+ランチ" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">케이블카 하산 후 이코마역 근처 식당</div></div>
-        <div class="tl-item move"><div class="tl-time">13:30</div><div class="tl-title">이코마→텐노지</div><div class="tl-desc">킨테츠 → 츠루하시 환승 → JR (약 35분, ¥500)</div></div>
-        <div class="tl-item spot"><div class="tl-time">14:15</div><div class="tl-title">🏙️ 아베노하루카스 전망대 <a href="https://www.google.com/maps/search/?api=1&query=あべのハルカス+展望台" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">일본 최고층 300m 전망 · 입장 ¥1,800</div></div>
-        <div class="tl-item spot"><div class="tl-time">16:00</div><div class="tl-title">🗼 쓰텐카쿠 & 신세카이 <a href="https://www.google.com/maps/search/?api=1&query=通天閣+新世界+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">레트로 분위기 거리 산책 · 쿠시카츠 거리</div></div>
-        <div class="tl-item food"><div class="tl-time">17:30</div><div class="tl-title">🍢 쿠시카츠 저녁 <span class="tl-badge badge-food">저녁</span> <a href="https://www.google.com/maps/search/?api=1&query=串カツだるま+新世界" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">신세카이 쿠시카츠 다루마 등 · ¥1,500~</div></div>
-        <div class="tl-item move"><div class="tl-time">19:00</div><div class="tl-title">텐노지→우메다 귀환</div><div class="tl-desc">미도스지선 (20분, ¥280)</div></div>
+        <div class="tl-item move"><div class="tl-time">10:30</div><div class="tl-title">미도스지선 우메다→난바</div><div class="tl-desc">미도스지선 (10분, ¥240)</div></div>
+        <div class="tl-item move"><div class="tl-time">10:45</div><div class="tl-title">난카이 본선 난바역→스미요시타이샤역</div><div class="tl-desc">난카이 본선 (10분, ¥220)</div></div>
+        <div class="tl-item spot"><div class="tl-time">11:00</div><div class="tl-title">⛩️ 스미요시타이샤 <a href="https://www.google.com/maps/search/?api=1&query=住吉大社+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">오사카 최고(最古) 신사 · 태고교(반달다리) · 오마모리 기념품 · 무료</div></div>
+        <div class="tl-item move"><div class="tl-time">12:15</div><div class="tl-title">스미요시타이샤→이코마역</div><div class="tl-desc">난카이→난바 환승 → 킨테츠 나라선 (약 40분, ¥490)</div></div>
+        <div class="tl-item food"><div class="tl-time">13:00</div><div class="tl-title">🍜 이코마역 주변 점심 <span class="tl-badge badge-food">점심</span> <a href="https://www.google.com/maps/search/?api=1&query=生駒駅+ランチ" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">케이블카 타기 전 이코마역 근처 식당</div></div>
+        <div class="tl-item move"><div class="tl-time">14:00</div><div class="tl-title">🚃 이코마 케이블카 탑승</div><div class="tl-desc">이코마역→호잔지역 · 일본 최초 케이블카 (6분, 편도 ¥300)</div></div>
+        <div class="tl-item spot"><div class="tl-time">14:15</div><div class="tl-title">🏔️ 호잔지 (宝山寺) <a href="https://www.google.com/maps/search/?api=1&query=宝山寺+生駒" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">상업의 신 · 암벽에 지어진 본당 · 참배길 석등 · 무료</div></div>
+        <div class="tl-item move"><div class="tl-time">15:30</div><div class="tl-title">이코마→오사카 귀환</div><div class="tl-desc">킨테츠 이코마역 → 난바 or 우메다 방면 (약 40분)</div></div>
+        <div class="tl-item"><div class="tl-time">16:30~</div><div class="tl-title">저녁 · 자유 시간</div><div class="tl-desc">미정 · 여유롭게 오사카 시내</div></div>
       </div>
     </div>
   </div>
@@ -564,12 +561,9 @@ const mapData = {
   map4: {
     center: [34.650, 135.550], zoom: 11,
     spots: [
-      {lat:34.6128,lng:135.4929,name:'스미요시타이샤',time:'09:00',icon:'⛩️'},
-      {lat:34.6785,lng:135.7003,name:'이코마역',time:'11:00',icon:'🚃'},
-      {lat:34.6810,lng:135.6850,name:'호잔지',time:'11:15',icon:'🏔️'},
-      {lat:34.6462,lng:135.5134,name:'아베노하루카스',time:'14:15',icon:'🏙️'},
-      {lat:34.6524,lng:135.5063,name:'쓰텐카쿠·신세카이',time:'16:00',icon:'🗼'},
-      {lat:34.6520,lng:135.5055,name:'쿠시카츠 저녁',time:'17:30',icon:'🍢'}
+      {lat:34.6128,lng:135.4929,name:'스미요시타이샤',time:'11:00',icon:'⛩️'},
+      {lat:34.6785,lng:135.7003,name:'이코마역',time:'13:00',icon:'🚃'},
+      {lat:34.6810,lng:135.6850,name:'호잔지',time:'14:15',icon:'🏔️'}
     ],color:'#a78bfa'
   },
   map5: {
