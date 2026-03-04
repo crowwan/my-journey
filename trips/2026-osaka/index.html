@@ -209,7 +209,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="info-card"><div class="label" style="color:var(--blue)">DAY 2 · 3/3 화</div><div class="value">난바 쇼핑 & 호젠지 · Cafe mog · TORA鶏YA</div><div class="sub">쿠니마루 → 난바 쇼핑 → 호젠지 → 도톤보리 → Cafe mog → 대욕탕 → TORA鶏YA</div></div>
     <div class="info-card"><div class="label" style="color:var(--green)">DAY 3 · 3/4 수</div><div class="value">교토 히가시야마 산책</div><div class="sub">기요미즈데라 → 산넨자카 → 야사카신사 → 기온 → 니시키시장</div></div>
     <div class="info-card"><div class="label" style="color:var(--purple)">DAY 4 · 3/5 목</div><div class="value">스미요시타이샤 & 이코마 호잔지</div><div class="sub">스미요시타이샤 → 이코마 호잔지 → 아베노하루카스 → 신세카이</div></div>
-    <div class="info-card"><div class="label" style="color:var(--pink)">DAY 5 · 3/6 금</div><div class="value">아침 산책 & 귀국</div><div class="sub">오사카성 → 간사이공항</div></div>
+    <div class="info-card"><div class="label" style="color:var(--pink)">DAY 5 · 3/6 금</div><div class="value">귀국</div><div class="sub">숙소 → 간사이공항 → 김포</div></div>
   </div>
 </div>
 
@@ -315,14 +315,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <!-- DAY 5 -->
   <div class="day-card">
-    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#f472b6,#ec4899)">D5</div><div class="day-meta"><h3>아침 산책 & 귀국</h3><p>3/6 (금) · 오사카성 → 간사이공항</p></div><span class="chv">▼</span></div>
+    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#f472b6,#ec4899)">D5</div><div class="day-meta"><h3>귀국</h3><p>3/6 (금) · 숙소 → 간사이공항 → 김포</p></div><span class="chv">▼</span></div>
     <div class="day-body">
       <div class="map-toggle" onclick="toggleMap('map5',this)">🗺️ 지도로 경로 보기</div>
       <div class="map-wrap" id="map5-wrap"><div class="day-map" id="map5"></div></div>
       <div class="timeline">
-        <div class="tl-item spot"><div class="tl-time">07:00</div><div class="tl-title">오사카성 공원 산책 <a href="https://www.google.com/maps/search/?api=1&query=大阪城公園" target="_blank" rel="noopener" class="tl-map">📍지도</a></div></div>
-        <div class="tl-item"><div class="tl-time">08:00</div><div class="tl-title">숙소 체크아웃</div></div>
-        <div class="tl-item move"><div class="tl-time">08:25</div><div class="tl-title">HARUKA No.9 탑승 → 간사이공항</div><div class="tl-desc">WEST QR 티켓 · 8호차 8D (창가석) · 48분 · 09:13 공항 도착</div></div>
+        <div class="tl-item"><div class="tl-time">06:30</div><div class="tl-title">숙소 체크아웃</div><div class="tl-desc">짐 챙기고 일찍 출발</div></div>
+        <div class="tl-item move"><div class="tl-time">07:20</div><div class="tl-title">HARUKA 탑승 → 간사이공항</div><div class="tl-desc">JR 오사카역 출발 · WEST QR 티켓 · 약 48분 · 08:08 공항 도착</div></div>
+        <div class="tl-item"><div class="tl-time">08:08</div><div class="tl-title">간사이공항 도착 · 체크인</div><div class="tl-desc">출국심사 + 면세점 여유</div></div>
         <div class="tl-item move"><div class="tl-time">11:30</div><div class="tl-title">김포공항행 출발 ✈️ <span class="tl-badge badge-move">비행 2h</span></div></div>
         <div class="tl-item move"><div class="tl-time">13:30</div><div class="tl-title">김포공항 도착</div><div class="tl-desc">입국심사 + 수하물 수령</div></div>
         <div class="tl-item move"><div class="tl-time">14:30</div><div class="tl-title">김포공항 → 어린이대공원역</div><div class="tl-desc">5호선(상일동 방면) → 군자역 환승 → 7호선 · 약 1시간 20분 · ₩1,400</div></div>
@@ -569,10 +569,9 @@ const mapData = {
   map5: {
     center: [34.620, 135.400], zoom: 10,
     spots: [
-      {lat:34.6873,lng:135.5262,name:'오사카성 공원',time:'07:00',icon:'🏯'},
-      {lat:34.6995,lng:135.5008,name:'숙소 체크아웃',time:'08:00',icon:'🏨'},
-      {lat:34.7024,lng:135.4959,name:'JR 오사카역',time:'08:25',icon:'🚉'},
-      {lat:34.4320,lng:135.2304,name:'간사이공항',time:'09:13',icon:'✈️'}
+      {lat:34.6995,lng:135.5008,name:'숙소 체크아웃',time:'06:30',icon:'🏨'},
+      {lat:34.7024,lng:135.4959,name:'JR 오사카역 (HARUKA)',time:'07:20',icon:'🚉'},
+      {lat:34.4320,lng:135.2304,name:'간사이공항',time:'08:08',icon:'✈️'}
     ],color:'#f472b6'
   }
 };
