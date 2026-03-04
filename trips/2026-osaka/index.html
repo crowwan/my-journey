@@ -209,7 +209,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="info-card"><div class="label" style="color:var(--blue)">DAY 2 · 3/3 화</div><div class="value">난바 쇼핑 & 호젠지 · Cafe mog · TORA鶏YA</div><div class="sub">쿠니마루 → 난바 쇼핑 → 호젠지 → 도톤보리 → Cafe mog → 대욕탕 → TORA鶏YA</div></div>
     <div class="info-card"><div class="label" style="color:var(--green)">DAY 3 · 3/4 수</div><div class="value">교토 히가시야마 산책</div><div class="sub">기요미즈데라 → 산넨자카 → 야사카신사 → 기온 → 니시키시장</div></div>
     <div class="info-card"><div class="label" style="color:var(--purple)">DAY 4 · 3/5 목</div><div class="value">스미요시타이샤 & 이코마 호잔지</div><div class="sub">스미요시타이샤 → 이코마 호잔지 → 아베노하루카스 → 신세카이</div></div>
-    <div class="info-card"><div class="label" style="color:var(--pink)">DAY 5 · 3/6 금</div><div class="value">아침 산책 & 귀국</div><div class="sub">오사카성 → 간사이공항</div></div>
+    <div class="info-card"><div class="label" style="color:var(--pink)">DAY 5 · 3/6 금</div><div class="value">귀국</div><div class="sub">숙소 → 간사이공항 → 김포</div></div>
   </div>
 </div>
 
@@ -295,37 +295,34 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
   <!-- DAY 4 -->
   <div class="day-card">
-    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6)">D4</div><div class="day-meta"><h3>스미요시타이샤 & 이코마 호잔지</h3><p>3/5 (목) · 스미요시타이샤 → 이코마 호잔지 → 아베노하루카스 → 신세카이</p></div><span class="chv">▼</span></div>
+    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6)">D4</div><div class="day-meta"><h3>스미요시타이샤 & 이코마 호잔지</h3><p>3/5 (목) · 스미요시타이샤 → 이코마 참배길 도보 → 호잔지</p></div><span class="chv">▼</span></div>
     <div class="day-body">
       <div class="map-toggle" onclick="toggleMap('map4',this)">🗺️ 지도로 경로 보기</div>
       <div class="map-wrap" id="map4-wrap"><div class="day-map" id="map4"></div></div>
       <div class="timeline">
-        <div class="tl-item move"><div class="tl-time">08:30</div><div class="tl-title">미도스지선 우메다→난바</div><div class="tl-desc">미도스지선 (10분, ¥240)</div></div>
-        <div class="tl-item move"><div class="tl-time">08:45</div><div class="tl-title">난카이 본선 난바역→스미요시타이샤역</div><div class="tl-desc">난카이 본선 (10분, ¥220)</div></div>
-        <div class="tl-item spot"><div class="tl-time">09:00</div><div class="tl-title">⛩️ 스미요시타이샤 <a href="https://www.google.com/maps/search/?api=1&query=住吉大社+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">오사카 최고(最古) 신사 · 태고교(반달다리) · 오마모리 기념품 · 무료</div></div>
-        <div class="tl-item move"><div class="tl-time">10:15</div><div class="tl-title">스미요시타이샤→이코마역</div><div class="tl-desc">난카이→난바 환승 → 킨테츠 나라선 (약 40분, ¥490)</div></div>
-        <div class="tl-item move"><div class="tl-time">11:00</div><div class="tl-title">🚃 이코마 케이블카 탑승</div><div class="tl-desc">이코마역→호잔지역 · 일본 최초 케이블카 (6분, 편도 ¥300)</div></div>
-        <div class="tl-item spot"><div class="tl-time">11:15</div><div class="tl-title">🏔️ 호잔지 (宝山寺) <a href="https://www.google.com/maps/search/?api=1&query=宝山寺+生駒" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">상업의 신 · 암벽에 지어진 본당 · 참배길 석등 · 무료</div></div>
-        <div class="tl-item food"><div class="tl-time">12:30</div><div class="tl-title">🍜 점심: 이코마역 주변 <span class="tl-badge badge-food">점심</span> <a href="https://www.google.com/maps/search/?api=1&query=生駒駅+ランチ" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">케이블카 하산 후 이코마역 근처 식당</div></div>
-        <div class="tl-item move"><div class="tl-time">13:30</div><div class="tl-title">이코마→텐노지</div><div class="tl-desc">킨테츠 → 츠루하시 환승 → JR (약 35분, ¥500)</div></div>
-        <div class="tl-item spot"><div class="tl-time">14:15</div><div class="tl-title">🏙️ 아베노하루카스 전망대 <a href="https://www.google.com/maps/search/?api=1&query=あべのハルカス+展望台" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">일본 최고층 300m 전망 · 입장 ¥1,800</div></div>
-        <div class="tl-item spot"><div class="tl-time">16:00</div><div class="tl-title">🗼 쓰텐카쿠 & 신세카이 <a href="https://www.google.com/maps/search/?api=1&query=通天閣+新世界+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">레트로 분위기 거리 산책 · 쿠시카츠 거리</div></div>
-        <div class="tl-item food"><div class="tl-time">17:30</div><div class="tl-title">🍢 쿠시카츠 저녁 <span class="tl-badge badge-food">저녁</span> <a href="https://www.google.com/maps/search/?api=1&query=串カツだるま+新世界" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">신세카이 쿠시카츠 다루마 등 · ¥1,500~</div></div>
-        <div class="tl-item move"><div class="tl-time">19:00</div><div class="tl-title">텐노지→우메다 귀환</div><div class="tl-desc">미도스지선 (20분, ¥280)</div></div>
+        <div class="tl-item move"><div class="tl-time">10:30</div><div class="tl-title">미도스지선 우메다→난바</div><div class="tl-desc">미도스지선 (10분, ¥240)</div></div>
+        <div class="tl-item move"><div class="tl-time">10:45</div><div class="tl-title">난카이 본선 난바역→스미요시타이샤역</div><div class="tl-desc">난카이 본선 (10분, ¥220)</div></div>
+        <div class="tl-item spot"><div class="tl-time">11:00</div><div class="tl-title">⛩️ 스미요시타이샤 <a href="https://www.google.com/maps/search/?api=1&query=住吉大社+大阪" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">오사카 최고(最古) 신사 · 태고교(반달다리) · 오마모리 기념품 · 무료</div></div>
+        <div class="tl-item move"><div class="tl-time">12:15</div><div class="tl-title">스미요시타이샤→이코마역</div><div class="tl-desc">난카이→난바 환승 → 킨테츠 나라선 (약 40분, ¥490)</div></div>
+        <div class="tl-item food"><div class="tl-time">13:00</div><div class="tl-title">🍜 이코마역 주변 점심 <span class="tl-badge badge-food">점심</span> <a href="https://www.google.com/maps/search/?api=1&query=生駒駅+ランチ" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">호잔지 올라가기 전 이코마역 근처 식당</div></div>
+        <div class="tl-item move"><div class="tl-time">14:00</div><div class="tl-title">🥾 호잔지 참배길 도보</div><div class="tl-desc">이코마역→호잔지 · 석등이 늘어선 참배길 도보 (약 30~40분 오르막)</div></div>
+        <div class="tl-item spot"><div class="tl-time">14:40</div><div class="tl-title">🏔️ 호잔지 (宝山寺) <a href="https://www.google.com/maps/search/?api=1&query=宝山寺+生駒" target="_blank" rel="noopener" class="tl-map">📍지도</a></div><div class="tl-desc">상업의 신 · 암벽에 지어진 본당 · 참배길 석등 · 무료</div></div>
+        <div class="tl-item move"><div class="tl-time">15:45</div><div class="tl-title">이코마→오사카 귀환</div><div class="tl-desc">참배길 하산 (20분) + 킨테츠 이코마역 → 난바 or 우메다 (약 40분)</div></div>
+        <div class="tl-item"><div class="tl-time">16:45~</div><div class="tl-title">저녁 · 자유 시간</div><div class="tl-desc">미정 · 여유롭게 오사카 시내</div></div>
       </div>
     </div>
   </div>
 
   <!-- DAY 5 -->
   <div class="day-card">
-    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#f472b6,#ec4899)">D5</div><div class="day-meta"><h3>아침 산책 & 귀국</h3><p>3/6 (금) · 오사카성 → 간사이공항</p></div><span class="chv">▼</span></div>
+    <div class="day-header" onclick="toggleDay(this)"><div class="day-num" style="background:linear-gradient(135deg,#f472b6,#ec4899)">D5</div><div class="day-meta"><h3>귀국</h3><p>3/6 (금) · 숙소 → 간사이공항 → 김포</p></div><span class="chv">▼</span></div>
     <div class="day-body">
       <div class="map-toggle" onclick="toggleMap('map5',this)">🗺️ 지도로 경로 보기</div>
       <div class="map-wrap" id="map5-wrap"><div class="day-map" id="map5"></div></div>
       <div class="timeline">
-        <div class="tl-item spot"><div class="tl-time">07:00</div><div class="tl-title">오사카성 공원 산책 <a href="https://www.google.com/maps/search/?api=1&query=大阪城公園" target="_blank" rel="noopener" class="tl-map">📍지도</a></div></div>
-        <div class="tl-item"><div class="tl-time">08:00</div><div class="tl-title">숙소 체크아웃</div></div>
-        <div class="tl-item move"><div class="tl-time">08:25</div><div class="tl-title">HARUKA No.9 탑승 → 간사이공항</div><div class="tl-desc">WEST QR 티켓 · 8호차 8D (창가석) · 48분 · 09:13 공항 도착</div></div>
+        <div class="tl-item"><div class="tl-time">06:30</div><div class="tl-title">숙소 체크아웃</div><div class="tl-desc">짐 챙기고 일찍 출발</div></div>
+        <div class="tl-item move"><div class="tl-time">07:20</div><div class="tl-title">HARUKA 5호 탑승 → 간사이공항</div><div class="tl-desc">JR 오사카역 출발 · 8호차 8D (지정석·창가) · 59분 · ¥2,910 · 08:19 공항 도착</div></div>
+        <div class="tl-item"><div class="tl-time">08:19</div><div class="tl-title">간사이공항 도착 · 체크인</div><div class="tl-desc">출국심사 + 면세점 여유</div></div>
         <div class="tl-item move"><div class="tl-time">11:30</div><div class="tl-title">김포공항행 출발 ✈️ <span class="tl-badge badge-move">비행 2h</span></div></div>
         <div class="tl-item move"><div class="tl-time">13:30</div><div class="tl-title">김포공항 도착</div><div class="tl-desc">입국심사 + 수하물 수령</div></div>
         <div class="tl-item move"><div class="tl-time">14:30</div><div class="tl-title">김포공항 → 어린이대공원역</div><div class="tl-desc">5호선(상일동 방면) → 군자역 환승 → 7호선 · 약 1시간 20분 · ₩1,400</div></div>
@@ -564,21 +561,17 @@ const mapData = {
   map4: {
     center: [34.650, 135.550], zoom: 11,
     spots: [
-      {lat:34.6128,lng:135.4929,name:'스미요시타이샤',time:'09:00',icon:'⛩️'},
-      {lat:34.6785,lng:135.7003,name:'이코마역',time:'11:00',icon:'🚃'},
-      {lat:34.6810,lng:135.6850,name:'호잔지',time:'11:15',icon:'🏔️'},
-      {lat:34.6462,lng:135.5134,name:'아베노하루카스',time:'14:15',icon:'🏙️'},
-      {lat:34.6524,lng:135.5063,name:'쓰텐카쿠·신세카이',time:'16:00',icon:'🗼'},
-      {lat:34.6520,lng:135.5055,name:'쿠시카츠 저녁',time:'17:30',icon:'🍢'}
+      {lat:34.6128,lng:135.4929,name:'스미요시타이샤',time:'11:00',icon:'⛩️'},
+      {lat:34.6785,lng:135.7003,name:'이코마역',time:'13:00',icon:'🍜'},
+      {lat:34.6810,lng:135.6850,name:'호잔지',time:'14:40',icon:'🏔️'}
     ],color:'#a78bfa'
   },
   map5: {
     center: [34.620, 135.400], zoom: 10,
     spots: [
-      {lat:34.6873,lng:135.5262,name:'오사카성 공원',time:'07:00',icon:'🏯'},
-      {lat:34.6995,lng:135.5008,name:'숙소 체크아웃',time:'08:00',icon:'🏨'},
-      {lat:34.7024,lng:135.4959,name:'JR 오사카역',time:'08:25',icon:'🚉'},
-      {lat:34.4320,lng:135.2304,name:'간사이공항',time:'09:13',icon:'✈️'}
+      {lat:34.6995,lng:135.5008,name:'숙소 체크아웃',time:'06:30',icon:'🏨'},
+      {lat:34.7024,lng:135.4959,name:'JR 오사카역 (HARUKA)',time:'07:20',icon:'🚉'},
+      {lat:34.4320,lng:135.2304,name:'간사이공항',time:'08:19',icon:'✈️'}
     ],color:'#f472b6'
   }
 };
