@@ -35,17 +35,26 @@ export async function POST(req: Request) {
     console.error('Chat API error:', error);
 
     const message = error instanceof Error ? error.message : 'Unknown error';
-    const status = message.includes('429') ? 429 : 500;
+
+    // Rate limit
+    if (message.includes('429')) {
+      return NextResponse.json(
+        { success: false, error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.' },
+        { status: 429 },
+      );
+    }
+
+    // JSON 파싱 실패
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { success: false, error: 'AI 응답을 처리하지 못했습니다. 다시 시도해주세요.' },
+        { status: 502 },
+      );
+    }
 
     return NextResponse.json(
-      {
-        success: false,
-        error:
-          status === 429
-            ? '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.'
-            : 'AI 응답 생성에 실패했습니다.',
-      },
-      { status },
+      { success: false, error: 'AI 응답 생성에 실패했습니다. 잠시 후 다시 시도해주세요.' },
+      { status: 500 },
     );
   }
 }

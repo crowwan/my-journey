@@ -7,8 +7,20 @@
 import { GoogleGenAI } from '@google/genai';
 import type { Trip, TripAction, TripActionType, ChatMessage } from '@/types/trip';
 
-// -- SDK 초기화 --------------------------------------------------
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY ?? '' });
+// -- SDK 초기화 (lazy) --------------------------------------------
+// Vercel 빌드 시 환경변수 없이도 모듈 로드가 가능하도록 지연 초기화
+let _ai: GoogleGenAI | null = null;
+
+function getAI(): GoogleGenAI {
+  if (!_ai) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY 환경변수가 설정되지 않았습니다.');
+    }
+    _ai = new GoogleGenAI({ apiKey });
+  }
+  return _ai;
+}
 
 // -- Rate Limit 관리 (in-memory, 단일 유저 프로토타입용) ----------
 const PRIMARY_MODEL = 'gemini-2.5-flash';
@@ -321,7 +333,7 @@ export const geminiApi = {
     const model = getModel();
     const contents = toGeminiContents(messages);
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model,
       contents,
       config: {
@@ -346,7 +358,7 @@ export const geminiApi = {
     const systemPrompt = EDIT_TRIP_PROMPT.replace('{TRIP_JSON}', JSON.stringify(currentTrip));
     const contents = toGeminiContents(messages);
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model,
       contents,
       config: {
@@ -370,7 +382,7 @@ export const geminiApi = {
     const model = getModel();
     const contents = toGeminiContents(messages);
 
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model,
       contents,
       config: {

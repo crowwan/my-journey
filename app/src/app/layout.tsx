@@ -12,6 +12,14 @@ const notoSansKR = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: "My Journey - AI Travel Planner",
   description: "AI와 대화하며 여행 계획을 세우고, 예쁘게 보여주는 앱",
+  openGraph: {
+    title: "My Journey - AI Travel Planner",
+    description: "AI와 대화하며 맞춤 여행 일정을 만들어보세요",
+    type: "website",
+  },
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>",
+  },
 };
 
 export const viewport: Viewport = {
