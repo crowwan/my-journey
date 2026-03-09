@@ -16,7 +16,9 @@ interface TripCardProps {
 
 export function TripCard({ trip, index = 0, packingProgress }: TripCardProps) {
   const router = useRouter();
-  const initial = trip.title.charAt(0);
+  const segmenter = new Intl.Segmenter('ko', { granularity: 'grapheme' });
+  const firstGrapheme = segmenter.segment(trip.title)[Symbol.iterator]().next().value?.segment ?? '';
+  const isEmoji = /\p{Emoji_Presentation}|\p{Extended_Pictographic}/u.test(firstGrapheme);
   const status = getTripStatus(trip.startDate, trip.endDate);
   const dday = getDDay(trip.startDate, trip.endDate);
   const badgeStyle = getDDayBadgeStyle(status);
@@ -31,8 +33,8 @@ export function TripCard({ trip, index = 0, packingProgress }: TripCardProps) {
         <div className="flex items-center gap-3.5">
           {/* 이니셜 */}
           <div className="shrink-0 w-12 h-12 rounded-xl bg-accent-bg border border-accent/[0.1] flex items-center justify-center">
-            <span className="font-bold text-lg text-accent/80">
-              {initial}
+            <span className={isEmoji ? 'text-2xl' : 'font-bold text-lg text-accent/80'}>
+              {firstGrapheme}
             </span>
           </div>
 

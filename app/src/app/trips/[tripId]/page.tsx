@@ -9,15 +9,14 @@ import type { Trip } from '@/types/trip';
 export default function TripPage() {
   const params = useParams();
   const tripId = typeof params.tripId === 'string' ? params.tripId : '';
-  const { trips, isLoaded, loadTrips, loadSeedData } = useTripStore();
+  const { trips, isLoaded, loadTrips } = useTripStore();
   const [trip, setTrip] = useState<Trip | null>(null);
 
   useEffect(() => {
     if (!isLoaded) {
       loadTrips();
-      loadSeedData();
     }
-  }, [isLoaded, loadTrips, loadSeedData]);
+  }, [isLoaded, loadTrips]);
 
   useEffect(() => {
     const found = trips.get(tripId);

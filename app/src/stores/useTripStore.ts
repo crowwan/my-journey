@@ -9,7 +9,7 @@ interface TripState {
 
   // Actions
   loadTrips: () => void;
-  loadSeedData: () => Promise<void>;
+
   saveTrip: (trip: Trip) => void;
   deleteTrip: (tripId: string) => void;
   setCurrentTrip: (tripId: string | null) => void;
@@ -31,23 +31,6 @@ export const useTripStore = create<TripState>((set, get) => ({
     set({ trips: tripsMap, isLoaded: true });
   },
 
-  loadSeedData: async () => {
-    // 시드 데이터가 이미 저장되어 있으면 스킵
-    if (storage.getTrip('osaka-2026')) return;
-
-    try {
-      const res = await fetch('/seed/osaka-2026.json');
-      const trip: Trip = await res.json();
-      storage.saveTrip(trip);
-      set((state) => {
-        const newTrips = new Map(state.trips);
-        newTrips.set(trip.id, trip);
-        return { trips: newTrips };
-      });
-    } catch (e) {
-      console.error('시드 데이터 로드 실패:', e);
-    }
-  },
 
   saveTrip: (trip) => {
     storage.saveTrip(trip);

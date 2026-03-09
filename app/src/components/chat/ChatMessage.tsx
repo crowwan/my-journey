@@ -13,6 +13,62 @@ function formatTime(timestamp: number): string {
   return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
+// 인라인 마크다운 파싱: **bold**, *italic*
+function parseInline(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*)/g;
+  let lastIndex = 0;
+  let match;
+  let key = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    // 매치 전 일반 텍스트
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    if (match[2]) {
+      // **bold**
+      parts.push(<strong key={key++} className="font-semibold">{match[2]}</strong>);
+    } else if (match[3]) {
+      // *italic*
+      parts.push(<em key={key++}>{match[3]}</em>);
+    }
+
+    lastIndex = regex.lastIndex;
+  }
+
+  // 나머지 텍스트
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
+}
+
+// 경량 마크다운 파싱: 줄 단위 처리 + 인라인 마크다운
+function parseMarkdown(text: string): React.ReactNode[] {
+  const lines = text.split('\n');
+
+  return lines.map((line, i) => {
+    const isLast = i === lines.length - 1;
+
+    // 리스트 아이템: - 또는 • 로 시작
+    const listMatch = line.match(/^[-•]\s+(.+)/);
+    if (listMatch) {
+      return (
+        <span key={i} className="flex gap-1.5">
+          <span className="text-accent shrink-0">•</span>
+          <span>{parseInline(listMatch[1])}</span>
+          {!isLast && '\n'}
+        </span>
+      );
+    }
+
+    return <span key={i}>{parseInline(line)}{!isLast && '\n'}</span>;
+  });
+}
+
 export function ChatMessage({ message }: ChatMessageProps) {
   const { role, content, timestamp, tripPreview } = message;
 
@@ -40,7 +96,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               : 'bg-white text-text rounded-2xl rounded-bl-md border border-border/60 shadow-[var(--shadow-card)]'
           }`}
         >
-          {content}
+          {parseMarkdown(content)}
         </div>
 
         {/* 여행 프리뷰 카드 */}
