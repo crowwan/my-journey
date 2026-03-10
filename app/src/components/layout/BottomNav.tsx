@@ -39,7 +39,7 @@ export function BottomNav() {
   if (pathname.startsWith('/trips/')) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 h-[var(--bottom-nav-h)] bg-white/90 backdrop-blur-sm border-t border-border shadow-none">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-t border-border shadow-none safe-bottom">
       <div className="max-w-[1100px] mx-auto flex justify-around h-full items-center">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.path;

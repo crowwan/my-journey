@@ -82,6 +82,8 @@
 
 /* === shadcn/ui Base Tokens (light) === */
 :root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --radius: 0.75rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -158,6 +160,16 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* === Safe Area === */
+.safe-top {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 1rem);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
 }
 
 /* === Project Base Styles === */

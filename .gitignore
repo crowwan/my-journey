@@ -13,3 +13,7 @@ docs/.pdca-snapshots/
 docs/03-analysis/
 .agents/
 skills-lock.json
+
+# Capacitor iOS native project
+app/ios/
+.vercel
