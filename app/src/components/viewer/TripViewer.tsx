@@ -17,16 +17,17 @@ import { PreTodoTab } from './tabs/PreTodoTab';
 
 interface TripViewerProps {
   trip: Trip;
+  onEdit?: () => void;
 }
 
-export function TripViewer({ trip }: TripViewerProps) {
+export function TripViewer({ trip, onEdit }: TripViewerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const checkedMap = storage.getPackingChecked(trip.id);
   const packingProgress = getPackingProgress(trip.packing, checkedMap);
 
   return (
     <div>
-      <HeroSection trip={trip} packingProgress={packingProgress} />
+      <HeroSection trip={trip} packingProgress={packingProgress} onEdit={onEdit} />
       <TabBar activeTab={activeTab} onChange={setActiveTab} />
       <div className="max-w-[1100px] mx-auto px-5 py-8">
         {activeTab === 'overview' && <OverviewTab trip={trip} />}

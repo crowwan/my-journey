@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 interface HeroSectionProps {
   trip: Trip;
   packingProgress?: { checked: number; total: number; percentage: number };
+  onEdit?: () => void;
 }
 
-export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
+export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps) {
   const status = getTripStatus(trip.startDate, trip.endDate);
   const dday = getDDay(trip.startDate, trip.endDate);
   const badgeStyle = getDDayBadgeStyle(status);
@@ -49,6 +50,17 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
               {packingProgress.checked}/{packingProgress.total}
             </span>
           </div>
+        )}
+
+        {/* AI 수정 버튼 */}
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            className="mt-4 flex items-center gap-1.5 mx-auto text-xs text-accent border border-accent/20 bg-accent-bg rounded-full px-4 py-2 hover:bg-accent-bg-hover transition-colors"
+          >
+            <span>✏️</span>
+            AI로 수정하기
+          </button>
         )}
       </div>
     </div>

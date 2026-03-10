@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import { useChatStore } from '@/stores/useChatStore';
+import { useTripStore } from '@/stores/useTripStore';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
@@ -18,12 +19,27 @@ const EXAMPLE_PROMPTS = [
   '파리 허니문 코스 추천',
 ];
 
-export function ChatContainer({ mode = 'create' }: ChatContainerProps) {
+// 편집 모드용 예시 질문
+const EDIT_PROMPTS = [
+  '일정 순서 변경해줘',
+  '맛집 추가해줘',
+  '예산 수정해줘',
+];
+
+export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
   const messages = useChatStore((s) => s.messages);
   const isLoading = useChatStore((s) => s.isLoading);
   const generatedTrip = useChatStore((s) => s.generatedTrip);
   const sendMessage = useChatStore((s) => s.sendMessage);
+  const { trips, isLoaded, loadTrips } = useTripStore();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 편집 모드일 때 trip 데이터 로드
+  useEffect(() => {
+    if (!isLoaded) loadTrips();
+  }, [isLoaded, loadTrips]);
+
+  const tripContext = tripId ? trips.get(tripId) : undefined;
 
   // 새 메시지 시 자동 스크롤
   useEffect(() => {
@@ -33,9 +49,13 @@ export function ChatContainer({ mode = 'create' }: ChatContainerProps) {
     }
   }, [messages, isLoading]);
 
-  // 일반 채팅은 항상 chat 모드로 전송
+  // 메시지 전송 (편집 모드일 때 tripContext 포함)
   const handleSend = (text: string) => {
-    sendMessage(text, mode === 'edit' ? 'edit' : 'chat');
+    if (mode === 'edit' && tripContext) {
+      sendMessage(text, 'edit', tripContext);
+    } else {
+      sendMessage(text, mode === 'edit' ? 'edit' : 'chat');
+    }
   };
 
   // "여행 계획 생성하기" 버튼 클릭 시에만 create 모드로 전환
@@ -54,17 +74,19 @@ export function ChatContainer({ mode = 'create' }: ChatContainerProps) {
         {isEmpty ? (
           // 빈 상태 안내
           <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
-            <div className="text-5xl mb-4">✈️</div>
+            <div className="text-5xl mb-4">{mode === 'edit' ? '✏️' : '✈️'}</div>
             <h2 className="text-2xl font-bold text-text mb-1">
-              어디로 떠나볼까요?
+              {mode === 'edit' ? '여행을 수정해볼까요?' : '어디로 떠나볼까요?'}
             </h2>
             <p className="text-text-secondary text-sm mb-8 max-w-xs">
-              여행지와 기간을 알려주시면 AI가 맞춤 일정을 만들어 드려요
+              {mode === 'edit'
+                ? '수정하고 싶은 부분을 알려주세요'
+                : '여행지와 기간을 알려주시면 AI가 맞춤 일정을 만들어 드려요'}
             </p>
 
             {/* 예시 질문 칩 — 글래스 카드 스타일 */}
             <div className="flex flex-wrap justify-center gap-2.5 max-w-md">
-              {EXAMPLE_PROMPTS.map((prompt) => (
+              {(mode === 'edit' ? EDIT_PROMPTS : EXAMPLE_PROMPTS).map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => handleSend(prompt)}

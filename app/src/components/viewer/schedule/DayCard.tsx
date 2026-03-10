@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import type { Day } from '@/types/trip';
 import { TimelineItemComponent } from './TimelineItem';
 import {
@@ -8,6 +9,8 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion';
+
+const DayMap = dynamic(() => import('./DayMap'), { ssr: false });
 
 interface DayCardProps {
   day: Day;
@@ -44,6 +47,11 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-5 pb-5">
+          {day.mapSpots && day.mapSpots.length > 0 && (
+            <div className="mb-4">
+              <DayMap mapSpots={day.mapSpots} color={color} />
+            </div>
+          )}
           <div className="timeline animate-fade-up">
             {day.items.map((item, idx) => (
               <TimelineItemComponent key={idx} item={item} />

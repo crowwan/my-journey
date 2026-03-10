@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useTripStore } from '@/stores/useTripStore';
 import { TripViewer } from '@/components/viewer/TripViewer';
 import type { Trip } from '@/types/trip';
 
 export default function TripPage() {
   const params = useParams();
+  const router = useRouter();
   const tripId = typeof params.tripId === 'string' ? params.tripId : '';
   const { trips, isLoaded, loadTrips } = useTripStore();
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -31,5 +32,9 @@ export default function TripPage() {
     );
   }
 
-  return <TripViewer trip={trip} />;
+  const handleEdit = () => {
+    router.push(`/chat?mode=edit&tripId=${tripId}`);
+  };
+
+  return <TripViewer trip={trip} onEdit={handleEdit} />;
 }
