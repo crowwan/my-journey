@@ -195,19 +195,28 @@
 
 ---
 
-## 7. 현재 이슈 & 다음 단계
+## 7. 시행착오 기록 (Safe Area)
 
-### 미해결 이슈
-- **Safe Area 상단 겹침**: Header와 iPhone 상태바 겹침 보고됨
-  - `StatusBar.setOverlaysWebView({ overlay: true })` 추가 + globals.css에 `.safe-top` 클래스 적용
-  - 최신 코드 Vercel 배포 후 시뮬레이터에서 재확인 필요
-  - 커밋 `c2d7dc4`에 수정 포함, push 완료 → Vercel 자동 배포 대기 중
+> 다시 시도하지 말 것
+
+- ❌ CSS `env(safe-area-inset-top)` Tailwind arbitrary value → Capacitor WebView에서 작동 안 함
+- ❌ globals.css에 `.safe-top`/`.safe-bottom` 커스텀 클래스 → 효과 없음
+- ❌ `StatusBar.setOverlaysWebView({ overlay: true })` → contentInset과 충돌
+- ❌ MyViewController.swift 커스텀 클래스 (CAPBridgeViewController 상속) → 앱 실행 불가
+- ❌ `app/ios/`를 git에 포함 → 빌드 아티팩트(이미지, xcodeproj) 포함됨, 되돌림
+- ✅ **`contentInset: 'always'`가 정답** — capacitor.config.ts의 ios 옵션으로 해결
+
+## 8. 현재 상태 & 다음 단계
+
+### 해결된 이슈
+- Safe Area: `contentInset: 'always'`로 해결 완료 (커밋 `f35eb07`)
+- Vercel Deployment Protection: OFF로 WebView 로딩 정상화
+- Vercel 고정 도메인: `my-journey-app.vercel.app` alias 설정
 
 ### 다음 즉시 단계
-1. Vercel 배포 완료 후 시뮬레이터에서 Safe Area 확인
-2. Safe Area 문제 해결 확인 후, Quick Wins 구현 (캘린더 .ics, 공유, 지도앱 열기)
-3. 앱 아이콘 & 런치 스크린 제작
-4. Apple Developer 등록 → TestFlight 배포
+1. Quick Wins 구현 (캘린더 .ics, 공유, 지도앱 열기)
+2. 앱 아이콘 & 런치 스크린 제작
+3. Apple Developer 등록 → TestFlight 배포
 
 ---
 

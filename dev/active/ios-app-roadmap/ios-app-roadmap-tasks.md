@@ -36,23 +36,11 @@
 - [x] `src/lib/capacitor.ts` — initCapacitor() 함수 (StatusBar + SplashScreen)
 - [x] `CapacitorInit.tsx` 클라이언트 컴포넌트 → layout.tsx에 추가
 - [x] viewport-fit: cover 추가 (layout.tsx)
-- [x] Safe Area CSS 클래스 (.safe-top, .safe-bottom) — globals.css
-- [x] Header.tsx에 safe-top 클래스 적용
-- [x] BottomNav.tsx에 safe-bottom 클래스 적용
-- [x] StatusBar.setOverlaysWebView({ overlay: true }) 추가
+- [x] Safe Area 대응 — `contentInset: 'always'` (capacitor.config.ts)
 - [x] Vercel 고정 도메인 설정 (`my-journey-app.vercel.app`)
 - [x] Vercel Deployment Protection OFF
 - [x] .gitignore에 `app/ios/` 추가
-
----
-
-## 진행 중 — Safe Area 검증
-
-- [ ] **Vercel 배포 완료 후 시뮬레이터에서 Safe Area 재확인**
-  - 커밋 c2d7dc4 push 완료, Vercel 자동 배포 대기
-  - Xcode에서 Cmd + R로 확인
-  - 상단 Header가 노치/Dynamic Island와 겹치지 않는지
-  - 하단 BottomNav가 홈 인디케이터와 겹치지 않는지
+- [x] 시뮬레이터에서 Safe Area 정상 확인
 
 ---
 
