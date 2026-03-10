@@ -14,6 +14,7 @@ docs/03-analysis/
 .agents/
 skills-lock.json
 
-# Capacitor iOS native project
-app/ios/
+# Capacitor iOS build artifacts
+app/ios/App/Pods/
+app/ios/capacitor-cordova-ios-plugins/
 .vercel

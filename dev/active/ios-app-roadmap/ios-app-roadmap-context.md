@@ -1,12 +1,12 @@
 # iOS 앱 로드맵 — 컨텍스트 & 의존성
 
-**최종 갱신**: 2026-03-10
+**최종 갱신**: 2026-03-10 (v0.3 Capacitor 설정 완료)
 
 ---
 
 ## 1. 프로젝트 현황 스냅샷
 
-### 완료된 기능 (v0.1 ~ v0.2)
+### 완료된 기능 (v0.1 ~ v0.3)
 
 #### v0.1 MVP (2026-03-09 배포)
 - [x] AI 채팅 인터페이스 (Gemini 2.5 Flash)
@@ -24,6 +24,14 @@
 - [x] Leaflet 지도 (DayMap — 번호 마커 + 대시선 경로)
 - [x] AI 편집 모드 (뷰어 → 채팅 edit 모드)
 
+#### v0.3 Capacitor iOS 설정 (2026-03-10)
+- [x] Capacitor v6 + iOS 프로젝트 초기화
+- [x] StatusBar/SplashScreen 네이티브 플러그인
+- [x] Safe Area CSS 대응 (Header, BottomNav)
+- [x] CapacitorInit 클라이언트 컴포넌트
+- [x] Vercel 고정 도메인 설정
+- [x] Vercel Deployment Protection 비활성화
+
 ---
 
 ## 2. 핵심 파일 맵
@@ -39,6 +47,14 @@
 | `app/src/app/global-error.tsx` | 전역 에러 |
 | `app/src/app/layout.tsx` | 루트 레이아웃 |
 | `app/src/app/globals.css` | 전역 스타일 |
+
+### Capacitor (v0.3 신규)
+| 파일 | 역할 |
+|------|------|
+| `app/capacitor.config.ts` | Capacitor 설정 (server 모드) |
+| `app/src/lib/capacitor.ts` | 네이티브 초기화 (StatusBar, SplashScreen) |
+| `app/src/components/CapacitorInit.tsx` | useEffect 초기화 클라이언트 컴포넌트 |
+| `app/ios/` | iOS 네이티브 프로젝트 (.gitignore됨) |
 
 ### 상태 관리
 | 파일 | 역할 |
@@ -86,19 +102,19 @@
 - class-variance-authority 0.7.1
 - clsx 2.1.1, tailwind-merge 3.5.0
 - tw-animate-css 1.4.0
+- **@capacitor/core@6** (v0.3 추가)
+- **@capacitor/ios@6** (v0.3 추가)
+- **@capacitor/status-bar@6** (v0.3 추가)
+- **@capacitor/splash-screen@6** (v0.3 추가)
 
 **개발**:
 - typescript 5, @types/node, @types/react, @types/react-dom
 - @types/leaflet
 - @eslint/eslintrc, eslint, eslint-config-next
 - @tailwindcss/postcss, tailwindcss 4
+- **@capacitor/cli@6** (v0.3 추가)
 
-### iOS 앱 추가 예정 패키지
-- @capacitor/core
-- @capacitor/ios
-- @capacitor/cli
-- @capacitor/splash-screen
-- @capacitor/status-bar
+### 향후 추가 예정 패키지
 - @capacitor/local-notifications (Phase 3)
 - @capacitor-community/calendar (Phase 2)
 
@@ -111,36 +127,91 @@
 - **트레이드오프**: 오프라인 시 앱 사용 불가 (Phase 5에서 해결)
 - **대안**: static 모드 (앱에 번들) — 오프라인 가능하나 업데이트마다 앱 심사
 
-### 결정 2: 캘린더 — .ics 우선, EventKit 후속
+### 결정 2: Capacitor v6 사용 (v8 아님)
+- **이유**: 현재 Node 20.13.1 환경. Capacitor v8은 Node >= 22 필요
+- **영향**: 기능적 차이 없음, v6도 iOS 18 지원
+
+### 결정 3: Vercel Deployment Protection OFF
+- **이유**: Capacitor WebView에서 Vercel 인증 벽에 막혀 Safari로 리다이렉트됨
+- **영향**: 프로덕션 URL이 공개 접근 가능 (보안 민감 데이터 없으므로 OK)
+
+### 결정 4: 캘린더 — .ics 우선, EventKit 후속
 - **이유**: .ics는 웹에서도 동작하여 즉시 배포 가능
 - **트레이드오프**: 양방향 동기화 불가 (단방향 내보내기만)
 
-### 결정 3: 알림 — 로컬 알림 우선
+### 결정 5: 알림 — 로컬 알림 우선
 - **이유**: 서버 인프라 불필요, Capacitor 플러그인으로 간단 구현
 - **트레이드오프**: 앱 삭제 시 알림 소실
 
-### 결정 4: 지도 — Leaflet 유지 + "지도 앱에서 열기" 추가
+### 결정 6: 지도 — Leaflet 유지 + "지도 앱에서 열기" 추가
 - **이유**: 이미 구현된 Leaflet 활용, 네이티브 지도 앱이 더 나은 UX
 - **트레이드오프**: 앱 내 경로 안내 불가
 
 ---
 
-## 5. 환경 설정
+## 5. 배포 방식
+
+### 웹 (Vercel)
+- **프로젝트**: `crowwans-projects/app`
+- **프로덕션 도메인**: `https://my-journey-app.vercel.app` (alias 설정됨)
+- **배포 트리거**: `git push origin main` → Vercel 자동 배포
+- **Vercel 프로젝트 설정**: root directory = `app/`
+- **환경변수**: `GEMINI_API_KEY` (Vercel 대시보드에서 설정)
+- **Deployment Protection**: OFF (Capacitor WebView 호환 위해)
+
+### iOS (Capacitor)
+- **모드**: server 모드 (Vercel URL을 WKWebView로 로드)
+- **설정 파일**: `app/capacitor.config.ts`
+- **iOS 프로젝트**: `app/ios/` (.gitignore됨, 로컬에서 생성)
+- **빌드 커맨드**:
+  ```bash
+  cd app
+  npx cap sync ios    # 설정/플러그인 동기화
+  npx cap open ios    # Xcode 열기
+  # Xcode에서 Cmd + R로 시뮬레이터 실행
+  ```
+- **로컬 테스트 시**: `capacitor.config.ts`의 URL을 `http://localhost:3000`으로 임시 변경 + `cleartext: true`
+
+### CLI 배포 주의사항
+- `npx vercel --prod`는 프로젝트 루트에서 실행하면 `my-journey` 프로젝트로 감
+- `app/` 디렉토리의 Vercel 프로젝트(`app`)는 git push로만 배포 권장
+- 두 개의 `.vercel/project.json` 존재: 루트(`my-journey`) / `app/`(`app`)
+
+---
+
+## 6. 환경 설정
 
 ### 현재 환경
 - **배포**: Vercel (vercel.com)
 - **환경변수**: `.env.local` — `GEMINI_API_KEY`
-- **도메인**: Vercel 기본 도메인
+- **도메인**: `my-journey-app.vercel.app` (고정 alias)
+- **Node**: v20.13.1
 
-### iOS 빌드 환경 (추가 필요)
+### iOS 빌드 환경
 - Xcode (최신)
-- CocoaPods
-- Apple Developer Account ($99/년)
-- 프로비저닝 프로파일 & 인증서
+- CocoaPods (Capacitor sync 시 자동 설치)
+- Apple Developer Account ($99/년) — 아직 미등록
+- 프로비저닝 프로파일 & 인증서 — 아직 미생성
 
 ---
 
-## 6. 관련 문서
+## 7. 현재 이슈 & 다음 단계
+
+### 미해결 이슈
+- **Safe Area 상단 겹침**: Header와 iPhone 상태바 겹침 보고됨
+  - `StatusBar.setOverlaysWebView({ overlay: true })` 추가 + globals.css에 `.safe-top` 클래스 적용
+  - 최신 코드 Vercel 배포 후 시뮬레이터에서 재확인 필요
+  - 커밋 `c2d7dc4`에 수정 포함, push 완료 → Vercel 자동 배포 대기 중
+
+### 다음 즉시 단계
+1. Vercel 배포 완료 후 시뮬레이터에서 Safe Area 확인
+2. Safe Area 문제 해결 확인 후, Quick Wins 구현 (캘린더 .ics, 공유, 지도앱 열기)
+3. 앱 아이콘 & 런치 스크린 제작
+4. Apple Developer 등록 → TestFlight 배포
+
+---
+
+## 8. 관련 문서
 
 | 문서 | 경로 |
 |------|------|

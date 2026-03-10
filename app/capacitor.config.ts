@@ -9,6 +9,7 @@ const config: CapacitorConfig = {
   },
   ios: {
     scheme: 'My Journey',
+    contentInset: 'always',
   },
 };
 
