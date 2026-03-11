@@ -46,15 +46,20 @@
 
 ## Phase 1 남은 작업: iOS 앱 래핑 (v0.3)
 
-### UI 레이아웃 리팩토링 — ✅ 완료 (2026-03-11)
+### UI 레이아웃 리팩토링 — ✅ 완료 (2026-03-11, 커밋 `6ace450`~`2eaf453`)
 - [x] BottomNav 완전 제거 (page.tsx, chat/page.tsx, globals.css에서 제거, 파일은 보존)
 - [x] 홈 네비게이션 단순화 (Header에 채팅 버튼 추가, 새 일정은 기존 NewTripButton 유지)
 - [x] 채팅 페이지 뒤로가기 버튼 (기존 showBack 활용, 추가 작업 없음)
-- [x] ChatInput에 safe-area-inset-bottom 처리 이관
-- [x] TabBar 뒤로가기를 스크롤 밖 고정 요소로 분리
-- [x] contentInset: 'always' 복원 + CSS env() safe area 제거 (Header pt-3으로 변경)
+- [x] TabBar 뒤로가기를 탭 위 별도 행 "← 홈"으로 분리
+- [x] 홈 페이지 min-h-screen 제거 (하단 여백 스크롤 방지)
 - [x] 스플래시: sessionStorage로 세션당 1회만 (커밋 c9d55d0)
 - [x] 빌드 버전 UI footer (커밋 c9d55d0)
+
+### iOS Safe Area 대응 — 🔄 검증 대기 (2026-03-11, 커밋 `2eaf453`)
+- [x] JS 기반 `--safe-area-top` CSS 변수 주입 (`initCapacitor()`)
+- [x] Header/TabBar에 var(--safe-area-top) 패딩 적용
+- [ ] **Vercel 배포 완료 후 iOS 리빌드하여 최종 검증**
+- 시행착오: contentInset(sticky 미호환), CSS env()(값 0), viewport-fit 제거(효과 없음) 모두 실패
 
 ### iOS 네이티브 마무리
 - [ ] 앱 아이콘 생성 (1024x1024 기본 + 각 사이즈)

@@ -240,26 +240,49 @@ Capacitor server 모드에서 WKWebView가 이전 배포를 캐싱하여 최신 
 
 ---
 
-## 8. 시행착오 기록 (Safe Area)
+## 8. 시행착오 기록 (Safe Area) — 2026-03-11 최종 갱신
 
 > 다시 시도하지 말 것
 
-- ❌ CSS `env(safe-area-inset-top)` Tailwind arbitrary value → Capacitor WebView에서 작동 안 함
+- ❌ CSS `env(safe-area-inset-top)` Tailwind arbitrary value → Capacitor WKWebView에서 값이 0
 - ❌ globals.css에 `.safe-top`/`.safe-bottom` 커스텀 클래스 → 효과 없음
-- ❌ `StatusBar.setOverlaysWebView({ overlay: true })` → contentInset과 충돌
+- ❌ `StatusBar.setOverlaysWebView({ overlay: false })` → 효과 없음
+- ❌ `viewport-fit: cover` 제거 → WKWebView가 네이티브 레벨에서 status bar 뒤까지 확장하므로 CSS meta로 제어 불가
+- ❌ `contentInset: 'always'` → 스크롤 콘텐츠는 밀어주지만 **sticky top-0 요소는 노치 뒤에 붙음** + 하단에도 inset 추가되어 불필요한 스크롤
+- ❌ `contentInset: 'always'` + JS safe area 동시 → 이중 패딩
 - ❌ MyViewController.swift 커스텀 클래스 (CAPBridgeViewController 상속) → 앱 실행 불가
-- ❌ `app/ios/`를 git에 포함 → 빌드 아티팩트(이미지, xcodeproj) 포함됨, 되돌림
-- ✅ **`contentInset: 'always'`가 정답** — capacitor.config.ts의 ios 옵션으로 해결
+- ❌ `app/ios/`를 git에 포함 → 빌드 아티팩트 포함됨, 되돌림
+- ✅ **JS `--safe-area-top` CSS 변수 방식** — `initCapacitor()`에서 기기 화면 크기로 계산, sticky 헤더에 직접 패딩 (검증 대기)
 
-## 8. 현재 상태 & 다음 단계
+### Safe Area 최종 구현 (커밋 `2eaf453`)
+```
+initCapacitor() → iOS 기기 화면 크기로 safe area 계산
+  → document.documentElement.style.setProperty('--safe-area-top', '47px' 또는 '59px')
+  → Header: pt-[calc(0.75rem+var(--safe-area-top,0px))]
+  → TabBar: pt-[var(--safe-area-top,0px)]
+  → 웹에서는 변수 미설정 → 0px (영향 없음)
+```
+
+### ⚠️ 중요: Capacitor server 모드 테스트 순서
+1. `git push origin main` → Vercel 배포 시작
+2. Vercel 배포 완료 대기 (1~2분)
+3. `cd app && npx cap sync ios` → 네이티브 설정 동기화
+4. Xcode에서 리빌드 (Cmd+R)
+5. **Vercel 배포 전에 iOS 리빌드하면 이전 웹 코드가 로드됨!**
+
+## 9. 현재 상태 & 다음 단계
 
 ### 해결된 이슈
-- Safe Area: `contentInset: 'always'`로 해결 완료 (커밋 `f35eb07`)
+- BottomNav 제거 + Header에 채팅 버튼 (커밋 `6ace450`)
+- TabBar 뒤로가기 별도 행 분리 (커밋 `ff7079c`)
 - Vercel Deployment Protection: OFF로 WebView 로딩 정상화
-- Vercel 고정 도메인: `my-journey-planner.vercel.app` alias 설정
+- Vercel 고정 도메인: `my-journey-planner.vercel.app`
+
+### 검증 대기
+- Safe Area: JS `--safe-area-top` 방식 — Vercel 배포 후 iOS 리빌드 검증 필요
 
 ### 다음 즉시 단계
-1. ~~Quick Wins 구현~~ ✅ 완료 (커밋 `d9175aa`)
+1. **Safe Area 최종 검증** (Vercel 배포 완료 후 iOS 리빌드)
 2. 앱 아이콘 & 런치 스크린 제작 (디자인 에셋 필요)
 3. Info.plist 설정 (세로 모드 고정, 수출 규정 플래그)
 4. Apple Developer 등록 → TestFlight 배포
