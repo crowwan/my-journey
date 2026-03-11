@@ -3,7 +3,6 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { ChatContainer } from '@/components/chat/ChatContainer';
 
 function ChatPageInner() {
@@ -14,10 +13,9 @@ function ChatPageInner() {
   return (
     <div className="h-dvh flex flex-col">
       <Header title={mode === 'edit' ? '여행 수정하기' : 'AI Travel Planner'} showBack />
-      <div className="flex-1 min-h-0 pb-[var(--bottom-nav-h)]">
+      <div className="flex-1 min-h-0">
         <ChatContainer mode={mode} tripId={tripId} />
       </div>
-      <BottomNav />
     </div>
   );
 }

@@ -46,6 +46,16 @@
 
 ## Phase 1 남은 작업: iOS 앱 래핑 (v0.3)
 
+### UI 레이아웃 리팩토링 — ✅ 완료 (2026-03-11)
+- [x] BottomNav 완전 제거 (page.tsx, chat/page.tsx, globals.css에서 제거, 파일은 보존)
+- [x] 홈 네비게이션 단순화 (Header에 채팅 버튼 추가, 새 일정은 기존 NewTripButton 유지)
+- [x] 채팅 페이지 뒤로가기 버튼 (기존 showBack 활용, 추가 작업 없음)
+- [x] ChatInput에 safe-area-inset-bottom 처리 이관
+- [x] TabBar 뒤로가기를 스크롤 밖 고정 요소로 분리
+- [x] contentInset: 'always' 복원 + CSS env() safe area 제거 (Header pt-3으로 변경)
+- [x] 스플래시: sessionStorage로 세션당 1회만 (커밋 c9d55d0)
+- [x] 빌드 버전 UI footer (커밋 c9d55d0)
+
 ### iOS 네이티브 마무리
 - [ ] 앱 아이콘 생성 (1024x1024 기본 + 각 사이즈)
 - [ ] 런치 스크린 (LaunchScreen.storyboard)

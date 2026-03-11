@@ -5,7 +5,6 @@ import { useTripStore } from '@/stores/useTripStore';
 import { storage } from '@/lib/storage';
 import { getPackingProgress } from '@/lib/trip-utils';
 import { Header } from '@/components/layout/Header';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { TripCard } from '@/components/home/TripCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
@@ -42,7 +41,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen pb-[var(--bottom-nav-h)]">
+    <div className="min-h-screen">
       <Header title="My Journey" />
 
       {/* 시간대별 인사말 */}
@@ -85,7 +84,6 @@ export default function Home() {
           Build {process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 7)} · {process.env.NEXT_PUBLIC_BUILD_TIME?.slice(0, 16).replace('T', ' ')}
         </p>
       </footer>
-      <BottomNav />
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="shrink-0 bg-white border-t border-border px-4 py-3">
+    <div className="shrink-0 bg-white border-t border-border px-4 py-3 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-[1100px] mx-auto flex items-end gap-2">
         <textarea
           ref={textareaRef}
