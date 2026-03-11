@@ -32,7 +32,7 @@ export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps)
   };
 
   return (
-    <div className="bg-gradient-to-b from-accent-bg to-white flex items-center justify-center text-center px-5 py-8">
+    <div className="bg-gradient-to-b from-accent-bg to-white flex items-center justify-center text-center px-5 py-8 pt-[calc(2rem+var(--safe-area-top,0px))]">
       <div className="w-full max-w-lg">
         {/* D-day 뱃지 */}
         <Badge className={cn('mb-4 text-xs font-medium px-3 py-1', badgeStyle)}>
