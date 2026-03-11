@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { TAB_CONFIG, type TabId } from '@/lib/constants';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -9,10 +10,19 @@ interface TabBarProps {
 }
 
 export function TabBar({ activeTab, onChange }: TabBarProps) {
+  const router = useRouter();
+
   return (
     <div className="sticky top-0 z-[100] bg-white/95 backdrop-blur-sm border-b border-border/50 pt-[env(safe-area-inset-top)]">
       <Tabs value={activeTab} onValueChange={(v) => onChange(v as TabId)} className="max-w-[1100px] mx-auto px-3">
         <TabsList variant="line" className="w-full justify-start overflow-x-auto scrollbar-hide gap-0">
+          <button
+            onClick={() => router.push('/')}
+            className="px-3 py-3.5 text-text-secondary hover:text-accent transition-colors shrink-0"
+            aria-label="홈으로"
+          >
+            ←
+          </button>
           {TAB_CONFIG.map((tab) => (
             <TabsTrigger
               key={tab.id}
