@@ -1,6 +1,6 @@
 # iOS 앱 로드맵 — 작업 체크리스트
 
-**최종 갱신**: 2026-03-10
+**최종 갱신**: 2026-03-11
 
 ---
 
@@ -51,11 +51,11 @@
 - [ ] 런치 스크린 (LaunchScreen.storyboard)
 - [ ] Info.plist 설정 (앱 이름, 권한 설명 등)
 
-### Quick Wins (Phase 1에 포함)
-- [ ] `.ics` 캘린더 내보내기 유틸 구현
-- [ ] "캘린더에 추가" 버튼 (OverviewTab)
-- [ ] "지도 앱에서 열기" 딥링크 버튼 (DayMap)
-- [ ] 공유 기능 (`@capacitor/share`)
+### Quick Wins (Phase 1에 포함) — ✅ 완료 (2026-03-11, 커밋 `d9175aa`)
+- [x] `.ics` 캘린더 내보내기 유틸 구현 (`app/src/lib/ics-utils.ts`)
+- [x] "캘린더에 추가" 버튼 (OverviewTab)
+- [x] "지도 앱에서 열기" 딥링크 버튼 (DayCard, 전체 경유지 경로 지원)
+- [x] 공유 기능 (Web Share API + 클립보드 폴백, `@capacitor/share` 불필요)
 
 ### App Store 배포
 - [ ] Apple Developer 계정 등록 ($99/년)

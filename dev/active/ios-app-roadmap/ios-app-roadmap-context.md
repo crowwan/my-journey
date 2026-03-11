@@ -1,6 +1,6 @@
 # iOS 앱 로드맵 — 컨텍스트 & 의존성
 
-**최종 갱신**: 2026-03-10 (v0.3 Capacitor 설정 완료)
+**최종 갱신**: 2026-03-11 (Quick Wins 구현 완료)
 
 ---
 
@@ -75,13 +75,21 @@
 | `app/src/lib/constants.ts` | 탭 설정, Day 컬러 |
 | `app/src/lib/trip-utils.ts` | D-day 계산, 상태 유틸 |
 
+### Quick Wins 유틸 (v0.3 신규, 커밋 `d9175aa`)
+| 파일 | 역할 |
+|------|------|
+| `app/src/lib/ics-utils.ts` | .ics 캘린더 내보내기 (RFC 5545, subtitle만 DESCRIPTION) |
+| `app/src/lib/map-utils.ts` | 지도 앱 열기 (Apple Maps/Google Maps, 전체 경유지 경로) |
+| `app/src/lib/share-utils.ts` | 공유 (Web Share API + 클립보드 폴백) |
+
 ### 컴포넌트 (주요)
 | 파일 | 역할 |
 |------|------|
 | `app/src/components/viewer/TripViewer.tsx` | 여행 뷰어 메인 |
-| `app/src/components/viewer/HeroSection.tsx` | 히어로 (D-day, 편집 버튼) |
-| `app/src/components/viewer/schedule/DayCard.tsx` | Day 카드 (지도 포함) |
+| `app/src/components/viewer/HeroSection.tsx` | 히어로 (D-day, 편집/공유 버튼) |
+| `app/src/components/viewer/schedule/DayCard.tsx` | Day 카드 (지도 + 지도앱 열기 버튼) |
 | `app/src/components/viewer/schedule/DayMap.tsx` | Leaflet 지도 |
+| `app/src/components/viewer/tabs/OverviewTab.tsx` | 개요탭 (캘린더 추가 버튼) |
 | `app/src/components/chat/ChatContainer.tsx` | 채팅 컨테이너 |
 | `app/src/components/layout/BottomNav.tsx` | 하단 네비게이션 |
 | `app/src/components/layout/SplashScreen.tsx` | 스플래시 |
@@ -146,6 +154,20 @@
 ### 결정 6: 지도 — Leaflet 유지 + "지도 앱에서 열기" 추가
 - **이유**: 이미 구현된 Leaflet 활용, 네이티브 지도 앱이 더 나은 UX
 - **트레이드오프**: 앱 내 경로 안내 불가
+
+### 결정 7: 공유 — Web Share API 사용 (@capacitor/share 불필요)
+- **이유**: iOS WKWebView에서 `navigator.share()` 정상 동작, 추가 패키지 불필요
+- **폴백**: 클립보드 복사 + 토스트 메시지
+- **공유 URL**: `https://my-journey-app.vercel.app/trips/{trip.id}`
+
+### 결정 8: 캘린더 DESCRIPTION — subtitle만 포함
+- **이유**: 타임라인 아이템 전체 포함 시 캘린더 앱에서 내용이 너무 길어짐
+- **변경**: 초기 구현에서 시간별 요약 포함 → subtitle 한 줄로 축소
+
+### 결정 9: 지도 앱 경로 — 전체 경유지 포함
+- **이유**: 첫/끝 2곳만 표시하면 중간 경유지가 빠져 실용성 떨어짐
+- **Apple Maps**: `daddr=장소1+to:장소2+to:장소3`
+- **Google Maps**: `/dir/장소1/장소2/장소3`
 
 ---
 
@@ -214,9 +236,10 @@
 - Vercel 고정 도메인: `my-journey-app.vercel.app` alias 설정
 
 ### 다음 즉시 단계
-1. Quick Wins 구현 (캘린더 .ics, 공유, 지도앱 열기)
-2. 앱 아이콘 & 런치 스크린 제작
-3. Apple Developer 등록 → TestFlight 배포
+1. ~~Quick Wins 구현~~ ✅ 완료 (커밋 `d9175aa`)
+2. 앱 아이콘 & 런치 스크린 제작 (디자인 에셋 필요)
+3. Info.plist 설정 (세로 모드 고정, 수출 규정 플래그)
+4. Apple Developer 등록 → TestFlight 배포
 
 ---
 
@@ -229,3 +252,4 @@
 | MVP 배포 계획 | `docs/01-plan/features/mvp-deployment.plan.md` |
 | AI 플래너 설계 | `docs/02-design/features/ai-travel-planner-prototype.design.md` |
 | 프로젝트 셋업 계획 | `docs/01-plan/features/my-journey-project-setup.plan.md` |
+| Quick Wins 구현 계획 | `docs/plans/2026-03-11-ios-quick-wins.md` |

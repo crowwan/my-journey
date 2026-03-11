@@ -91,7 +91,7 @@ export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps)
 
       {/* 클립보드 복사 토스트 */}
       {toastMessage && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm px-4 py-2 rounded-full shadow-lg z-50">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-text text-white text-sm px-4 py-2 rounded-full shadow-lg z-50">
           {toastMessage}
         </div>
       )}
