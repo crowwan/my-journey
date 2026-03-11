@@ -7,5 +7,6 @@ export async function initCapacitor() {
   if (!Capacitor.isNativePlatform()) return;
 
   await StatusBar.setStyle({ style: Style.Light });
+  await StatusBar.setOverlaysWebView({ overlay: false });
   await SplashScreen.hide();
 }
