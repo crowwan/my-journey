@@ -11,7 +11,7 @@ export function Header({ title = 'My Journey', showBack = false }: HeaderProps) 
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border px-4 py-4 pt-[calc(0.75rem+var(--safe-area-top,0px))] flex items-center gap-3 shadow-none">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border px-4 py-4 pt-3 flex items-center gap-3 shadow-none">
       {showBack && (
         <button
           onClick={() => router.back()}
