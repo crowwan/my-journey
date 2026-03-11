@@ -10,7 +10,7 @@ interface TabBarProps {
 
 export function TabBar({ activeTab, onChange }: TabBarProps) {
   return (
-    <div className="sticky top-0 z-[100] bg-white/95 backdrop-blur-sm border-b border-border/50">
+    <div className="sticky top-0 z-[100] bg-white/95 backdrop-blur-sm border-b border-border/50 pt-[env(safe-area-inset-top)]">
       <Tabs value={activeTab} onValueChange={(v) => onChange(v as TabId)} className="max-w-[1100px] mx-auto px-3">
         <TabsList variant="line" className="w-full justify-start overflow-x-auto scrollbar-hide gap-0">
           {TAB_CONFIG.map((tab) => (
