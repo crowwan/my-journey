@@ -11,7 +11,7 @@ interface ShareResult {
  * Web Share API 우선 사용, 미지원 시 클립보드 복사 폴백.
  */
 export async function shareTrip(trip: Trip): Promise<ShareResult> {
-  const url = `https://my-journey-app.vercel.app/trips/${trip.id}`;
+  const url = `https://my-journey-planner.vercel.app/trips/${trip.id}`;
   const title = trip.title;
   const text = `${trip.title} (${trip.startDate} ~ ${trip.endDate})`;
 

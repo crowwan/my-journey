@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.myjourney.app',
   appName: 'My Journey',
   server: {
-    url: 'https://my-journey-app.vercel.app',
+    url: 'https://my-journey-planner.vercel.app',
     cleartext: false,
   },
   ios: {

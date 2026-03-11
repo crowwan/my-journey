@@ -158,7 +158,7 @@
 ### 결정 7: 공유 — Web Share API 사용 (@capacitor/share 불필요)
 - **이유**: iOS WKWebView에서 `navigator.share()` 정상 동작, 추가 패키지 불필요
 - **폴백**: 클립보드 복사 + 토스트 메시지
-- **공유 URL**: `https://my-journey-app.vercel.app/trips/{trip.id}`
+- **공유 URL**: `https://my-journey-planner.vercel.app/trips/{trip.id}`
 
 ### 결정 8: 캘린더 DESCRIPTION — subtitle만 포함
 - **이유**: 타임라인 아이템 전체 포함 시 캘린더 앱에서 내용이 너무 길어짐
@@ -175,7 +175,8 @@
 
 ### 웹 (Vercel)
 - **프로젝트**: `crowwans-projects/app`
-- **프로덕션 도메인**: `https://my-journey-app.vercel.app` (alias 설정됨)
+- **프로덕션 도메인**: `https://my-journey-planner.vercel.app` (프로젝트 도메인, 자동 배포)
+- **자동 생성 도메인**: `app-six-gray-52.vercel.app`
 - **배포 트리거**: `git push origin main` → Vercel 자동 배포
 - **Vercel 프로젝트 설정**: root directory = `app/`
 - **환경변수**: `GEMINI_API_KEY` (Vercel 대시보드에서 설정)
@@ -199,6 +200,11 @@
 - `app/` 디렉토리의 Vercel 프로젝트(`app`)는 git push로만 배포 권장
 - 두 개의 `.vercel/project.json` 존재: 루트(`my-journey`) / `app/`(`app`)
 
+### Vercel 도메인 시행착오 (2026-03-11)
+- ❌ `vercel alias`로 수동 연결 → 배포마다 수동 갱신 필요, 비추천
+- ❌ `.vercel.app` 서브도메인은 전체 사용자 간 유니크 → `my-journey-app`, `myjourney-app` 이미 타인이 점유
+- ✅ `app` 프로젝트 Settings > Domains에 `my-journey-planner.vercel.app` 추가 → 자동 배포 연동
+
 ---
 
 ## 6. 환경 설정
@@ -206,7 +212,7 @@
 ### 현재 환경
 - **배포**: Vercel (vercel.com)
 - **환경변수**: `.env.local` — `GEMINI_API_KEY`
-- **도메인**: `my-journey-app.vercel.app` (고정 alias)
+- **도메인**: `my-journey-planner.vercel.app` (프로젝트 도메인, 자동 업데이트)
 - **Node**: v20.13.1
 
 ### iOS 빌드 환경
@@ -217,7 +223,24 @@
 
 ---
 
-## 7. 시행착오 기록 (Safe Area)
+## 7. WKWebView 캐시 대응
+
+### 문제
+Capacitor server 모드에서 WKWebView가 이전 배포를 캐싱하여 최신 버전이 반영되지 않음.
+
+### 해결: next.config.ts Cache-Control 헤더
+- HTML 페이지에 `no-cache, no-store, must-revalidate` 헤더 적용
+- 정적 에셋(`_next/static`)은 해시 기반이라 캐시 허용
+- `app/ios/` 네이티브 코드 수정 없이 서버 레벨에서 해결
+
+### 그래도 캐시가 남는 경우
+- 앱 완전 종료 후 재실행
+- 앱 삭제 → Xcode에서 재빌드 (Cmd+R)
+- 시뮬레이터: Device > Erase All Content and Settings
+
+---
+
+## 8. 시행착오 기록 (Safe Area)
 
 > 다시 시도하지 말 것
 
@@ -233,7 +256,7 @@
 ### 해결된 이슈
 - Safe Area: `contentInset: 'always'`로 해결 완료 (커밋 `f35eb07`)
 - Vercel Deployment Protection: OFF로 WebView 로딩 정상화
-- Vercel 고정 도메인: `my-journey-app.vercel.app` alias 설정
+- Vercel 고정 도메인: `my-journey-planner.vercel.app` alias 설정
 
 ### 다음 즉시 단계
 1. ~~Quick Wins 구현~~ ✅ 완료 (커밋 `d9175aa`)

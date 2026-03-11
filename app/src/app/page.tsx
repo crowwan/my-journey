@@ -21,7 +21,10 @@ function getGreeting(): string {
 export default function Home() {
   const { isLoaded, loadTrips, getTripSummaries } = useTripStore();
   const trips = useTripStore((s) => s.trips);
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return !sessionStorage.getItem('splashShown');
+  });
 
   useEffect(() => {
     if (!isLoaded) {
@@ -32,7 +35,10 @@ export default function Home() {
   const summaries = getTripSummaries();
 
   if (showSplash) {
-    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+    return <SplashScreen onFinish={() => {
+      sessionStorage.setItem('splashShown', '1');
+      setShowSplash(false);
+    }} />;
   }
 
   return (
@@ -73,6 +79,12 @@ export default function Home() {
           })}
         </div>
       </main>
+      {/* 빌드 버전 */}
+      <footer className="max-w-[1100px] mx-auto px-5 pb-4 text-center">
+        <p className="text-[10px] text-text-tertiary">
+          Build {process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 7)} · {process.env.NEXT_PUBLIC_BUILD_TIME?.slice(0, 16).replace('T', ' ')}
+        </p>
+      </footer>
       <BottomNav />
     </div>
   );
