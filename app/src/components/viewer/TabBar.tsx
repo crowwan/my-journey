@@ -13,7 +13,7 @@ export function TabBar({ activeTab, onChange }: TabBarProps) {
   const router = useRouter();
 
   return (
-    <div className="sticky top-0 z-[100] bg-white/95 backdrop-blur-sm border-b border-border/50">
+    <div className="sticky top-0 z-[100] bg-white/95 backdrop-blur-sm border-b border-border/50 pt-[var(--safe-area-top,0px)]">
       <div className="max-w-[1100px] mx-auto px-3">
         {/* 홈 뒤로가기 — 탭 위 별도 행 */}
         <button
