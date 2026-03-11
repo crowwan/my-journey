@@ -1,4 +1,7 @@
+'use client';
+
 import type { Trip } from '@/types/trip';
+import { downloadIcsFile } from '@/lib/ics-utils';
 import { SectionTitle } from '../shared/SectionTitle';
 import { InfoGrid } from '../shared/InfoGrid';
 import { InfoCard } from '../shared/InfoCard';
@@ -104,6 +107,15 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       <SectionTitle icon="📅" bgColor="#f97316">
         일정 요약
       </SectionTitle>
+      {days.length > 0 && (
+        <button
+          onClick={() => downloadIcsFile(trip)}
+          className="flex items-center gap-1.5 text-xs text-accent border border-accent/20 bg-accent-bg rounded-full px-4 py-2 hover:bg-accent-bg-hover transition-colors mb-4"
+        >
+          <span>📅</span>
+          캘린더에 추가
+        </button>
+      )}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
         {days.map((day, index) => (
           <div

@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import type { Day } from '@/types/trip';
 import { TimelineItemComponent } from './TimelineItem';
+import { openInMapsApp } from '@/lib/map-utils';
 import {
   Accordion,
   AccordionItem,
@@ -50,6 +51,13 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
           {day.mapSpots && day.mapSpots.length > 0 && (
             <div className="mb-4">
               <DayMap mapSpots={day.mapSpots} color={color} />
+              <button
+                onClick={() => openInMapsApp(day.mapSpots)}
+                className="flex items-center gap-1.5 text-xs text-trip-blue border border-trip-blue/20 bg-trip-blue/5 rounded-full px-4 py-2 hover:bg-trip-blue/10 transition-colors mt-2 mx-auto"
+              >
+                <span>🗺️</span>
+                지도 앱에서 열기
+              </button>
             </div>
           )}
           <div className="timeline animate-fade-up">
