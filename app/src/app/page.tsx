@@ -41,7 +41,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div>
       <Header title="My Journey" />
 
       {/* 시간대별 인사말 */}
