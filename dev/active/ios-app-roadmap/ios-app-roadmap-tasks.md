@@ -55,10 +55,11 @@
 - [x] 스플래시: sessionStorage로 세션당 1회만 (커밋 c9d55d0)
 - [x] 빌드 버전 UI footer (커밋 c9d55d0)
 
-### iOS Safe Area 대응 — 🔄 검증 대기 (2026-03-11, 커밋 `2eaf453`)
+### iOS Safe Area 대응 — ✅ 완료 (2026-03-11, 커밋 `2eaf453`+`4dd56ec`)
 - [x] JS 기반 `--safe-area-top` CSS 변수 주입 (`initCapacitor()`)
-- [x] Header/TabBar에 var(--safe-area-top) 패딩 적용
-- [ ] **Vercel 배포 완료 후 iOS 리빌드하여 최종 검증**
+- [x] Header/TabBar/HeroSection에 var(--safe-area-top) 패딩 적용
+- [x] 홈/채팅 페이지 safe area 확인 완료
+- [x] 여행 상세 페이지 safe area 최종 검증 완료
 - 시행착오: contentInset(sticky 미호환), CSS env()(값 0), viewport-fit 제거(효과 없음) 모두 실패
 
 ### iOS 네이티브 마무리
