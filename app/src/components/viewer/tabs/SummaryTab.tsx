@@ -3,6 +3,7 @@
 import { Plane, Hotel, CloudSun, CalendarDays, CalendarPlus, ExternalLink } from 'lucide-react';
 import type { Trip } from '@/types/trip';
 import { downloadIcsFile } from '@/lib/ics-utils';
+import { EmojiIcon } from '@/lib/emoji-to-icon';
 import { SectionTitle } from '../shared/SectionTitle';
 import { TipsAccordion } from '../shared/TipsAccordion';
 
@@ -16,6 +17,12 @@ export function SummaryTab({ trip }: SummaryTabProps) {
   const weather = trip.overview?.weather ?? [];
   const tips = trip.overview?.tips ?? [];
   const days = trip.days ?? [];
+
+  // 오늘 날짜 문자열 (로컬 시간 기준)
+  const todayStr = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  })();
 
   return (
     <div className="animate-fade-up">
@@ -116,7 +123,7 @@ export function SummaryTab({ trip }: SummaryTabProps) {
             className="bg-surface border border-border-light rounded-xl p-4 min-w-[120px] text-center shrink-0 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="text-xs text-text-tertiary font-semibold">{w.dayOfWeek}</div>
-            <div className="text-2xl my-1.5">{w.icon}</div>
+            <div className="text-2xl my-1.5"><EmojiIcon emoji={w.icon} size={24} className="inline-block" /></div>
             <div className="text-base font-bold text-text-primary">{w.tempAvg}°</div>
             <div className="text-xs text-text-secondary">
               {w.tempLow}° ~ {w.tempHigh}°
@@ -139,22 +146,26 @@ export function SummaryTab({ trip }: SummaryTabProps) {
         </button>
       )}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
-        {days.map((day, index) => (
+        {days.map((day, index) => {
+          const isToday = day.date === todayStr;
+          return (
           <div
             key={`day-${day.dayNumber ?? index}`}
             className="rounded-xl p-5 border border-border-light shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-            style={{ background: `${day.color}08`, borderColor: `${day.color}25` }}
           >
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black text-white mb-2"
-              style={{ background: day.color }}
-            >
-              {day.dayNumber}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg font-black text-primary">{day.dayNumber}</span>
+              {isToday && (
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-white px-2 py-0.5 rounded-full">
+                  Today
+                </span>
+              )}
             </div>
             <div className="text-sm font-bold text-text-primary">{day.title}</div>
             <div className="text-xs text-text-secondary mt-0.5">{day.subtitle}</div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* 팁 */}

@@ -4,6 +4,7 @@ import { Luggage, CheckCircle } from 'lucide-react';
 import type { PackingItem, PreTodoItem } from '@/types/trip';
 import { useTripStore } from '@/stores/useTripStore';
 import { storage } from '@/lib/storage';
+import { EmojiIcon } from '@/lib/emoji-to-icon';
 import { SectionTitle } from '../shared/SectionTitle';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
@@ -85,7 +86,7 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
               <div key={category.category} className="mb-4">
                 {/* 카테고리 헤더 */}
                 <div className="flex items-center gap-2 mb-2 px-1">
-                  <span>{category.categoryIcon}</span>
+                  <EmojiIcon emoji={category.categoryIcon} size={16} className="text-text-secondary" />
                   <span className="text-sm font-semibold text-text-primary">{category.category}</span>
                   <span className="text-xs text-text-tertiary">({catChecked}/{catTotal})</span>
                 </div>

@@ -5,6 +5,7 @@ import {
   CreditCard, Calculator, ExternalLink
 } from 'lucide-react';
 import type { Restaurant, TransportSection, TransportPass, BudgetSection } from '@/types/trip';
+import { EmojiIcon } from '@/lib/emoji-to-icon';
 import { SectionTitle } from '../shared/SectionTitle';
 import { Tip } from '../shared/Tip';
 import { TipsAccordion } from '../shared/TipsAccordion';
@@ -201,7 +202,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
             {homeToHotel.map((step, idx) => (
               <div key={idx} className="flex items-center gap-3 shrink-0">
                 <div className="bg-surface border border-border-light rounded-xl px-4 py-3 text-center min-w-[100px] shadow-sm">
-                  <div className="text-lg mb-0.5">{step.icon}</div>
+                  <div className="text-lg mb-0.5"><EmojiIcon emoji={step.icon} size={20} className="inline-block text-cat-transport" /></div>
                   <div className="text-sm font-semibold text-text-primary">{step.title}</div>
                   <div className="text-xs text-text-secondary">{step.subtitle}</div>
                 </div>
@@ -341,7 +342,7 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
             className="bg-surface border border-border-light rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-xl">{item.icon}</span>
+              <EmojiIcon emoji={item.icon} size={20} className="text-primary shrink-0" />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold text-text-primary">{item.label}</span>

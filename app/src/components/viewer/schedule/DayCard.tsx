@@ -20,13 +20,16 @@ interface DayCardProps {
 }
 
 export function DayCard({ day, defaultOpen = false }: DayCardProps) {
-  const color = day.color ?? '#f97316';
+  // 오늘 날짜와 day.date를 로컬 시간 기준으로 비교
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const isToday = day.date === todayStr;
 
   return (
     <Accordion
       type="single"
       collapsible
-      defaultValue={defaultOpen ? `day-${day.dayNumber}` : undefined}
+      defaultValue={defaultOpen || isToday ? `day-${day.dayNumber}` : undefined}
     >
       <AccordionItem
         value={`day-${day.dayNumber}`}
@@ -34,14 +37,18 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
       >
         <AccordionTrigger className="px-5 py-5 hover:no-underline hover:bg-surface-hover gap-3.5 rounded-xl">
           <div className="flex items-center gap-3.5">
-            <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-black text-white shrink-0 shadow-xs"
-              style={{ background: color }}
-            >
+            <div className="text-2xl font-black shrink-0 text-primary">
               {day.dayNumber ?? '?'}
             </div>
-            <div className="text-left">
-              <h3 className="text-base font-bold text-text-primary">{day.title}</h3>
+            <div className="text-left flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-text-primary">{day.title}</h3>
+                {isToday && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-white px-2 py-0.5 rounded-full">
+                    Today
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-text-secondary mt-0.5">
                 {(day.date ?? '').replace(/-/g, '.')} · {day.subtitle}
               </p>
@@ -51,7 +58,7 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
         <AccordionContent className="px-5 pb-5">
           {day.mapSpots && day.mapSpots.length > 0 && (
             <div className="mb-4">
-              <DayMap mapSpots={day.mapSpots} color={color} />
+              <DayMap mapSpots={day.mapSpots} color="#f97316" />
               <button
                 onClick={() => openInMapsApp(day.mapSpots)}
                 className="flex items-center gap-1.5 text-xs text-cat-transport border border-cat-transport/20 bg-cat-transport/5 rounded-full px-4 py-2 hover:bg-cat-transport/10 transition-colors mt-2 mx-auto"
