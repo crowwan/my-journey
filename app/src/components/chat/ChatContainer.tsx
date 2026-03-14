@@ -10,6 +10,7 @@ import { TypingIndicator } from './TypingIndicator';
 interface ChatContainerProps {
   mode?: 'create' | 'edit';
   tripId?: string;
+  onTripCreated?: () => void;
 }
 
 // 빈 상태에서 보여줄 예시 질문
@@ -26,7 +27,7 @@ const EDIT_PROMPTS = [
   '예산 수정해줘',
 ];
 
-export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
+export function ChatContainer({ mode = 'create', tripId, onTripCreated }: ChatContainerProps) {
   const messages = useChatStore((s) => s.messages);
   const isLoading = useChatStore((s) => s.isLoading);
   const generatedTrip = useChatStore((s) => s.generatedTrip);

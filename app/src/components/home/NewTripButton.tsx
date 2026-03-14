@@ -1,14 +1,14 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useUIStore } from '@/stores/useUIStore';
 import { Button } from '@/components/ui/button';
 
 export function NewTripButton() {
-  const router = useRouter();
+  const openAIDrawer = useUIStore((s) => s.openAIDrawer);
 
   return (
     <Button
-      onClick={() => router.push('/chat')}
+      onClick={() => openAIDrawer('create')}
       size="sm"
       className="rounded-full bg-primary text-white hover:bg-primary-600 shadow-sm hover:shadow-md transition-all"
     >

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR, Playfair_Display } from "next/font/google";
+import { AIDrawerProvider } from "@/components/ai/AIDrawerProvider";
 import "./globals.css";
 
 const notoSansKR = Noto_Sans_KR({
@@ -45,6 +46,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${notoSansKR.variable} ${playfairDisplay.variable} antialiased`}>
         {children}
+        <AIDrawerProvider />
       </body>
     </html>
   );

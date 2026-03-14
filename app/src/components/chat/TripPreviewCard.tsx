@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import type { Trip } from '@/types/trip';
 import { useTripStore } from '@/stores/useTripStore';
+import { useUIStore } from '@/stores/useUIStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,9 +24,12 @@ function formatDateRange(startDate: string, endDate: string): string {
 export function TripPreviewCard({ trip }: TripPreviewCardProps) {
   const router = useRouter();
   const saveTrip = useTripStore((s) => s.saveTrip);
+  const closeAIDrawer = useUIStore((s) => s.closeAIDrawer);
 
+  // 여행 저장 후 드로어 닫기 + 상세 페이지로 이동
   const handleSave = () => {
     saveTrip(trip);
+    closeAIDrawer();
     router.push(`/trips/${trip.id}`);
   };
 
