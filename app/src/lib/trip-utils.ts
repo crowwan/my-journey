@@ -14,7 +14,8 @@ export type TripGroup = {
 export function groupTrips(summaries: TripSummary[]): TripGroup {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const todayStr = today.toISOString().slice(0, 10); // YYYY-MM-DD
+  // 로컬 시간 기준 YYYY-MM-DD (toISOString()은 UTC 기준이라 KST에서 하루 전 날짜가 됨)
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   const group: TripGroup = { upcoming: [], ongoing: [], past: [] };
 

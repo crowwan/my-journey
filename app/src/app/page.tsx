@@ -9,8 +9,9 @@ import { SplashScreen } from '@/components/layout/SplashScreen';
 import { TripCard } from '@/components/home/TripCard';
 import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
-import { HorizontalScroll } from '@/components/shared/HorizontalScroll';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { cn } from '@/lib/utils';
+import type { CardVariant } from '@/components/home/TripCard';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -24,6 +25,7 @@ export default function Home() {
   const { isLoaded, loadTrips, getTripSummaries } = useTripStore();
   const trips = useTripStore((s) => s.trips);
   const [showSplash, setShowSplash] = useState(true);
+  const [variant, setVariant] = useState<CardVariant>('A');
 
   useEffect(() => {
     if (sessionStorage.getItem('splashShown')) {
@@ -86,6 +88,27 @@ export default function Home() {
         <p className="text-sm text-text-secondary">{getSubtitle()}</p>
       </section>
 
+      {/* 디자인 비교 토글 (임시) */}
+      <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-2 pb-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-text-tertiary">디자인:</span>
+          {(['A', 'B', 'C'] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => setVariant(v)}
+              className={cn(
+                'px-3 py-1 text-xs rounded-full border transition-colors',
+                variant === v
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-surface text-text-secondary border-border-light hover:border-primary/50'
+              )}
+            >
+              {v}안
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* 여행 없을 때 빈 상태 */}
       {hasNoTrips && (
         <EmptyState
@@ -99,7 +122,7 @@ export default function Home() {
       {/* 히어로 카드 (ongoing 또는 upcoming 첫번째) */}
       {heroTrip && (
         <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-4 pb-2">
-          <TripHeroCard trip={heroTrip} packingProgress={heroPackingProgress} />
+          <TripHeroCard trip={heroTrip} packingProgress={heroPackingProgress} variant={variant} />
         </section>
       )}
 
@@ -115,11 +138,11 @@ export default function Home() {
             </div>
             <NewTripButton />
           </div>
-          <HorizontalScroll>
+          <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
             {[...remainingOngoing, ...remainingUpcoming].map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} index={index} />
+              <TripCard key={trip.id} trip={trip} index={index} variant={variant} />
             ))}
-          </HorizontalScroll>
+          </div>
         </section>
       )}
 
@@ -136,11 +159,11 @@ export default function Home() {
               <NewTripButton />
             )}
           </div>
-          <HorizontalScroll>
+          <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
             {past.map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} index={index} />
+              <TripCard key={trip.id} trip={trip} index={index} variant={variant} />
             ))}
-          </HorizontalScroll>
+          </div>
         </section>
       )}
 
