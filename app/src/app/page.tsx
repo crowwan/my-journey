@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTripStore } from '@/stores/useTripStore';
+import { useUIStore } from '@/stores/useUIStore';
 import { groupTrips } from '@/lib/trip-utils';
 import { Header } from '@/components/layout/Header';
 import { SplashScreen } from '@/components/layout/SplashScreen';
@@ -9,20 +10,21 @@ import { TripCard } from '@/components/home/TripCard';
 import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Sun, CloudSun, Moon, MoonStar, Plane } from 'lucide-react';
+import { Sun, CloudSun, Moon, MoonStar, Plane, Plus } from 'lucide-react';
 
 // 시간대별 인사말 텍스트와 아이콘을 반환
 function getGreeting(): { text: string; icon: React.ReactNode } {
   const hour = new Date().getHours();
-  const iconClass = 'inline-block ml-1 text-primary';
-  if (hour >= 5 && hour <= 11) return { text: '좋은 아침이에요', icon: <Sun size={20} className={iconClass} /> };
-  if (hour >= 12 && hour <= 17) return { text: '좋은 오후예요', icon: <CloudSun size={20} className={iconClass} /> };
-  if (hour >= 18 && hour <= 22) return { text: '좋은 저녁이에요', icon: <Moon size={20} className={iconClass} /> };
-  return { text: '늦은 밤이에요', icon: <MoonStar size={20} className={iconClass} /> };
+  const iconClass = 'inline-block ml-1.5 text-primary align-middle -mt-0.5';
+  if (hour >= 5 && hour <= 11) return { text: '좋은 아침이에요', icon: <Sun size={18} className={iconClass} /> };
+  if (hour >= 12 && hour <= 17) return { text: '좋은 오후예요', icon: <CloudSun size={18} className={iconClass} /> };
+  if (hour >= 18 && hour <= 22) return { text: '좋은 저녁이에요', icon: <Moon size={18} className={iconClass} /> };
+  return { text: '늦은 밤이에요', icon: <MoonStar size={18} className={iconClass} /> };
 }
 
 export default function Home() {
   const { isLoaded, loadTrips, getTripSummaries, deleteTrip } = useTripStore();
+  const openAIDrawer = useUIStore((s) => s.openAIDrawer);
   const trips = useTripStore((s) => s.trips);
   const [showSplash, setShowSplash] = useState(true);
 
@@ -100,7 +102,15 @@ export default function Home() {
           icon={<Plane size={48} className="text-primary" />}
           title="아직 여행이 없어요"
           description="AI와 대화하며 첫 여행을 계획해보세요"
-          action={<NewTripButton />}
+          action={
+            <button
+              onClick={() => openAIDrawer('create')}
+              className="flex items-center gap-2 rounded-full bg-primary text-white px-6 py-3 text-sm font-medium hover:bg-primary-600 shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus size={18} />
+              새 여행 만들기
+            </button>
+          }
         />
       )}
 
