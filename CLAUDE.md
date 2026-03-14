@@ -80,8 +80,20 @@ my-journey/
 3. 사용자에게 목적지, 기간, 테마, 동행자 수 확인
 4. 생성 후 `/trip-build-index` 실행하여 홈페이지 갱신
 
+## 디자인 시스템
+
+> **모든 UI 구현 작업 전 반드시 디자인 시스템 문서를 읽고 작업할 것.**
+
+- **디자인 시스템 문서**: `docs/design-system.md`
+  - 색상, 타이포그래피, 스페이싱, 컴포넌트 스타일 가이드
+  - Tailwind 클래스 조합 예시 포함
+  - DO / DON'T 규칙
+
 ## 참조 파일
 
+- 디자인 시스템: `docs/design-system.md`
+- 리디자인 설계서: `docs/plans/2026-03-14-design-system-redesign.md`
+- 리디자인 구현 계획서: `docs/plans/2026-03-14-design-system-redesign-implementation.md`
 - 실제 예시: `trips/2025-osaka/index.html`
 - 템플릿: `templates/trip-page.html`
 - 계획서: `docs/01-plan/features/my-journey-project-setup.plan.md`
