@@ -79,10 +79,10 @@ cd app && npm uninstall @capacitor/core @capacitor/ios @capacitor/splash-screen 
 - 완료 조건: `@capacitor` import 없음, `isNative` 없음
 
 ### Phase 1 완료 조건 (DoD)
-- [ ] `npm run build` 성공 (빌드 에러 없음)
-- [ ] 프로젝트 전체에서 `@capacitor` import 0건 (`grep -r "@capacitor" app/src/`)
-- [ ] `--safe-area-top` CSS 변수 참조 0건
-- [ ] `viewportFit` 참조 0건
+- [x] `npm run build` 성공 (빌드 에러 없음) [2026-03-14]
+- [x] 프로젝트 전체에서 `@capacitor` import 0건 [2026-03-14]
+- [x] `--safe-area-top` CSS 변수 참조 0건 [2026-03-14]
+- [x] `viewportFit` 참조 0건 [2026-03-14]
 - [ ] 기존 기능(홈, 여행 상세, 채팅) 정상 동작
 
 ### Phase 1 위험
