@@ -20,7 +20,7 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
   return (
     <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white ${exiting ? 'animate-splash-exit' : ''}`}>
       <div className="animate-plane-slide text-5xl">✈️</div>
-      <h1 className="animate-splash-text text-2xl font-bold text-text">My Journey</h1>
+      <h1 className="animate-splash-text text-2xl font-bold text-text-primary">My Journey</h1>
       <p className="animate-splash-sub text-sm text-text-secondary">AI Travel Planner</p>
     </div>
   );

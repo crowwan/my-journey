@@ -46,7 +46,7 @@ export default function Home() {
 
       {/* 시간대별 인사말 */}
       <section className="max-w-[1100px] mx-auto px-5 pt-6 pb-2">
-        <p className="text-lg font-medium text-text">{getGreeting()}</p>
+        <p className="text-lg font-medium text-text-primary">{getGreeting()}</p>
         <p className="text-sm text-text-secondary">오늘도 좋은 여행을!</p>
       </section>
 
@@ -54,7 +54,7 @@ export default function Home() {
       <section className="max-w-[1100px] mx-auto px-5 pt-3 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
-            <h2 className="text-2xl font-bold text-text">내 여행</h2>
+            <h2 className="text-2xl font-bold text-text-primary">내 여행</h2>
             <span className="text-sm text-text-tertiary">{summaries.length}</span>
           </div>
           <NewTripButton />

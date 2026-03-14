@@ -29,19 +29,19 @@ export function PreTodoTab({ preTodos }: PreTodoTabProps) {
         {preTodos.map((todo) => (
           <Card
             key={todo.order}
-            className="rounded-[16px] py-0 gap-0 hover:border-trip-green/30 transition-colors"
+            className="rounded-xl py-0 gap-0 hover:border-cat-sightseeing/30 transition-colors"
           >
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
                 {/* 번호 뱃지 */}
                 <Badge
                   variant="secondary"
-                  className="w-8 h-8 rounded-lg bg-trip-green/20 text-sm font-black text-trip-green shrink-0 p-0"
+                  className="w-8 h-8 rounded-lg bg-cat-sightseeing/20 text-sm font-black text-cat-sightseeing shrink-0 p-0"
                 >
                   {todo.order}
                 </Badge>
                 <div>
-                  <h4 className="text-sm font-bold text-text mb-1">{todo.title}</h4>
+                  <h4 className="text-sm font-bold text-text-primary mb-1">{todo.title}</h4>
                   <p className="text-sm text-text-secondary leading-relaxed">
                     {todo.description}
                   </p>

@@ -29,9 +29,9 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
     >
       <AccordionItem
         value={`day-${day.dayNumber}`}
-        className="bg-card border border-border rounded-[16px] mb-5 overflow-visible last:border-b"
+        className="bg-surface border border-border rounded-xl mb-5 overflow-visible last:border-b"
       >
-        <AccordionTrigger className="px-5 py-5 hover:no-underline hover:bg-glass gap-3.5">
+        <AccordionTrigger className="px-5 py-5 hover:no-underline hover:bg-overlay-light gap-3.5">
           <div className="flex items-center gap-3.5">
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-black text-white shrink-0"
@@ -40,7 +40,7 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
               {day.dayNumber ?? '?'}
             </div>
             <div className="text-left">
-              <h3 className="text-base font-bold text-text">{day.title}</h3>
+              <h3 className="text-base font-bold text-text-primary">{day.title}</h3>
               <p className="text-sm text-text-secondary mt-0.5">
                 {(day.date ?? '').replace(/-/g, '.')} · {day.subtitle}
               </p>
@@ -53,7 +53,7 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
               <DayMap mapSpots={day.mapSpots} color={color} />
               <button
                 onClick={() => openInMapsApp(day.mapSpots)}
-                className="flex items-center gap-1.5 text-xs text-trip-blue border border-trip-blue/20 bg-trip-blue/5 rounded-full px-4 py-2 hover:bg-trip-blue/10 transition-colors mt-2 mx-auto"
+                className="flex items-center gap-1.5 text-xs text-cat-transport border border-cat-transport/20 bg-cat-transport/5 rounded-full px-4 py-2 hover:bg-cat-transport/10 transition-colors mt-2 mx-auto"
               >
                 <span>🗺️</span>
                 지도 앱에서 열기

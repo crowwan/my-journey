@@ -58,7 +58,7 @@ function parseMarkdown(text: string): React.ReactNode[] {
     if (listMatch) {
       return (
         <span key={i} className="flex gap-1.5">
-          <span className="text-accent shrink-0">•</span>
+          <span className="text-primary shrink-0">•</span>
           <span>{parseInline(listMatch[1])}</span>
           {!isLast && '\n'}
         </span>
@@ -76,7 +76,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
   if (role === 'system') {
     return (
       <div className="flex justify-center py-2">
-        <span className="text-text-tertiary text-xs px-3 py-1 bg-card-secondary/50 rounded-full">
+        <span className="text-text-tertiary text-xs px-3 py-1 bg-bg-tertiary/50 rounded-full">
           {content}
         </span>
       </div>
@@ -92,8 +92,8 @@ export function ChatMessage({ message }: ChatMessageProps) {
         <div
           className={`px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
-              ? 'bg-accent text-white rounded-2xl rounded-br-md'
-              : 'bg-white text-text rounded-2xl rounded-bl-md border border-border/60 shadow-[var(--shadow-card)]'
+              ? 'bg-primary text-white rounded-2xl rounded-br-md'
+              : 'bg-white text-text-primary rounded-2xl rounded-bl-md border border-border/60 shadow-sm'
           }`}
         >
           {parseMarkdown(content)}

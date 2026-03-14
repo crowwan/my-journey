@@ -40,11 +40,11 @@ export function RestaurantTab({ restaurants }: RestaurantTabProps) {
             {dayRestaurants.map((restaurant) => (
               <div
                 key={`${dayNumber}-${restaurant.name}`}
-                className="bg-white border border-border rounded-[16px] p-5 transition-all hover:border-trip-pink/30 hover:-translate-y-0.5"
+                className="bg-white border border-border rounded-xl p-5 transition-all hover:border-cat-food/30 hover:-translate-y-0.5"
               >
                 {/* 카테고리 + 평점 */}
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs bg-trip-pink/15 text-trip-pink px-2 py-0.5 rounded-md font-semibold">
+                  <span className="text-xs bg-cat-food/15 text-cat-food px-2 py-0.5 rounded-md font-semibold">
                     {restaurant.category}
                   </span>
                   <span className="text-sm text-amber-500 font-semibold">
@@ -58,7 +58,7 @@ export function RestaurantTab({ restaurants }: RestaurantTabProps) {
                   </span>
                 </div>
                 {/* 가게명 */}
-                <h4 className="text-base font-bold text-text mb-1">{restaurant.name}</h4>
+                <h4 className="text-base font-bold text-text-primary mb-1">{restaurant.name}</h4>
                 {/* 설명 */}
                 <p className="text-sm text-text-secondary leading-relaxed mb-2">
                   {restaurant.description}

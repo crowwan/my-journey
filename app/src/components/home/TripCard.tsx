@@ -26,21 +26,21 @@ export function TripCard({ trip, index = 0, packingProgress }: TripCardProps) {
   return (
     <Card
       onClick={() => router.push(`/trips/${trip.id}`)}
-      className="group cursor-pointer p-5 gap-0 rounded-[16px] transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] animate-stagger-reveal hover:border-accent/20 hover:shadow-[var(--shadow-card-hover)]"
+      className="group cursor-pointer p-5 gap-0 rounded-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] animate-stagger-reveal hover:border-primary/20 hover:shadow-md"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <CardContent className="p-0">
         <div className="flex items-center gap-3.5">
           {/* 이니셜 */}
-          <div className="shrink-0 w-12 h-12 rounded-xl bg-accent-bg border border-accent/[0.1] flex items-center justify-center">
-            <span className={isEmoji ? 'text-2xl' : 'font-bold text-lg text-accent/80'}>
+          <div className="shrink-0 w-12 h-12 rounded-xl bg-primary-50 border border-primary/[0.1] flex items-center justify-center">
+            <span className={isEmoji ? 'text-2xl' : 'font-bold text-lg text-primary/80'}>
               {firstGrapheme}
             </span>
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="text-base font-bold text-text group-hover:text-accent-light transition-colors duration-300 truncate">
+              <h3 className="text-base font-bold text-text-primary group-hover:text-primary-400 transition-colors duration-300 truncate">
                 {trip.title}
               </h3>
               <Badge className={cn('shrink-0 text-[11px] font-medium', badgeStyle)}>
@@ -55,7 +55,7 @@ export function TripCard({ trip, index = 0, packingProgress }: TripCardProps) {
           </div>
 
           {/* Chevron */}
-          <svg className="shrink-0 w-5 h-5 text-text-tertiary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="shrink-0 w-5 h-5 text-text-tertiary group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </div>

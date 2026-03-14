@@ -75,7 +75,7 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
           // 빈 상태 안내
           <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
             <div className="text-5xl mb-4">{mode === 'edit' ? '✏️' : '✈️'}</div>
-            <h2 className="text-2xl font-bold text-text mb-1">
+            <h2 className="text-2xl font-bold text-text-primary mb-1">
               {mode === 'edit' ? '여행을 수정해볼까요?' : '어디로 떠나볼까요?'}
             </h2>
             <p className="text-text-secondary text-sm mb-8 max-w-xs">
@@ -91,7 +91,7 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
                   key={prompt}
                   onClick={() => handleSend(prompt)}
                   disabled={isLoading}
-                  className="text-xs bg-accent-bg text-accent border border-accent/20 rounded-full px-4 py-2.5 hover:bg-accent-bg-hover hover:border-accent/40 transition-all duration-200 disabled:opacity-50"
+                  className="text-xs bg-primary-50 text-primary border border-primary/20 rounded-full px-4 py-2.5 hover:bg-primary-100 hover:border-primary/40 transition-all duration-200 disabled:opacity-50"
                 >
                   {prompt}
                 </button>
@@ -115,7 +115,7 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
           <button
             onClick={handleCreateTrip}
             disabled={isLoading}
-            className="flex items-center gap-2 bg-accent text-white rounded-full px-6 py-3 text-sm font-semibold hover:bg-accent-warm shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+            className="flex items-center gap-2 bg-primary text-white rounded-full px-6 py-3 text-sm font-semibold hover:bg-primary-600 shadow-md hover:shadow-lg transition-all disabled:opacity-50"
           >
             <span>🗺️</span>
             여행 계획 생성하기

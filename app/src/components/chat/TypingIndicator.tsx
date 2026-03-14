@@ -2,7 +2,7 @@
 export function TypingIndicator() {
   return (
     <div className="flex justify-start mb-3">
-      <div className="bg-card border border-border rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2">
+      <div className="bg-surface border border-border rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2">
         {/* 3개의 bounce dot */}
         <div className="flex items-center gap-1">
           <span

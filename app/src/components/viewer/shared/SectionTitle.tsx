@@ -15,7 +15,7 @@ export function SectionTitle({ icon, bgColor, children }: SectionTitleProps) {
       >
         {icon}
       </span>
-      <span className="text-xl font-bold text-text">{children}</span>
+      <span className="text-xl font-bold text-text-primary">{children}</span>
       <span className="flex-1 h-[1px] bg-border" />
     </div>
   );

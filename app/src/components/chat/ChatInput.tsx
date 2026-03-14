@@ -52,12 +52,12 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="여행 계획을 알려주세요..."
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-card text-text text-sm rounded-xl px-4 py-3 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200"
+          className="flex-1 bg-surface text-text-primary text-sm rounded-xl px-4 py-3 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
         />
         <Button
           onClick={handleSend}
           disabled={disabled || !text.trim()}
-          className="rounded-xl px-5 py-3 bg-accent text-white hover:bg-accent/90 shadow-sm hover:shadow-md shrink-0"
+          className="rounded-xl px-5 py-3 bg-primary text-white hover:bg-primary/90 shadow-sm hover:shadow-md shrink-0"
         >
           전송
         </Button>

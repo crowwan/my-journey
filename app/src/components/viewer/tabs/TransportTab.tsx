@@ -10,11 +10,11 @@ interface TransportTabProps {
 function getPassColor(recommendation: TransportPass['recommendation']) {
   switch (recommendation) {
     case 'recommended':
-      return { border: 'border-trip-green/40', bg: 'bg-trip-green/10', text: 'text-trip-green', badge: 'bg-trip-green/20 text-trip-green' };
+      return { border: 'border-cat-sightseeing/40', bg: 'bg-cat-sightseeing/10', text: 'text-cat-sightseeing', badge: 'bg-cat-sightseeing/20 text-cat-sightseeing' };
     case 'neutral':
-      return { border: 'border-accent/40', bg: 'bg-accent/10', text: 'text-accent', badge: 'bg-accent/20 text-accent' };
+      return { border: 'border-primary/40', bg: 'bg-primary/10', text: 'text-primary', badge: 'bg-primary/20 text-primary' };
     case 'not-recommended':
-      return { border: 'border-text-tertiary/40', bg: 'bg-glass', text: 'text-text-tertiary', badge: 'bg-glass text-text-tertiary' };
+      return { border: 'border-text-tertiary/40', bg: 'bg-overlay-light', text: 'text-text-tertiary', badge: 'bg-overlay-light text-text-tertiary' };
   }
 }
 
@@ -45,17 +45,17 @@ export function TransportTab({ transport }: TransportTabProps) {
           <SectionTitle icon="🛫" bgColor="#3b82f6">
             집 → 호텔 경로
           </SectionTitle>
-          <div className="bg-card border border-border rounded-[16px] p-5 mb-3">
+          <div className="bg-surface border border-border rounded-xl p-5 mb-3">
             <div className="flex flex-wrap items-center gap-2">
               {homeToHotel.map((step, idx) => (
                 <div key={idx} className="flex items-center gap-2">
-                  <div className="bg-card-secondary rounded-xl px-4 py-3 text-center min-w-[90px]">
+                  <div className="bg-bg-tertiary rounded-xl px-4 py-3 text-center min-w-[90px]">
                     <div className="text-lg mb-0.5">{step.icon}</div>
-                    <div className="text-sm font-semibold text-text">{step.title}</div>
+                    <div className="text-sm font-semibold text-text-primary">{step.title}</div>
                     <div className="text-xs text-text-secondary">{step.subtitle}</div>
                   </div>
                   {idx < homeToHotel.length - 1 && (
-                    <span className="text-trip-blue text-lg">→</span>
+                    <span className="text-cat-transport text-lg">→</span>
                   )}
                 </div>
               ))}
@@ -70,7 +70,7 @@ export function TransportTab({ transport }: TransportTabProps) {
           <SectionTitle icon="🚃" bgColor="#3b82f6">
             도시간 노선
           </SectionTitle>
-          <div className="bg-card border border-border rounded-[16px] overflow-hidden mb-3">
+          <div className="bg-surface border border-border rounded-xl overflow-hidden mb-3">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-text-tertiary text-xs uppercase tracking-wider">
@@ -85,13 +85,13 @@ export function TransportTab({ transport }: TransportTabProps) {
                 {intercityRoutes.map((route, idx) => (
                   <tr
                     key={idx}
-                    className="border-b border-border last:border-b-0 hover:bg-accent-bg/50 transition-colors"
+                    className="border-b border-border last:border-b-0 hover:bg-primary-50/50 transition-colors"
                   >
-                    <td className="px-4 py-3 text-text font-medium">{route.from}</td>
-                    <td className="px-4 py-3 text-text font-medium">{route.to}</td>
-                    <td className="px-4 py-3 text-trip-blue">{route.method}</td>
+                    <td className="px-4 py-3 text-text-primary font-medium">{route.from}</td>
+                    <td className="px-4 py-3 text-text-primary font-medium">{route.to}</td>
+                    <td className="px-4 py-3 text-cat-transport">{route.method}</td>
                     <td className="px-4 py-3 text-text-secondary">{route.duration}</td>
-                    <td className="px-4 py-3 text-accent text-right font-semibold">{route.cost}</td>
+                    <td className="px-4 py-3 text-primary text-right font-semibold">{route.cost}</td>
                   </tr>
                 ))}
               </tbody>
@@ -112,10 +112,10 @@ export function TransportTab({ transport }: TransportTabProps) {
               return (
                 <div
                   key={pass.name}
-                  className={`${color.bg} border ${color.border} rounded-[16px] p-5`}
+                  className={`${color.bg} border ${color.border} rounded-xl p-5`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-base font-bold text-text">{pass.name}</h4>
+                    <h4 className="text-base font-bold text-text-primary">{pass.name}</h4>
                     <span className={`text-xs px-2 py-0.5 rounded-md font-semibold ${color.badge}`}>
                       {pass.recommendation === 'recommended'
                         ? '추천'
@@ -142,11 +142,11 @@ export function TransportTab({ transport }: TransportTabProps) {
           <SectionTitle icon="💳" bgColor="#22d3ee">
             ICOCA 가이드
           </SectionTitle>
-          <div className="bg-card border border-border rounded-[16px] p-5 mb-3">
+          <div className="bg-surface border border-border rounded-xl p-5 mb-3">
             <ul className="space-y-2">
               {icocaGuide.map((guide, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm">
-                  <span className="text-trip-cyan font-bold shrink-0">{idx + 1}.</span>
+                  <span className="text-cat-activity font-bold shrink-0">{idx + 1}.</span>
                   <span className="text-text-secondary">{guide}</span>
                 </li>
               ))}

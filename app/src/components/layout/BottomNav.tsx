@@ -49,8 +49,8 @@ export function BottomNav() {
               onClick={() => router.push(item.path)}
               className={`flex flex-col items-center gap-1 px-6 py-1.5 rounded-lg transition-all duration-300 ${
                 isActive
-                  ? 'text-accent font-semibold'
-                  : 'text-text-secondary hover:text-text'
+                  ? 'text-primary font-semibold'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               <span>{item.icon}</span>

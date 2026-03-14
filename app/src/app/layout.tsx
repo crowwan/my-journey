@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR } from "next/font/google";
+import { Noto_Sans_KR, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "900"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -36,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${notoSansKR.variable} antialiased`}>
+      <body className={`${notoSansKR.variable} ${playfairDisplay.variable} antialiased`}>
         {children}
       </body>
     </html>

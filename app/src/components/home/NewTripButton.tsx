@@ -10,7 +10,7 @@ export function NewTripButton() {
     <Button
       onClick={() => router.push('/chat')}
       size="sm"
-      className="rounded-full bg-accent text-white hover:bg-accent-warm shadow-sm hover:shadow-md transition-all"
+      className="rounded-full bg-primary text-white hover:bg-primary-600 shadow-sm hover:shadow-md transition-all"
     >
       + 새 여행
     </Button>

@@ -13,8 +13,8 @@ export function Tip({ variant = 'tip', children }: TipProps) {
       className={cn(
         'rounded-xl border px-4 py-3.5 text-sm leading-relaxed shadow-none gap-0',
         variant === 'warn'
-          ? 'bg-trip-red/10 border-trip-red/25 text-trip-red'
-          : 'bg-accent-bg border-accent/20 text-accent'
+          ? 'bg-error/10 border-error/25 text-error'
+          : 'bg-primary-50 border-primary/20 text-primary'
       )}
     >
       {children}

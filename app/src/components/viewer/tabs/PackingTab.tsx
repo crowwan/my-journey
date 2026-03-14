@@ -55,15 +55,15 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
                     className={cn(
                       'flex items-center gap-3 px-5 py-3.5 rounded-xl cursor-pointer transition-all',
                       isChecked
-                        ? 'bg-trip-green/10 border border-trip-green/20'
-                        : 'bg-card border border-border hover:border-border'
+                        ? 'bg-cat-sightseeing/10 border border-cat-sightseeing/20'
+                        : 'bg-surface border border-border hover:border-border'
                     )}
                   >
                     <Checkbox
                       checked={isChecked}
                       className={cn(
                         'pointer-events-none',
-                        isChecked && 'data-[state=checked]:bg-trip-green data-[state=checked]:border-trip-green'
+                        isChecked && 'data-[state=checked]:bg-cat-sightseeing data-[state=checked]:border-cat-sightseeing'
                       )}
                       tabIndex={-1}
                     />
@@ -72,7 +72,7 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
                       <span
                         className={cn(
                           'text-sm font-medium',
-                          isChecked ? 'text-text-secondary line-through' : 'text-text'
+                          isChecked ? 'text-text-secondary line-through' : 'text-text-primary'
                         )}
                       >
                         {item.name}

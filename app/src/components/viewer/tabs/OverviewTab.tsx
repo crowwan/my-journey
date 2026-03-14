@@ -32,7 +32,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       {flights.map((flight) => (
         <div
           key={flight.direction}
-          className="bg-card border border-border rounded-[16px] p-5 mb-3"
+          className="bg-surface border border-border rounded-xl p-5 mb-3"
         >
           <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
             {flight.direction === 'outbound' ? '가는 편' : '오는 편'}
@@ -53,7 +53,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
         숙소
       </SectionTitle>
       {accommodation ? (
-        <div className="bg-card border border-border rounded-[16px] p-5 mb-3">
+        <div className="bg-surface border border-border rounded-xl p-5 mb-3">
           <InfoGrid>
             <InfoCard label="숙소명" value={accommodation.name} />
             <InfoCard label="지역" value={accommodation.area} />
@@ -68,7 +68,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
                 {(accommodation.nearbyStations ?? []).map((station) => (
                   <span
                     key={station}
-                    className="text-sm bg-trip-blue/10 text-trip-blue px-2.5 py-1 rounded-lg"
+                    className="text-sm bg-cat-transport/10 text-cat-transport px-2.5 py-1 rounded-lg"
                   >
                     {station}
                   </span>
@@ -91,11 +91,11 @@ export function OverviewTab({ trip }: OverviewTabProps) {
         {weather.map((w) => (
           <div
             key={w.date}
-            className="bg-card border border-border rounded-[16px] p-4 min-w-[120px] text-center shrink-0 hover:border-trip-cyan/30 transition-colors"
+            className="bg-surface border border-border rounded-xl p-4 min-w-[120px] text-center shrink-0 hover:border-cat-activity/30 transition-colors"
           >
             <div className="text-xs text-text-tertiary font-semibold">{w.dayOfWeek}</div>
             <div className="text-2xl my-1.5">{w.icon}</div>
-            <div className="text-base font-bold text-text">{w.tempAvg}°</div>
+            <div className="text-base font-bold text-text-primary">{w.tempAvg}°</div>
             <div className="text-xs text-text-secondary">
               {w.tempLow}° ~ {w.tempHigh}°
             </div>
@@ -110,7 +110,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
       {days.length > 0 && (
         <button
           onClick={() => downloadIcsFile(trip)}
-          className="flex items-center gap-1.5 text-xs text-accent border border-accent/20 bg-accent-bg rounded-full px-4 py-2 hover:bg-accent-bg-hover transition-colors mb-4"
+          className="flex items-center gap-1.5 text-xs text-primary border border-primary/20 bg-primary-50 rounded-full px-4 py-2 hover:bg-primary-100 transition-colors mb-4"
         >
           <span>📅</span>
           캘린더에 추가
@@ -120,7 +120,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
         {days.map((day, index) => (
           <div
             key={`day-${day.dayNumber ?? index}`}
-            className="rounded-[16px] p-5 border border-border transition-all hover:-translate-y-0.5"
+            className="rounded-xl p-5 border border-border transition-all hover:-translate-y-0.5"
             style={{ background: `${day.color}10`, borderColor: `${day.color}30` }}
           >
             <div
@@ -129,7 +129,7 @@ export function OverviewTab({ trip }: OverviewTabProps) {
             >
               {day.dayNumber}
             </div>
-            <div className="text-sm font-bold text-text">{day.title}</div>
+            <div className="text-sm font-bold text-text-primary">{day.title}</div>
             <div className="text-xs text-text-secondary mt-0.5">{day.subtitle}</div>
           </div>
         ))}

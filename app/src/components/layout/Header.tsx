@@ -15,19 +15,19 @@ export function Header({ title = 'My Journey', showBack = false }: HeaderProps) 
       {showBack && (
         <button
           onClick={() => router.back()}
-          className="text-text-secondary hover:text-accent transition-colors text-lg"
+          className="text-text-secondary hover:text-primary transition-colors text-lg"
         >
           &larr;
         </button>
       )}
-      <h1 className="font-sans text-lg font-bold text-text tracking-wide flex-1">
+      <h1 className="font-sans text-lg font-bold text-text-primary tracking-wide flex-1">
         {title}
       </h1>
       {/* 홈에서만 채팅 버튼 표시 */}
       {!showBack && (
         <button
           onClick={() => router.push('/chat')}
-          className="w-9 h-9 flex items-center justify-center rounded-full text-text-secondary hover:text-accent hover:bg-accent/10 transition-all"
+          className="w-9 h-9 flex items-center justify-center rounded-full text-text-secondary hover:text-primary hover:bg-primary/10 transition-all"
           aria-label="AI 여행 플래너"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

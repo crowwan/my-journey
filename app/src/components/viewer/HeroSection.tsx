@@ -32,14 +32,14 @@ export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps)
   };
 
   return (
-    <div className="bg-gradient-to-b from-accent-bg to-white flex items-center justify-center text-center px-5 py-8 pt-8">
+    <div className="bg-gradient-to-b from-primary-50 to-white flex items-center justify-center text-center px-5 py-8 pt-8">
       <div className="w-full max-w-lg">
         {/* D-day 뱃지 */}
         <Badge className={cn('mb-4 text-xs font-medium px-3 py-1', badgeStyle)}>
           {dday}
         </Badge>
 
-        <h1 className="text-3xl font-black text-text tracking-tight mb-2">
+        <h1 className="text-3xl font-black text-text-primary tracking-tight mb-2">
           {trip.title}
         </h1>
         <p className="text-sm text-text-secondary font-light tracking-[0.15em]">
@@ -51,7 +51,7 @@ export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps)
             <Badge
               key={tag}
               variant="secondary"
-              className="bg-accent-bg text-accent px-3 py-1 border border-accent/15 text-xs font-medium"
+              className="bg-primary-50 text-primary px-3 py-1 border border-primary/15 text-xs font-medium"
             >
               {tag}
             </Badge>
@@ -72,7 +72,7 @@ export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps)
         <div className="flex items-center gap-2 justify-center mt-4">
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 text-xs text-accent border border-accent/20 bg-accent-bg rounded-full px-4 py-2 hover:bg-accent-bg-hover transition-colors"
+            className="flex items-center gap-1.5 text-xs text-primary border border-primary/20 bg-primary-50 rounded-full px-4 py-2 hover:bg-primary-100 transition-colors"
           >
             <span>🔗</span>
             공유하기
@@ -80,7 +80,7 @@ export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps)
           {onEdit && (
             <button
               onClick={onEdit}
-              className="flex items-center gap-1.5 text-xs text-accent border border-accent/20 bg-accent-bg rounded-full px-4 py-2 hover:bg-accent-bg-hover transition-colors"
+              className="flex items-center gap-1.5 text-xs text-primary border border-primary/20 bg-primary-50 rounded-full px-4 py-2 hover:bg-primary-100 transition-colors"
             >
               <span>✏️</span>
               AI로 수정하기
@@ -91,7 +91,7 @@ export function HeroSection({ trip, packingProgress, onEdit }: HeroSectionProps)
 
       {/* 클립보드 복사 토스트 */}
       {toastMessage && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-text text-white text-sm px-4 py-2 rounded-full shadow-lg z-50">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-text-primary text-white text-sm px-4 py-2 rounded-full shadow-lg z-50">
           {toastMessage}
         </div>
       )}

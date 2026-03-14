@@ -30,11 +30,11 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
   };
 
   return (
-    <Card className="rounded-[16px] py-0 gap-0 shadow-[var(--shadow-card)]">
+    <Card className="rounded-xl py-0 gap-0 shadow-sm">
       <CardContent className="p-4 space-y-3">
         {/* 제목 + 목적지 */}
         <div>
-          <h3 className="text-text font-bold text-sm">{trip.title}</h3>
+          <h3 className="text-text-primary font-bold text-sm">{trip.title}</h3>
           <p className="text-text-secondary text-xs mt-0.5">
             {trip.destination} &middot; {formatDateRange(trip.startDate, trip.endDate)} &middot; {trip.days.length}일
           </p>
@@ -47,7 +47,7 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
               <Badge
                 key={tag}
                 variant="secondary"
-                className="text-[0.65rem] px-2 py-0.5 bg-accent/10 text-accent"
+                className="text-[0.65rem] px-2 py-0.5 bg-primary/10 text-primary"
               >
                 {tag}
               </Badge>
@@ -58,7 +58,7 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
         {/* 저장 버튼 */}
         <Button
           onClick={handleSave}
-          className="w-full rounded-xl bg-accent text-white hover:bg-accent-warm shadow-sm hover:shadow-md"
+          className="w-full rounded-xl bg-primary text-white hover:bg-primary-600 shadow-sm hover:shadow-md"
         >
           여행 저장하기
         </Button>

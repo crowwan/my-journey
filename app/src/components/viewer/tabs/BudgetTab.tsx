@@ -34,20 +34,20 @@ export function BudgetTab({ budget }: BudgetTabProps) {
         {items.map((item) => (
           <div
             key={item.label}
-            className="bg-card border border-border rounded-[16px] p-4 hover:border-border transition-colors"
+            className="bg-surface border border-border rounded-xl p-4 hover:border-border transition-colors"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-xl">{item.icon}</span>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-text">{item.label}</span>
-                  <span className="text-sm font-bold text-accent">{item.amount}</span>
+                  <span className="text-sm font-bold text-text-primary">{item.label}</span>
+                  <span className="text-sm font-bold text-primary">{item.amount}</span>
                 </div>
                 <div className="text-xs text-text-secondary mt-0.5">{item.detail}</div>
               </div>
             </div>
             {/* 비율 바 */}
-            <div className="h-1.5 bg-glass rounded-full overflow-hidden">
+            <div className="h-1.5 bg-overlay-light rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all"
                 style={{ width: `${item.percentage}%`, background: item.color }}
@@ -62,15 +62,15 @@ export function BudgetTab({ budget }: BudgetTabProps) {
       <SectionTitle icon="🧮" bgColor="#10b981">
         예상 총 비용
       </SectionTitle>
-      <div className="bg-card border border-trip-green/30 rounded-[16px] p-7 mb-8">
+      <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8">
         <div className="text-center">
           <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
             예상 범위
           </div>
-          <div className="text-2xl font-black text-text mb-1">
+          <div className="text-2xl font-black text-text-primary mb-1">
             {total.min} ~ {total.max}
           </div>
-          <div className="text-base text-trip-green font-semibold">
+          <div className="text-base text-cat-sightseeing font-semibold">
             {total.minKRW} ~ {total.maxKRW}
           </div>
         </div>

@@ -207,10 +207,10 @@ cd app && npm uninstall @capacitor/core @capacitor/ios @capacitor/splash-screen 
 - 완료 조건: globals.css 내 기존 토큰명 참조 없음
 
 ### Phase 2 완료 조건 (DoD)
-- [ ] `npm run build` 성공
-- [ ] Playfair Display 폰트가 로드됨 (DevTools Network 확인)
-- [ ] `--color-accent` 등 구 토큰명 참조 0건
-- [ ] 모든 컴포넌트의 색상/그림자/반지름이 정상 렌더링
+- [x] `npm run build` 성공 [2026-03-14]
+- [x] Playfair Display 폰트가 로드됨 — layout.tsx에 next/font/google 설정 완료 [2026-03-14]
+- [x] `--color-accent` 등 구 토큰명 참조 0건 — grep 전수검사 통과 [2026-03-14]
+- [ ] 모든 컴포넌트의 색상/그림자/반지름이 정상 렌더링 (시각 확인 필요)
 - [ ] 시각적으로 기존과 동일 (색상값 자체는 변경 없으므로)
 
 ### Phase 2 위험
