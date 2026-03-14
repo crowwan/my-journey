@@ -1,108 +1,85 @@
 # 프로젝트 컨텍스트 & 의존성
 
-**최종 갱신**: 2026-03-14 (홈 화면 v2 리디자인 세션)
+**최종 갱신**: 2026-03-14 (여행 상세 UI + 히어로 + 홈 첫 화면 세션 완료)
 
 ---
 
-## 현재 상태: 홈 화면 v2 수정 진행 중 (미커밋)
+## 현재 상태: 모든 변경 커밋 & 푸시 완료
 
-### 이번 세션 변경 요약
+미커밋 변경 없음. 최신 커밋: `8a046ac`
 
-| 변경 | 파일 | 내용 |
-|------|------|------|
-| 홈 레이아웃 | `app/src/app/page.tsx` | 좌우 스크롤 → 세로 카드 리스트, 3섹션 구조 (최근 생성/다가오는 여행/지난 여행) |
-| 카드 디자인 A안 | `TripCard.tsx`, `TripHeroCard.tsx` | 다가오는 여행에 왼쪽 오렌지 보더(`border-l-4 border-l-primary`) |
-| 삭제 기능 | `TripCard.tsx`, `TripHeroCard.tsx` | 휴지통 아이콘 + confirm → `useTripStore.deleteTrip()` 호출 |
-| 폰트 변경 | `layout.tsx`, `globals.css` | Playfair Display(serif) → Outfit(sans-serif) |
-| 날짜 버그 수정 | `trip-utils.ts` | `toISOString()` UTC → 로컬 시간 기준 YYYY-MM-DD |
-| AI 날짜 버그 수정 | `gemini.ts` | `CREATE_TRIP_PROMPT`에 오늘 날짜 주입 → 미래 날짜로 여행 생성 |
-
-### 주요 결정
-
-1. **홈 3섹션 구조 확정**
-   - **최근 생성**: `createdAt` 기준 가장 최근 1개 → 히어로 카드
-   - **다가오는 여행**: ongoing + upcoming (최근 생성 제외) → 일반 카드
-   - **지난 여행**: past (최근 생성 제외) → 일반 카드
-
-2. **디자인 A안 확정**: 왼쪽 오렌지 보더로 다가오는/진행 중 여행 구분
-   - B안(상단 그라데이션 바), C안(연한 배경) 코드 제거 완료
-
-3. **Outfit 폰트 확정**: 모던하고 기하학적인 sans-serif
-   - Sora, Plus Jakarta, Montserrat, DM Sans 비교 후 선택
-
-4. **히어로 카드 D-day 뱃지**: 타이틀 옆으로 이동 (기존: 타이틀 위 별도 줄)
+### 커밋 이력 (이번 세션)
+| 커밋 | 내용 |
+|------|------|
+| `7ea19bc` | 여행 상세 UI 개선 — 팁 아코디언, 섹션 정리, 하드코딩 이모지→아이콘 |
+| `72fdf7e` | 이모지→lucide 매핑 유틸 + Day 색상 통일 + Today 칩 |
+| `6fa0de1` | 히어로 인라인 헤더 리디자인 + 홈 버튼 이동 |
+| `165891a` | 탭 변경 시 즉시 스크롤 상단 이동 |
+| `8a046ac` | 홈 첫 화면 개선 — 빈 상태 중앙, 아이콘 정렬, CTA 버튼 강화 |
 
 ---
 
-## 해결한 버그 (이번 세션)
+## 이번 세션 주요 결정
 
-### 1. 날짜 그룹핑 UTC 오류 (`trip-utils.ts`)
-- **원인**: `today.toISOString().slice(0,10)` → UTC 기준이라 KST에서 하루 전 날짜
-- **해결**: `getFullYear()/getMonth()/getDate()` 로컬 시간 기준으로 변경
+### 여행 상세 페이지
+1. **팁** → TipsAccordion 접이식 바 (SummaryTab/GuideTab)
+2. **섹션 타이틀** → 아이콘 제거, `text-sm font-semibold text-text-secondary` + 구분선
+3. **숙소** → 3카드→1카드, 구글맵 링크, 주변역 라벨
+4. **맛집** → 구글맵 링크, ExternalLink 아이콘, 가격 하단 고정, Day 간 `space-y-6`
+5. **교통** → 집→호텔 좌우 스크롤 카드
+6. **패스** → 추천만 색상, 칩 `shrink-0 whitespace-nowrap`, price `text-sm`
+7. **가이드 아코디언** → 트리거 아이콘 배경 제거, 폰트 `text-lg`, 콘텐츠 `px-4`
 
-### 2. AI가 과거 날짜로 여행 생성 (`gemini.ts`)
-- **원인**: `CREATE_TRIP_PROMPT`에 오늘 날짜 정보 없음
-- **해결**: `getCreateTripPrompt()` 함수로 변경, 호출 시 오늘 날짜 주입 + "startDate는 반드시 오늘 이후" 규칙 추가
+### 이모지 → 아이콘
+8. **하드코딩** → lucide 직접 교체 (인사말, 채팅, 스플래시, EmptyState)
+9. **동적** → `emoji-to-icon.tsx` 매핑 유틸, 날씨 고유 색상, DayMap 이모지 유지
 
-### 3. Hydration 불일치 (이전 세션)
-- **해결**: useState 초기값 항상 `true`, useEffect에서 sessionStorage 체크
+### Day 색상 + 히어로 + 홈
+10. **Day** → 전체 primary, 숫자 박스 제거, Today 칩, 자동 펼침
+11. **히어로** → 인라인 헤더 (배경 제거, 좌측 정렬, 2xl, 홈 버튼 포함)
+12. **탭 전환** → `scrollTo({ top: 0 })` 즉시 (smooth는 리렌더링 문제)
+13. **홈 첫 화면** → 빈 상태 `min-h-[50vh]` 중앙, 아이콘 정렬, CTA 버튼 강화
 
 ---
 
-## 핵심 파일 맵 (현재)
+## 핵심 파일 맵
 
-### 홈 화면 (이번 세션에서 변경)
-| 파일 | 역할 | 변경 |
-|------|------|------|
-| `app/src/app/page.tsx` | 홈 (3섹션 세로 카드 리스트) | 전면 재구성 |
-| `app/src/components/home/TripHeroCard.tsx` | 최근 생성 히어로 카드 | A안 확정, 삭제 버튼, D-day 제목 옆 |
-| `app/src/components/home/TripCard.tsx` | 일반 카드 (풀 너비 가로 레이아웃) | A안 확정, 삭제 버튼 |
-| `app/src/components/home/NewTripButton.tsx` | 새 여행 버튼 | 변경 없음 |
-| `app/src/components/shared/HorizontalScroll.tsx` | 수평 스크롤 (미사용, 삭제 가능) | 사용처 없음 |
-
-### 폰트/스타일
-| 파일 | 변경 |
+### 홈
+| 파일 | 역할 |
 |------|------|
-| `app/src/app/layout.tsx` | Outfit 단일 폰트 (`--font-display`) |
-| `app/src/app/globals.css` | `@theme inline`에 `--font-display: 'Outfit', sans-serif` |
+| `app/src/app/page.tsx` | 홈 (lucide 아이콘 인사말, 큰 CTA 버튼) |
+| `app/src/components/shared/EmptyState.tsx` | 빈 상태 (min-h-[50vh], icon: ReactNode) |
+| `app/src/components/shared/HorizontalScroll.tsx` | **미사용, 삭제 필요** |
 
-### AI/API
-| 파일 | 변경 |
+### 여행 상세 뷰어
+| 파일 | 역할 |
 |------|------|
-| `app/src/api/gemini.ts` | `getCreateTripPrompt()` 함수 (오늘 날짜 주입) |
-| `app/src/lib/trip-utils.ts` | `groupTrips()` 로컬 시간 기준 |
+| `app/src/components/viewer/TripViewer.tsx` | 뷰어 루트 (탭 전환 + 즉시 스크롤) |
+| `app/src/components/viewer/HeroSection.tsx` | 인라인 헤더 (홈 버튼 포함) |
+| `app/src/components/viewer/TabBar.tsx` | 4탭 바 |
+| `app/src/components/viewer/shared/SectionTitle.tsx` | 텍스트+구분선 |
+| `app/src/components/viewer/shared/TipsAccordion.tsx` | 팁 접이식 바 |
+| `app/src/components/viewer/schedule/DayCard.tsx` | Day 카드 (Today 칩) |
+| `app/src/lib/emoji-to-icon.tsx` | 이모지→lucide 매핑 |
 
-### 라우트 (변경 없음)
-| 경로 | 파일 |
-|------|------|
-| `/` | `app/src/app/page.tsx` |
-| `/trips/[tripId]` | `app/src/app/trips/[tripId]/page.tsx` |
+---
+
+## 알려진 이슈
+- `page.tsx:31` — ESLint 경고: useEffect 내 setState
+- `HorizontalScroll.tsx` — 미사용, 삭제 필요
+- DayMap 마커 — 이모지 유지
 
 ---
 
 ## 다음 즉시 단계
-
-1. **미커밋 변경사항 커밋** (홈 v2 + 폰트 + 버그 수정)
-2. **`git push origin main`** → Vercel 배포
-3. **브라우저 시각적 QA** (홈 3섹션, 삭제 기능, AI 드로어)
-4. **모바일 반응형 확인** (640px 이하)
-5. **CLAUDE.md 업데이트** — 7탭 → 4탭, 홈 구조 설명 변경
-6. **HorizontalScroll 컴포넌트 삭제** (사용처 없음)
+1. Vercel 배포 확인 (시각적 QA)
+2. 모바일 반응형 확인 (640px 이하)
+3. CLAUDE.md 업데이트
+4. HorizontalScroll.tsx 삭제
+5. page.tsx ESLint 경고 수정
 
 ---
 
 ## 배포
-
 - **웹**: `git push origin main` → Vercel 자동배포
-- **프로덕션 URL**: `https://my-journey-planner.vercel.app`
-
----
-
-## 관련 문서
-
-| 문서 | 경로 |
-|------|------|
-| 프로젝트 규칙 | `CLAUDE.md` |
-| 디자인 시스템 | `docs/design-system.md` |
-| 리디자인 설계서 | `docs/plans/2026-03-14-design-system-redesign.md` |
-| 리디자인 구현 계획서 | `docs/plans/2026-03-14-design-system-redesign-implementation.md` |
+- **URL**: `https://my-journey-planner.vercel.app`
