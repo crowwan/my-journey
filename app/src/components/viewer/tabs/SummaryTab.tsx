@@ -1,12 +1,10 @@
 'use client';
 
-import { Plane, Hotel, CloudSun, CalendarDays, Lightbulb, CalendarPlus } from 'lucide-react';
+import { Plane, Hotel, CloudSun, CalendarDays, CalendarPlus, ExternalLink } from 'lucide-react';
 import type { Trip } from '@/types/trip';
 import { downloadIcsFile } from '@/lib/ics-utils';
 import { SectionTitle } from '../shared/SectionTitle';
-import { InfoGrid } from '../shared/InfoGrid';
-import { InfoCard } from '../shared/InfoCard';
-import { Tip } from '../shared/Tip';
+import { TipsAccordion } from '../shared/TipsAccordion';
 
 interface SummaryTabProps {
   trip: Trip;
@@ -22,7 +20,7 @@ export function SummaryTab({ trip }: SummaryTabProps) {
   return (
     <div className="animate-fade-up">
       {/* 항공편 정보 */}
-      <SectionTitle icon={<Plane className="size-4 text-white" />} bgColor="bg-cat-transport">
+      <SectionTitle icon={<Plane className="size-4" />}>
         항공편
       </SectionTitle>
       {flights.length === 0 && (
@@ -67,34 +65,40 @@ export function SummaryTab({ trip }: SummaryTabProps) {
       ))}
 
       {/* 숙소 정보 */}
-      <SectionTitle icon={<Hotel className="size-4 text-white" />} bgColor="bg-cat-accommodation">
+      <SectionTitle icon={<Hotel className="size-4" />}>
         숙소
       </SectionTitle>
       {accommodation ? (
-        <div className="bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm">
-          <InfoGrid>
-            <InfoCard label="숙소명" value={accommodation.name} />
-            <InfoCard label="지역" value={accommodation.area} />
-            <InfoCard label="주소" value={accommodation.address} />
-          </InfoGrid>
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(accommodation.name + (accommodation.address ? ' ' + accommodation.address : ''))}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm hover:border-primary/30 hover:shadow-md transition-all group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="text-base font-bold text-text-primary">{accommodation.name}</div>
+            <ExternalLink className="size-3.5 text-text-tertiary group-hover:text-primary transition-colors shrink-0" />
+          </div>
+          {accommodation.area && (
+            <div className="text-sm text-text-secondary mt-1">{accommodation.area}</div>
+          )}
+          {accommodation.address && (
+            <div className="text-xs text-text-tertiary mt-1">{accommodation.address}</div>
+          )}
           {(accommodation.nearbyStations ?? []).length > 0 && (
-            <div className="mt-3">
-              <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-1">
-                주변 역
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {(accommodation.nearbyStations ?? []).map((station) => (
-                  <span
-                    key={station}
-                    className="text-sm bg-cat-transport/10 text-cat-transport px-2.5 py-1 rounded-full"
-                  >
-                    {station}
-                  </span>
-                ))}
-              </div>
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              <span className="text-xs text-text-tertiary">주변 역</span>
+              {(accommodation.nearbyStations ?? []).map((station) => (
+                <span
+                  key={station}
+                  className="text-xs bg-cat-transport/10 text-cat-transport px-2.5 py-1 rounded-full"
+                >
+                  {station}
+                </span>
+              ))}
             </div>
           )}
-        </div>
+        </a>
       ) : (
         <div className="text-center py-6 text-text-tertiary mb-3">
           <p className="text-sm">숙소 정보가 아직 없습니다</p>
@@ -102,7 +106,7 @@ export function SummaryTab({ trip }: SummaryTabProps) {
       )}
 
       {/* 날씨 */}
-      <SectionTitle icon={<CloudSun className="size-4 text-white" />} bgColor="bg-cat-activity">
+      <SectionTitle icon={<CloudSun className="size-4" />}>
         날씨 예보
       </SectionTitle>
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -122,7 +126,7 @@ export function SummaryTab({ trip }: SummaryTabProps) {
       </div>
 
       {/* 일별 요약 */}
-      <SectionTitle icon={<CalendarDays className="size-4 text-white" />} bgColor="bg-primary-500">
+      <SectionTitle icon={<CalendarDays className="size-4" />}>
         일정 요약
       </SectionTitle>
       {days.length > 0 && (
@@ -154,16 +158,7 @@ export function SummaryTab({ trip }: SummaryTabProps) {
       </div>
 
       {/* 팁 */}
-      {tips.length > 0 && (
-        <>
-          <SectionTitle icon={<Lightbulb className="size-4 text-white" />} bgColor="bg-primary-500">
-            여행 팁
-          </SectionTitle>
-          {tips.map((tip) => (
-            <Tip key={tip}>{tip}</Tip>
-          ))}
-        </>
-      )}
+      <TipsAccordion tips={tips} title="여행 팁" />
     </div>
   );
 }

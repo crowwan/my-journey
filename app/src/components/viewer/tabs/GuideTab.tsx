@@ -2,11 +2,12 @@
 
 import {
   UtensilsCrossed, Train, Wallet, Plane as PlaneIcon,
-  CreditCard, Lightbulb, Calculator
+  CreditCard, Calculator, ExternalLink
 } from 'lucide-react';
 import type { Restaurant, TransportSection, TransportPass, BudgetSection } from '@/types/trip';
 import { SectionTitle } from '../shared/SectionTitle';
 import { Tip } from '../shared/Tip';
+import { TipsAccordion } from '../shared/TipsAccordion';
 import {
   Accordion,
   AccordionContent,
@@ -26,9 +27,9 @@ function getPassColor(recommendation: TransportPass['recommendation']) {
     case 'recommended':
       return { border: 'border-cat-sightseeing/40', bg: 'bg-cat-sightseeing/10', text: 'text-cat-sightseeing', badge: 'bg-cat-sightseeing/20 text-cat-sightseeing' };
     case 'neutral':
-      return { border: 'border-primary/40', bg: 'bg-primary/10', text: 'text-primary', badge: 'bg-primary/20 text-primary' };
+      return { border: 'border-border-light', bg: 'bg-surface', text: 'text-text-secondary', badge: 'bg-bg-secondary text-text-secondary' };
     case 'not-recommended':
-      return { border: 'border-text-tertiary/40', bg: 'bg-overlay-light', text: 'text-text-tertiary', badge: 'bg-overlay-light text-text-tertiary' };
+      return { border: 'border-border-light', bg: 'bg-surface', text: 'text-text-tertiary', badge: 'bg-bg-secondary text-text-tertiary' };
   }
 }
 
@@ -45,16 +46,14 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
         <AccordionItem value="restaurants" className="border-b-0 mb-2">
           <AccordionTrigger className="hover:no-underline px-1 py-3">
             <div className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-lg bg-cat-food/15 flex items-center justify-center">
-                <UtensilsCrossed className="size-4 text-cat-food" />
-              </span>
-              <span className="text-base font-bold text-text-primary">맛집</span>
+              <UtensilsCrossed className="size-4 text-text-secondary" />
+              <span className="text-lg font-semibold text-text-primary">맛집</span>
               <span className="text-sm text-text-tertiary font-normal">
                 ({restaurantCount}곳)
               </span>
             </div>
           </AccordionTrigger>
-          <AccordionContent>
+          <AccordionContent className="px-4">
             <RestaurantSection restaurants={restaurants} />
           </AccordionContent>
         </AccordionItem>
@@ -63,10 +62,8 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
         <AccordionItem value="transport" className="border-b-0 mb-2">
           <AccordionTrigger className="hover:no-underline px-1 py-3">
             <div className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-lg bg-cat-transport/15 flex items-center justify-center">
-                <Train className="size-4 text-cat-transport" />
-              </span>
-              <span className="text-base font-bold text-text-primary">교통</span>
+              <Train className="size-4 text-text-secondary" />
+              <span className="text-lg font-semibold text-text-primary">교통</span>
               {routeCount > 0 && (
                 <span className="text-sm text-text-tertiary font-normal">
                   ({routeCount}개 노선)
@@ -74,7 +71,7 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent>
+          <AccordionContent className="px-4">
             <TransportSection_ transport={transport} />
           </AccordionContent>
         </AccordionItem>
@@ -83,10 +80,8 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
         <AccordionItem value="budget" className="border-b-0 mb-2">
           <AccordionTrigger className="hover:no-underline px-1 py-3">
             <div className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center">
-                <Wallet className="size-4 text-primary" />
-              </span>
-              <span className="text-base font-bold text-text-primary">예산</span>
+              <Wallet className="size-4 text-text-secondary" />
+              <span className="text-lg font-semibold text-text-primary">예산</span>
               {budgetTotal && budgetTotal.minKRW && (
                 <span className="text-sm text-text-tertiary font-normal">
                   ({budgetTotal.minKRW} ~ {budgetTotal.maxKRW})
@@ -94,7 +89,7 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
               )}
             </div>
           </AccordionTrigger>
-          <AccordionContent>
+          <AccordionContent className="px-4">
             <BudgetSection_ budget={budget} />
           </AccordionContent>
         </AccordionItem>
@@ -124,44 +119,52 @@ function RestaurantSection({ restaurants }: { restaurants: Restaurant[] }) {
   const sortedDays = Array.from(grouped.entries()).sort(([a], [b]) => a - b);
 
   return (
-    <div>
+    <div className="space-y-6">
       {sortedDays.map(([dayNumber, dayRestaurants]) => (
         <div key={dayNumber}>
-          <SectionTitle icon={<UtensilsCrossed className="size-4 text-white" />} bgColor="bg-cat-food">
+          <SectionTitle icon={<UtensilsCrossed className="size-4" />}>
             Day {dayNumber}
           </SectionTitle>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
             {dayRestaurants.map((restaurant) => (
-              <div
+              <a
                 key={`${dayNumber}-${restaurant.name}`}
-                className="bg-surface border border-border-light rounded-xl p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-surface border border-border-light rounded-xl p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-primary/30 group flex flex-col"
               >
                 {/* 카테고리 + 평점 */}
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs bg-cat-food/10 text-cat-food px-2.5 py-0.5 rounded-full font-medium">
                     {restaurant.category}
                   </span>
-                  <span className="text-sm text-amber-500 font-semibold">
-                    {'★'.repeat(Math.round(restaurant.rating))}{' '}
-                    <span className="text-text-secondary">{restaurant.rating}</span>
-                    {restaurant.reviewCount && (
-                      <span className="text-text-tertiary text-xs ml-1">
-                        ({restaurant.reviewCount})
-                      </span>
-                    )}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-amber-500 font-semibold">
+                      {'★'.repeat(Math.round(restaurant.rating))}{' '}
+                      <span className="text-text-secondary">{restaurant.rating}</span>
+                      {restaurant.reviewCount && (
+                        <span className="text-text-tertiary text-xs ml-1">
+                          ({restaurant.reviewCount})
+                        </span>
+                      )}
+                    </span>
+                    <ExternalLink className="size-3.5 text-text-tertiary group-hover:text-primary transition-colors shrink-0" />
+                  </div>
                 </div>
                 {/* 가게명 */}
                 <h4 className="text-base font-bold text-text-primary mb-1">{restaurant.name}</h4>
                 {/* 설명 */}
-                <p className="text-sm text-text-secondary leading-relaxed mb-2">
+                <p className="text-sm text-text-secondary leading-relaxed flex-1">
                   {restaurant.description}
                 </p>
                 {/* 가격대 */}
-                <div className="text-xs text-text-tertiary font-medium bg-bg-secondary px-2.5 py-1 rounded-full inline-block">
-                  {restaurant.priceRange}
+                <div className="mt-3">
+                  <span className="text-xs text-text-tertiary font-medium bg-bg-secondary px-2.5 py-1 rounded-full">
+                    {restaurant.priceRange}
+                  </span>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -191,24 +194,22 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* 집 -> 호텔 경로 */}
       {homeToHotel.length > 0 && (
         <>
-          <SectionTitle icon={<PlaneIcon className="size-4 text-white" />} bgColor="bg-cat-transport">
+          <SectionTitle icon={<PlaneIcon className="size-4" />}>
             집 → 호텔 경로
           </SectionTitle>
-          <div className="bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              {homeToHotel.map((step, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <div className="bg-bg-secondary rounded-xl px-4 py-3 text-center min-w-[90px]">
-                    <div className="text-lg mb-0.5">{step.icon}</div>
-                    <div className="text-sm font-semibold text-text-primary">{step.title}</div>
-                    <div className="text-xs text-text-secondary">{step.subtitle}</div>
-                  </div>
-                  {idx < homeToHotel.length - 1 && (
-                    <span className="text-cat-transport text-lg">→</span>
-                  )}
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {homeToHotel.map((step, idx) => (
+              <div key={idx} className="flex items-center gap-3 shrink-0">
+                <div className="bg-surface border border-border-light rounded-xl px-4 py-3 text-center min-w-[100px] shadow-sm">
+                  <div className="text-lg mb-0.5">{step.icon}</div>
+                  <div className="text-sm font-semibold text-text-primary">{step.title}</div>
+                  <div className="text-xs text-text-secondary">{step.subtitle}</div>
                 </div>
-              ))}
-            </div>
+                {idx < homeToHotel.length - 1 && (
+                  <span className="text-cat-transport text-lg">→</span>
+                )}
+              </div>
+            ))}
           </div>
         </>
       )}
@@ -216,7 +217,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* 도시간 노선 */}
       {intercityRoutes.length > 0 && (
         <>
-          <SectionTitle icon={<Train className="size-4 text-white" />} bgColor="bg-cat-transport">
+          <SectionTitle icon={<Train className="size-4" />}>
             도시간 노선
           </SectionTitle>
           <div className="bg-surface border border-border-light rounded-xl overflow-hidden mb-3 shadow-sm">
@@ -252,7 +253,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* 패스 비교 */}
       {passes.length > 0 && (
         <>
-          <SectionTitle icon={<CreditCard className="size-4 text-white" />} bgColor="bg-cat-accommodation">
+          <SectionTitle icon={<CreditCard className="size-4" />}>
             패스 비교
           </SectionTitle>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 mb-4">
@@ -263,9 +264,9 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
                   key={pass.name}
                   className={`${color.bg} border ${color.border} rounded-xl p-5`}
                 >
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-start justify-between gap-2 mb-2">
                     <h4 className="text-base font-bold text-text-primary">{pass.name}</h4>
-                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${color.badge}`}>
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium shrink-0 whitespace-nowrap ${color.badge}`}>
                       {pass.recommendation === 'recommended'
                         ? '추천'
                         : pass.recommendation === 'neutral'
@@ -273,7 +274,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
                           : '비추천'}
                     </span>
                   </div>
-                  <div className={`text-lg font-bold mb-1 ${color.text}`}>{pass.price}</div>
+                  <div className={`text-sm font-semibold mb-1 ${color.text}`}>{pass.price}</div>
                   <p className="text-sm text-text-secondary">{pass.reason}</p>
                 </div>
               );
@@ -288,7 +289,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* ICOCA 가이드 */}
       {icocaGuide.length > 0 && (
         <>
-          <SectionTitle icon={<CreditCard className="size-4 text-white" />} bgColor="bg-cat-activity">
+          <SectionTitle icon={<CreditCard className="size-4" />}>
             ICOCA 가이드
           </SectionTitle>
           <div className="bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm">
@@ -307,18 +308,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       )}
 
       {/* 교통 팁 */}
-      {tips.length > 0 && (
-        <>
-          <SectionTitle icon={<Lightbulb className="size-4 text-white" />} bgColor="bg-primary-500">
-            교통 팁
-          </SectionTitle>
-          {tips.map((tip) => (
-            <div key={tip} className="mb-2">
-              <Tip>{tip}</Tip>
-            </div>
-          ))}
-        </>
-      )}
+      <TipsAccordion tips={tips} title="교통 팁" />
     </div>
   );
 }
@@ -339,7 +329,7 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
 
   return (
     <div>
-      <SectionTitle icon={<Wallet className="size-4 text-white" />} bgColor="bg-primary-500">
+      <SectionTitle icon={<Wallet className="size-4" />}>
         예산 항목
       </SectionTitle>
 
@@ -373,7 +363,7 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
       </div>
 
       {/* 총합 카드 */}
-      <SectionTitle icon={<Calculator className="size-4 text-white" />} bgColor="bg-cat-sightseeing">
+      <SectionTitle icon={<Calculator className="size-4" />}>
         예상 총 비용
       </SectionTitle>
       <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8 shadow-sm">
@@ -391,18 +381,7 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
       </div>
 
       {/* 예산 팁 */}
-      {tips.length > 0 && (
-        <>
-          <SectionTitle icon={<Lightbulb className="size-4 text-white" />} bgColor="bg-primary-500">
-            예산 팁
-          </SectionTitle>
-          {tips.map((tip) => (
-            <div key={tip} className="mb-2">
-              <Tip>{tip}</Tip>
-            </div>
-          ))}
-        </>
-      )}
+      <TipsAccordion tips={tips} title="예산 팁" />
     </div>
   );
 }

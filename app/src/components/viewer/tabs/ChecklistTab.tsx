@@ -67,7 +67,7 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
       {/* 준비물 섹션 */}
       {hasPacking && (
         <div className="mb-8">
-          <SectionTitle icon={<Luggage className="size-4 text-white" />} bgColor="bg-cat-accommodation">
+          <SectionTitle icon={<Luggage className="size-4" />}>
             준비물
             <span className="text-sm font-normal text-text-secondary ml-2">
               ({packingChecked}/{packingTotal})
@@ -137,7 +137,7 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
       {/* 사전 할 일 섹션 */}
       {hasPreTodos && (
         <div>
-          <SectionTitle icon={<CheckCircle className="size-4 text-white" />} bgColor="bg-cat-sightseeing">
+          <SectionTitle icon={<CheckCircle className="size-4" />}>
             출발 전 할 일
           </SectionTitle>
           <div className="space-y-3">

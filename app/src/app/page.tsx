@@ -9,13 +9,16 @@ import { TripCard } from '@/components/home/TripCard';
 import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { Sun, CloudSun, Moon, MoonStar, Plane } from 'lucide-react';
 
-function getGreeting(): string {
+// 시간대별 인사말 텍스트와 아이콘을 반환
+function getGreeting(): { text: string; icon: React.ReactNode } {
   const hour = new Date().getHours();
-  if (hour >= 5 && hour <= 11) return '좋은 아침이에요 ☀️';
-  if (hour >= 12 && hour <= 17) return '좋은 오후예요 🌤️';
-  if (hour >= 18 && hour <= 22) return '좋은 저녁이에요 🌙';
-  return '늦은 밤이에요 🌛';
+  const iconClass = 'inline-block ml-1 text-primary';
+  if (hour >= 5 && hour <= 11) return { text: '좋은 아침이에요', icon: <Sun size={20} className={iconClass} /> };
+  if (hour >= 12 && hour <= 17) return { text: '좋은 오후예요', icon: <CloudSun size={20} className={iconClass} /> };
+  if (hour >= 18 && hour <= 22) return { text: '좋은 저녁이에요', icon: <Moon size={20} className={iconClass} /> };
+  return { text: '늦은 밤이에요', icon: <MoonStar size={20} className={iconClass} /> };
 }
 
 export default function Home() {
@@ -75,6 +78,7 @@ export default function Home() {
   }
 
   const hasNoTrips = summaries.length === 0;
+  const greeting = getGreeting();
 
   return (
     <div>
@@ -82,7 +86,10 @@ export default function Home() {
 
       {/* 시간대별 인사말 */}
       <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-6 pb-2">
-        <p className="text-lg font-medium text-text-primary">{getGreeting()}</p>
+        <p className="text-lg font-medium text-text-primary flex items-center">
+          {greeting.text}
+          {greeting.icon}
+        </p>
         <p className="text-sm text-text-secondary">{getSubtitle()}</p>
       </section>
 
@@ -90,7 +97,7 @@ export default function Home() {
       {/* 여행 없을 때 빈 상태 */}
       {hasNoTrips && (
         <EmptyState
-          icon="✈️"
+          icon={<Plane size={48} className="text-primary" />}
           title="아직 여행이 없어요"
           description="AI와 대화하며 첫 여행을 계획해보세요"
           action={<NewTripButton />}

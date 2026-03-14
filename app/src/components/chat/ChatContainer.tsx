@@ -6,6 +6,7 @@ import { useTripStore } from '@/stores/useTripStore';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
+import { Plane, Pencil, Map } from 'lucide-react';
 
 interface ChatContainerProps {
   mode?: 'create' | 'edit';
@@ -74,7 +75,9 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
         {isEmpty ? (
           // 빈 상태 안내
           <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
-            <div className="text-5xl mb-4">{mode === 'edit' ? '✏️' : '✈️'}</div>
+            <div className="mb-4 text-primary">
+              {mode === 'edit' ? <Pencil size={48} /> : <Plane size={48} />}
+            </div>
             <h2 className="text-2xl font-bold text-text-primary mb-1">
               {mode === 'edit' ? '여행을 수정해볼까요?' : '어디로 떠나볼까요?'}
             </h2>
@@ -117,7 +120,7 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
             disabled={isLoading}
             className="flex items-center gap-2 bg-primary text-white rounded-full px-6 py-3 text-sm font-semibold hover:bg-primary-600 shadow-md hover:shadow-lg transition-all disabled:opacity-50"
           >
-            <span>🗺️</span>
+            <Map size={18} />
             여행 계획 생성하기
           </button>
         </div>
