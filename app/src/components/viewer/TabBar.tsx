@@ -1,7 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { ChevronLeft, Plane, Calendar, Compass, CheckSquare } from 'lucide-react';
+import { Plane, Calendar, Compass, CheckSquare } from 'lucide-react';
 import { TAB_CONFIG, type TabId } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
@@ -19,21 +18,9 @@ interface TabBarProps {
 }
 
 export function TabBar({ activeTab, onChange }: TabBarProps) {
-  const router = useRouter();
-
   return (
     <div className="sticky top-0 z-40 bg-surface/95 backdrop-blur-sm border-b border-border-light">
       <div className="max-w-[1100px] mx-auto px-3">
-        {/* 홈 뒤로가기 — 탭 위 별도 행 */}
-        <button
-          onClick={() => router.push('/')}
-          className="flex items-center gap-0.5 px-1 pt-2 pb-1 text-sm text-text-secondary hover:text-primary transition-colors"
-          aria-label="홈으로"
-        >
-          <ChevronLeft className="size-4" />
-          <span>홈</span>
-        </button>
-
         {/* 4탭 균등 분배 */}
         <div className="flex justify-around">
           {TAB_CONFIG.map((tab) => {
