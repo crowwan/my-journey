@@ -38,8 +38,8 @@ export default function Home() {
   const summaries = getTripSummaries();
   const { upcoming, ongoing, past } = groupTrips(summaries);
 
-  // 최근 생성한 여행 (createdAt 기준 가장 최근 1개)
-  const latestTrip = summaries.length > 0
+  // 최근 생성한 여행 (createdAt 기준 가장 최근 1개, 미래 여행만 히어로로 표시)
+  const latestTripRaw = summaries.length > 0
     ? summaries.reduce((latest, current) => {
         const latestFull = trips.get(latest.id);
         const currentFull = trips.get(current.id);
@@ -48,10 +48,16 @@ export default function Home() {
       })
     : null;
 
-  // 최근 생성 카드를 다른 섹션에서 제외
-  const upcomingFiltered = upcoming.filter((t) => t.id !== latestTrip?.id);
-  const ongoingFiltered = ongoing.filter((t) => t.id !== latestTrip?.id);
-  const pastFiltered = past.filter((t) => t.id !== latestTrip?.id);
+  // 최근 생성이 과거 여행이면 히어로로 표시하지 않음
+  const isLatestPast = latestTripRaw
+    ? past.some((t) => t.id === latestTripRaw.id)
+    : false;
+  const latestTrip = isLatestPast ? null : latestTripRaw;
+
+  // 최근 생성 카드를 다른 섹션에서 제외 (히어로로 표시될 때만)
+  const upcomingFiltered = latestTrip ? upcoming.filter((t) => t.id !== latestTrip.id) : upcoming;
+  const ongoingFiltered = latestTrip ? ongoing.filter((t) => t.id !== latestTrip.id) : ongoing;
+  const pastFiltered = past;
 
   // 부제 결정
   function getSubtitle(): string {
@@ -114,7 +120,6 @@ export default function Home() {
                 {ongoingFiltered.length + upcomingFiltered.length}
               </span>
             </div>
-            <NewTripButton />
           </div>
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
             {[...ongoingFiltered, ...upcomingFiltered].map((trip, index) => (
@@ -132,10 +137,6 @@ export default function Home() {
               <h2 className="text-xl font-semibold text-text-primary">지난 여행</h2>
               <span className="text-sm text-text-tertiary">{pastFiltered.length}</span>
             </div>
-            {/* 다가오는 여행이 없을 때만 여기에 새 여행 버튼 표시 */}
-            {ongoingFiltered.length + upcomingFiltered.length === 0 && !hasNoTrips && (
-              <NewTripButton />
-            )}
           </div>
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
             {pastFiltered.map((trip, index) => (
