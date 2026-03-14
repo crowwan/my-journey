@@ -1,7 +1,41 @@
-import type { PackingItem } from '@/types/trip';
+import type { PackingItem, TripSummary } from '@/types/trip';
 
 // 여행 상태 타입
 export type TripStatus = 'upcoming' | 'ongoing' | 'completed';
+
+// 여행 그룹 타입 (시간 기준 분류)
+export type TripGroup = {
+  upcoming: TripSummary[]; // startDate > today
+  ongoing: TripSummary[];  // startDate <= today <= endDate
+  past: TripSummary[];     // endDate < today
+};
+
+// 여행 목록을 시간 기준으로 그룹핑
+export function groupTrips(summaries: TripSummary[]): TripGroup {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = today.toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const group: TripGroup = { upcoming: [], ongoing: [], past: [] };
+
+  for (const trip of summaries) {
+    if (trip.endDate < todayStr) {
+      group.past.push(trip);
+    } else if (trip.startDate > todayStr) {
+      group.upcoming.push(trip);
+    } else {
+      // startDate <= today <= endDate
+      group.ongoing.push(trip);
+    }
+  }
+
+  // upcoming: startDate 오름차순 (가까운 것 먼저)
+  group.upcoming.sort((a, b) => a.startDate.localeCompare(b.startDate));
+  // past: endDate 내림차순 (최근 것 먼저)
+  group.past.sort((a, b) => b.endDate.localeCompare(a.endDate));
+
+  return group;
+}
 
 // D-Day 계산: 여행 시작일까지 남은 일수를 문자열로 반환
 export function getDDay(startDate: string, endDate: string): string {

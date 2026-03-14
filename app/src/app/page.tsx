@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useTripStore } from '@/stores/useTripStore';
 import { storage } from '@/lib/storage';
-import { getPackingProgress } from '@/lib/trip-utils';
+import { getPackingProgress, groupTrips } from '@/lib/trip-utils';
 import { Header } from '@/components/layout/Header';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { TripCard } from '@/components/home/TripCard';
+import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
+import { HorizontalScroll } from '@/components/shared/HorizontalScroll';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -20,10 +23,13 @@ function getGreeting(): string {
 export default function Home() {
   const { isLoaded, loadTrips, getTripSummaries } = useTripStore();
   const trips = useTripStore((s) => s.trips);
-  const [showSplash, setShowSplash] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return !sessionStorage.getItem('splashShown');
-  });
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    if (sessionStorage.getItem('splashShown')) {
+      setShowSplash(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -32,6 +38,34 @@ export default function Home() {
   }, [isLoaded, loadTrips]);
 
   const summaries = getTripSummaries();
+  const { upcoming, ongoing, past } = groupTrips(summaries);
+
+  // 히어로에 표시할 여행: ongoing 우선, 없으면 upcoming 첫번째
+  const heroTrip = ongoing[0] ?? upcoming[0] ?? null;
+  // 히어로에 표시된 여행은 리스트에서 제외
+  const remainingUpcoming = heroTrip
+    ? upcoming.filter((t) => t.id !== heroTrip.id)
+    : upcoming;
+  const remainingOngoing = heroTrip
+    ? ongoing.filter((t) => t.id !== heroTrip.id)
+    : ongoing;
+
+  // 히어로 카드용 준비물 진행률
+  const heroPackingProgress = heroTrip
+    ? (() => {
+        const fullTrip = trips.get(heroTrip.id);
+        const checkedMap = storage.getPackingChecked(heroTrip.id);
+        return getPackingProgress(fullTrip?.packing, checkedMap);
+      })()
+    : undefined;
+
+  // 부제 결정
+  function getSubtitle(): string {
+    if (ongoing.length > 0) return '여행 중이시네요!';
+    if (upcoming.length > 0) return '다가오는 여행이 있어요!';
+    if (past.length > 0) return '새로운 여행을 계획해볼까요?';
+    return '첫 여행을 계획해보세요!';
+  }
 
   if (showSplash) {
     return <SplashScreen onFinish={() => {
@@ -40,46 +74,78 @@ export default function Home() {
     }} />;
   }
 
+  const hasNoTrips = summaries.length === 0;
+
   return (
     <div>
       <Header title="My Journey" />
 
       {/* 시간대별 인사말 */}
-      <section className="max-w-[1100px] mx-auto px-5 pt-6 pb-2">
+      <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-6 pb-2">
         <p className="text-lg font-medium text-text-primary">{getGreeting()}</p>
-        <p className="text-sm text-text-secondary">오늘도 좋은 여행을!</p>
+        <p className="text-sm text-text-secondary">{getSubtitle()}</p>
       </section>
 
-      {/* 컴팩트 헤더 */}
-      <section className="max-w-[1100px] mx-auto px-5 pt-3 pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-baseline gap-2">
-            <h2 className="text-2xl font-bold text-text-primary">내 여행</h2>
-            <span className="text-sm text-text-tertiary">{summaries.length}</span>
+      {/* 여행 없을 때 빈 상태 */}
+      {hasNoTrips && (
+        <EmptyState
+          icon="✈️"
+          title="아직 여행이 없어요"
+          description="AI와 대화하며 첫 여행을 계획해보세요"
+          action={<NewTripButton />}
+        />
+      )}
+
+      {/* 히어로 카드 (ongoing 또는 upcoming 첫번째) */}
+      {heroTrip && (
+        <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-4 pb-2">
+          <TripHeroCard trip={heroTrip} packingProgress={heroPackingProgress} />
+        </section>
+      )}
+
+      {/* 다가오는 여행 섹션 (ongoing 나머지 + upcoming 나머지) */}
+      {(remainingOngoing.length + remainingUpcoming.length) > 0 && (
+        <section className="pt-6 pb-2">
+          <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex items-center justify-between mb-3">
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-xl font-semibold text-text-primary">다가오는 여행</h2>
+              <span className="text-sm text-text-tertiary">
+                {remainingOngoing.length + remainingUpcoming.length}
+              </span>
+            </div>
+            <NewTripButton />
           </div>
-          <NewTripButton />
-        </div>
-      </section>
+          <HorizontalScroll>
+            {[...remainingOngoing, ...remainingUpcoming].map((trip, index) => (
+              <TripCard key={trip.id} trip={trip} index={index} />
+            ))}
+          </HorizontalScroll>
+        </section>
+      )}
 
-      <main className="max-w-[1100px] mx-auto px-5 pb-8">
-        <div className="flex flex-col gap-4">
-          {summaries.map((summary, index) => {
-            const fullTrip = trips.get(summary.id);
-            const checkedMap = storage.getPackingChecked(summary.id);
-            const packingProgress = getPackingProgress(fullTrip?.packing, checkedMap);
-            return (
-              <TripCard
-                key={summary.id}
-                trip={summary}
-                index={index}
-                packingProgress={packingProgress}
-              />
-            );
-          })}
-        </div>
-      </main>
+      {/* 지난 여행 섹션 */}
+      {past.length > 0 && (
+        <section className="pt-6 pb-2">
+          <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex items-center justify-between mb-3">
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-xl font-semibold text-text-primary">지난 여행</h2>
+              <span className="text-sm text-text-tertiary">{past.length}</span>
+            </div>
+            {/* 다가오는 여행이 없을 때만 여기에 새 여행 버튼 표시 */}
+            {remainingOngoing.length + remainingUpcoming.length === 0 && !hasNoTrips && (
+              <NewTripButton />
+            )}
+          </div>
+          <HorizontalScroll>
+            {past.map((trip, index) => (
+              <TripCard key={trip.id} trip={trip} index={index} />
+            ))}
+          </HorizontalScroll>
+        </section>
+      )}
+
       {/* 빌드 버전 */}
-      <footer className="max-w-[1100px] mx-auto px-5 pb-4 text-center">
+      <footer className="max-w-[1100px] mx-auto px-5 pb-4 pt-8 text-center">
         <p className="text-[10px] text-text-tertiary">
           Build {process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 7)} · {process.env.NEXT_PUBLIC_BUILD_TIME?.slice(0, 16).replace('T', ' ')}
         </p>
