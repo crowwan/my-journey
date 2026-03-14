@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR, Playfair_Display } from "next/font/google";
+import { Noto_Sans_KR, Outfit } from "next/font/google";
 import { AIDrawerProvider } from "@/components/ai/AIDrawerProvider";
 import "./globals.css";
 
@@ -10,9 +10,9 @@ const notoSansKR = Noto_Sans_KR({
   display: "swap",
 });
 
-const playfairDisplay = Playfair_Display({
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  weight: ["400", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });
@@ -44,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${notoSansKR.variable} ${playfairDisplay.variable} antialiased`}>
+      <body className={`${notoSansKR.variable} ${outfit.variable} antialiased`}>
         {children}
         <AIDrawerProvider />
       </body>

@@ -2,16 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useTripStore } from '@/stores/useTripStore';
-import { storage } from '@/lib/storage';
-import { getPackingProgress, groupTrips } from '@/lib/trip-utils';
+import { groupTrips } from '@/lib/trip-utils';
 import { Header } from '@/components/layout/Header';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { TripCard } from '@/components/home/TripCard';
 import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { cn } from '@/lib/utils';
-import type { CardVariant } from '@/components/home/TripCard';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -22,10 +19,9 @@ function getGreeting(): string {
 }
 
 export default function Home() {
-  const { isLoaded, loadTrips, getTripSummaries } = useTripStore();
+  const { isLoaded, loadTrips, getTripSummaries, deleteTrip } = useTripStore();
   const trips = useTripStore((s) => s.trips);
   const [showSplash, setShowSplash] = useState(true);
-  const [variant, setVariant] = useState<CardVariant>('A');
 
   useEffect(() => {
     if (sessionStorage.getItem('splashShown')) {
@@ -42,24 +38,20 @@ export default function Home() {
   const summaries = getTripSummaries();
   const { upcoming, ongoing, past } = groupTrips(summaries);
 
-  // 히어로에 표시할 여행: ongoing 우선, 없으면 upcoming 첫번째
-  const heroTrip = ongoing[0] ?? upcoming[0] ?? null;
-  // 히어로에 표시된 여행은 리스트에서 제외
-  const remainingUpcoming = heroTrip
-    ? upcoming.filter((t) => t.id !== heroTrip.id)
-    : upcoming;
-  const remainingOngoing = heroTrip
-    ? ongoing.filter((t) => t.id !== heroTrip.id)
-    : ongoing;
+  // 최근 생성한 여행 (createdAt 기준 가장 최근 1개)
+  const latestTrip = summaries.length > 0
+    ? summaries.reduce((latest, current) => {
+        const latestFull = trips.get(latest.id);
+        const currentFull = trips.get(current.id);
+        if (!latestFull || !currentFull) return latest;
+        return currentFull.createdAt > latestFull.createdAt ? current : latest;
+      })
+    : null;
 
-  // 히어로 카드용 준비물 진행률
-  const heroPackingProgress = heroTrip
-    ? (() => {
-        const fullTrip = trips.get(heroTrip.id);
-        const checkedMap = storage.getPackingChecked(heroTrip.id);
-        return getPackingProgress(fullTrip?.packing, checkedMap);
-      })()
-    : undefined;
+  // 최근 생성 카드를 다른 섹션에서 제외
+  const upcomingFiltered = upcoming.filter((t) => t.id !== latestTrip?.id);
+  const ongoingFiltered = ongoing.filter((t) => t.id !== latestTrip?.id);
+  const pastFiltered = past.filter((t) => t.id !== latestTrip?.id);
 
   // 부제 결정
   function getSubtitle(): string {
@@ -88,26 +80,6 @@ export default function Home() {
         <p className="text-sm text-text-secondary">{getSubtitle()}</p>
       </section>
 
-      {/* 디자인 비교 토글 (임시) */}
-      <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-2 pb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-text-tertiary">디자인:</span>
-          {(['A', 'B', 'C'] as const).map((v) => (
-            <button
-              key={v}
-              onClick={() => setVariant(v)}
-              className={cn(
-                'px-3 py-1 text-xs rounded-full border transition-colors',
-                variant === v
-                  ? 'bg-primary text-white border-primary'
-                  : 'bg-surface text-text-secondary border-border-light hover:border-primary/50'
-              )}
-            >
-              {v}안
-            </button>
-          ))}
-        </div>
-      </section>
 
       {/* 여행 없을 때 빈 상태 */}
       {hasNoTrips && (
@@ -119,49 +91,55 @@ export default function Home() {
         />
       )}
 
-      {/* 히어로 카드 (ongoing 또는 upcoming 첫번째) */}
-      {heroTrip && (
-        <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-4 pb-2">
-          <TripHeroCard trip={heroTrip} packingProgress={heroPackingProgress} variant={variant} />
+      {/* 최근 생성 섹션 */}
+      {latestTrip && (
+        <section className="pt-6 pb-2">
+          <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex items-center justify-between mb-3">
+            <h2 className="text-xl font-semibold text-text-primary">최근 생성</h2>
+            <NewTripButton />
+          </div>
+          <div className="max-w-[1100px] mx-auto px-5 sm:px-8">
+            <TripHeroCard trip={latestTrip} onDelete={deleteTrip} />
+          </div>
         </section>
       )}
 
-      {/* 다가오는 여행 섹션 (ongoing 나머지 + upcoming 나머지) */}
-      {(remainingOngoing.length + remainingUpcoming.length) > 0 && (
+      {/* 다가오는 여행 섹션 (히어로 + 나머지) */}
+      {(ongoingFiltered.length + upcomingFiltered.length) > 0 && (
         <section className="pt-6 pb-2">
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex items-center justify-between mb-3">
             <div className="flex items-baseline gap-2">
               <h2 className="text-xl font-semibold text-text-primary">다가오는 여행</h2>
               <span className="text-sm text-text-tertiary">
-                {remainingOngoing.length + remainingUpcoming.length}
+                {ongoingFiltered.length + upcomingFiltered.length}
               </span>
             </div>
             <NewTripButton />
           </div>
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
-            {[...remainingOngoing, ...remainingUpcoming].map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} index={index} variant={variant} />
+            {[...ongoingFiltered, ...upcomingFiltered].map((trip, index) => (
+              <TripCard key={trip.id} trip={trip} index={index} onDelete={deleteTrip} />
             ))}
           </div>
         </section>
       )}
 
       {/* 지난 여행 섹션 */}
-      {past.length > 0 && (
+      {pastFiltered.length > 0 && (
         <section className="pt-6 pb-2">
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex items-center justify-between mb-3">
             <div className="flex items-baseline gap-2">
               <h2 className="text-xl font-semibold text-text-primary">지난 여행</h2>
-              <span className="text-sm text-text-tertiary">{past.length}</span>
+              <span className="text-sm text-text-tertiary">{pastFiltered.length}</span>
             </div>
             {/* 다가오는 여행이 없을 때만 여기에 새 여행 버튼 표시 */}
-            {remainingOngoing.length + remainingUpcoming.length === 0 && !hasNoTrips && (
+            {ongoingFiltered.length + upcomingFiltered.length === 0 && !hasNoTrips && (
               <NewTripButton />
             )}
           </div>
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
-            {past.map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} index={index} variant={variant} />
+            {pastFiltered.map((trip, index) => (
+              <TripCard key={trip.id} trip={trip} index={index} onDelete={deleteTrip} />
             ))}
           </div>
         </section>

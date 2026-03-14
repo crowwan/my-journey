@@ -1,167 +1,104 @@
 # 프로젝트 컨텍스트 & 의존성
 
-**최종 갱신**: 2026-03-14 (방향 전환: iOS 앱 → 웹앱 전용 + 디자인 시스템 리디자인)
+**최종 갱신**: 2026-03-14 (홈 화면 v2 리디자인 세션)
 
 ---
 
-## 🚨 방향 전환 (2026-03-14)
+## 현재 상태: 홈 화면 v2 수정 진행 중 (미커밋)
 
-### 결정 사항
-- **iOS 앱 중단**: Capacitor/iOS 관련 코드 전면 제거
-- **웹앱 전용**: Vercel 배포만 유지, PWA 불필요
-- **전체 리디자인**: Trip.com 스타일 UI + 디자인 시스템 구축
-- **브랜드 컬러**: 오렌지(`#f97316`) 유지 + 틸(`#0d9488`) 보조색 추가
+### 이번 세션 변경 요약
 
-### 핵심 문서 (반드시 읽을 것)
-| 문서 | 경로 | 용도 |
+| 변경 | 파일 | 내용 |
 |------|------|------|
-| **디자인 시스템** | `docs/design-system.md` | 모든 UI 작업 시 참조 (색상/타이포/컴포넌트) |
-| **리디자인 설계서** | `docs/plans/2026-03-14-design-system-redesign.md` | AS-IS/TO-BE 논리 모델 |
-| **구현 계획서** | `docs/plans/2026-03-14-design-system-redesign-implementation.md` | 6 Phase 구현 순서 |
+| 홈 레이아웃 | `app/src/app/page.tsx` | 좌우 스크롤 → 세로 카드 리스트, 3섹션 구조 (최근 생성/다가오는 여행/지난 여행) |
+| 카드 디자인 A안 | `TripCard.tsx`, `TripHeroCard.tsx` | 다가오는 여행에 왼쪽 오렌지 보더(`border-l-4 border-l-primary`) |
+| 삭제 기능 | `TripCard.tsx`, `TripHeroCard.tsx` | 휴지통 아이콘 + confirm → `useTripStore.deleteTrip()` 호출 |
+| 폰트 변경 | `layout.tsx`, `globals.css` | Playfair Display(serif) → Outfit(sans-serif) |
+| 날짜 버그 수정 | `trip-utils.ts` | `toISOString()` UTC → 로컬 시간 기준 YYYY-MM-DD |
+| AI 날짜 버그 수정 | `gemini.ts` | `CREATE_TRIP_PROMPT`에 오늘 날짜 주입 → 미래 날짜로 여행 생성 |
+
+### 주요 결정
+
+1. **홈 3섹션 구조 확정**
+   - **최근 생성**: `createdAt` 기준 가장 최근 1개 → 히어로 카드
+   - **다가오는 여행**: ongoing + upcoming (최근 생성 제외) → 일반 카드
+   - **지난 여행**: past (최근 생성 제외) → 일반 카드
+
+2. **디자인 A안 확정**: 왼쪽 오렌지 보더로 다가오는/진행 중 여행 구분
+   - B안(상단 그라데이션 바), C안(연한 배경) 코드 제거 완료
+
+3. **Outfit 폰트 확정**: 모던하고 기하학적인 sans-serif
+   - Sora, Plus Jakarta, Montserrat, DM Sans 비교 후 선택
+
+4. **히어로 카드 D-day 뱃지**: 타이틀 옆으로 이동 (기존: 타이틀 위 별도 줄)
 
 ---
 
-## 1. 프로젝트 현황 스냅샷
+## 해결한 버그 (이번 세션)
 
-### 완료된 기능 (v0.1 ~ v0.3)
+### 1. 날짜 그룹핑 UTC 오류 (`trip-utils.ts`)
+- **원인**: `today.toISOString().slice(0,10)` → UTC 기준이라 KST에서 하루 전 날짜
+- **해결**: `getFullYear()/getMonth()/getDate()` 로컬 시간 기준으로 변경
 
-#### v0.1 MVP (2026-03-09)
-- [x] AI 채팅 인터페이스 (Gemini 2.5 Flash)
-- [x] 여행 계획 자동 생성 (JSON 스키마 기반)
-- [x] 7탭 여행 뷰어 (개요, 일정, 맛집, 교통, 예산, 준비물, 사전준비)
-- [x] 준비물 체크리스트 (localStorage 저장)
-- [x] 스플래시 화면 + 인사말
-- [x] Vercel 프로덕션 배포
-- [x] Rate Limiting (분당 8회, fallback 모델)
+### 2. AI가 과거 날짜로 여행 생성 (`gemini.ts`)
+- **원인**: `CREATE_TRIP_PROMPT`에 오늘 날짜 정보 없음
+- **해결**: `getCreateTripPrompt()` 함수로 변경, 호출 시 오늘 날짜 주입 + "startDate는 반드시 오늘 이후" 규칙 추가
 
-#### v0.2 UX 개선 (2026-03-10)
-- [x] 에러 바운더리
-- [x] Leaflet 지도 (DayMap)
-- [x] AI 편집 모드
-
-#### v0.3 Capacitor iOS (2026-03-10) — ⚠️ 제거 예정
-- [x] Capacitor v6 + iOS 프로젝트 (제거 예정)
-- [x] Safe Area 대응 (제거 예정)
-
-#### v0.3.1 UI 리팩토링 (2026-03-11)
-- [x] BottomNav 제거, Header에 채팅 버튼
-- [x] TabBar 뒤로가기 별도 행
-- [x] Quick Wins (.ics 내보내기, 지도 앱 열기, 공유)
+### 3. Hydration 불일치 (이전 세션)
+- **해결**: useState 초기값 항상 `true`, useEffect에서 sessionStorage 체크
 
 ---
 
-## 2. 현재 진행 작업: 리디자인 Phase 1 (Capacitor 제거)
+## 핵심 파일 맵 (현재)
 
-### Phase 1 상태: 미시작 → 시작 예정
+### 홈 화면 (이번 세션에서 변경)
+| 파일 | 역할 | 변경 |
+|------|------|------|
+| `app/src/app/page.tsx` | 홈 (3섹션 세로 카드 리스트) | 전면 재구성 |
+| `app/src/components/home/TripHeroCard.tsx` | 최근 생성 히어로 카드 | A안 확정, 삭제 버튼, D-day 제목 옆 |
+| `app/src/components/home/TripCard.tsx` | 일반 카드 (풀 너비 가로 레이아웃) | A안 확정, 삭제 버튼 |
+| `app/src/components/home/NewTripButton.tsx` | 새 여행 버튼 | 변경 없음 |
+| `app/src/components/shared/HorizontalScroll.tsx` | 수평 스크롤 (미사용, 삭제 가능) | 사용처 없음 |
 
-### Phase 1 작업 내용
-1. Capacitor 패키지 제거 (5개): `@capacitor/core`, `@capacitor/ios`, `@capacitor/status-bar`, `@capacitor/splash-screen`, `@capacitor/cli`
-2. 파일 삭제: `app/src/lib/capacitor.ts`, `app/src/components/CapacitorInit.tsx`, `app/capacitor.config.ts`
-3. 코드 수정:
-   - `app/src/app/layout.tsx`: CapacitorInit import/사용 제거, `viewportFit: "cover"` 제거
-   - `app/src/components/layout/Header.tsx`: `pt-[calc(0.75rem+var(--safe-area-top,0px))]` → `pt-3`
-   - `app/src/components/viewer/TabBar.tsx`: `pt-[var(--safe-area-top,0px)]` 제거
-   - `app/src/components/viewer/HeroSection.tsx`: `pt-[calc(2rem+var(--safe-area-top,0px))]` → `pt-8`
-   - `app/src/lib/map-utils.ts`: Capacitor import 제거, 웹 전용으로 단순화
-4. 폴더 삭제: `app/ios/` (로컬에만 존재)
-
-### 완료 조건 (DoD)
-- `npm run build` 성공
-- Capacitor 관련 import 0개 (`grep -r "capacitor" app/src/`)
-- `--safe-area-top` CSS 변수 참조 0개
-- 기존 기능 (홈, 채팅, 여행 상세) 정상 동작
-
----
-
-## 3. 전체 리디자인 6 Phase 요약
-
-| Phase | 내용 | 상태 |
-|-------|------|------|
-| **1** | Capacitor 제거 + 클린업 | ⬜ 미시작 |
-| **2** | 디자인 토큰 시스템 구축 | ⬜ 미시작 |
-| **3** | 7탭 → 4탭 재구성 | ⬜ 미시작 |
-| **4** | 홈 리디자인 (히어로+수평 스크롤) | ⬜ 미시작 |
-| **5** | AI 드로어 통합 (FAB + Drawer) | ⬜ 미시작 |
-| **6** | 전체 스타일 리디자인 | ⬜ 미시작 |
-
----
-
-## 4. 핵심 파일 맵
-
-### 라우트
-| 파일 | 역할 |
+### 폰트/스타일
+| 파일 | 변경 |
 |------|------|
-| `app/src/app/page.tsx` | 홈 (여행 목록) |
-| `app/src/app/chat/page.tsx` | AI 채팅 (Phase 5에서 드로어로 통합 후 제거) |
-| `app/src/app/trips/[tripId]/page.tsx` | 여행 상세 |
-| `app/src/app/api/chat/route.ts` | AI API 엔드포인트 |
-| `app/src/app/layout.tsx` | 루트 레이아웃 |
-| `app/src/app/globals.css` | 전역 스타일 |
+| `app/src/app/layout.tsx` | Outfit 단일 폰트 (`--font-display`) |
+| `app/src/app/globals.css` | `@theme inline`에 `--font-display: 'Outfit', sans-serif` |
 
-### 상태 관리
-| 파일 | 역할 |
+### AI/API
+| 파일 | 변경 |
 |------|------|
-| `app/src/stores/useTripStore.ts` | 여행 CRUD + 준비물 체크 |
-| `app/src/stores/useChatStore.ts` | 채팅 메시지 + AI 호출 |
+| `app/src/api/gemini.ts` | `getCreateTripPrompt()` 함수 (오늘 날짜 주입) |
+| `app/src/lib/trip-utils.ts` | `groupTrips()` 로컬 시간 기준 |
 
-### 데이터
-| 파일 | 역할 |
+### 라우트 (변경 없음)
+| 경로 | 파일 |
 |------|------|
-| `app/src/types/trip.ts` | 전체 도메인 타입 정의 |
-| `app/src/lib/storage.ts` | localStorage 추상화 |
-| `app/src/lib/constants.ts` | 탭 설정, Day 컬러 |
-| `app/src/lib/trip-utils.ts` | D-day 계산, 상태 유틸 |
-
-### 유틸
-| 파일 | 역할 |
-|------|------|
-| `app/src/lib/ics-utils.ts` | .ics 캘린더 내보내기 |
-| `app/src/lib/map-utils.ts` | 지도 앱 열기 (Phase 1에서 웹 전용으로 수정) |
-| `app/src/lib/share-utils.ts` | 공유 (Web Share API) |
-
-### 제거 대상 (Phase 1)
-| 파일 | 역할 |
-|------|------|
-| `app/src/lib/capacitor.ts` | ❌ 삭제 |
-| `app/src/components/CapacitorInit.tsx` | ❌ 삭제 |
-| `app/capacitor.config.ts` | ❌ 삭제 |
+| `/` | `app/src/app/page.tsx` |
+| `/trips/[tripId]` | `app/src/app/trips/[tripId]/page.tsx` |
 
 ---
 
-## 5. 아키텍처 결정 사항
+## 다음 즉시 단계
 
-### 유지되는 결정
-- Vercel 프로덕션 배포 (`my-journey-planner.vercel.app`)
-- Gemini API 연동 (create/edit/chat)
-- Leaflet 지도 유지
-- Web Share API 사용
-
-### 새로운 결정 (2026-03-14)
-- **iOS 중단**: 웹앱만으로 충분, Capacitor 복잡도 제거
-- **디자인 시스템**: Trip.com 스타일, 오렌지+틸 브랜드 컬러
-- **4탭 구조**: 요약/일정/가이드/체크리스트 (기존 7탭 통합)
-- **AI 드로어**: 별도 /chat 페이지 → 플로팅 버튼 + 사이드 드로어
-- **라이트 테마 기본**: 화이트 배경, 깔끔한 카드 UI
-- **Playfair Display 폰트 복원**: 히어로 제목용
-
-### 폐기된 결정
-- ~~Capacitor server 모드~~ → 웹앱 전용
-- ~~Safe Area JS 변수 방식~~ → 불필요
-- ~~App Store 배포~~ → 중단
+1. **미커밋 변경사항 커밋** (홈 v2 + 폰트 + 버그 수정)
+2. **`git push origin main`** → Vercel 배포
+3. **브라우저 시각적 QA** (홈 3섹션, 삭제 기능, AI 드로어)
+4. **모바일 반응형 확인** (640px 이하)
+5. **CLAUDE.md 업데이트** — 7탭 → 4탭, 홈 구조 설명 변경
+6. **HorizontalScroll 컴포넌트 삭제** (사용처 없음)
 
 ---
 
-## 6. 배포 방식
+## 배포
 
-### 웹 (Vercel) — 유일한 배포 대상
-- **프로덕션 도메인**: `https://my-journey-planner.vercel.app`
-- **배포 트리거**: `git push origin main` → Vercel 자동 배포
-- **Vercel 프로젝트 설정**: root directory = `app/`
-- **환경변수**: `GEMINI_API_KEY` (Vercel 대시보드)
+- **웹**: `git push origin main` → Vercel 자동배포
+- **프로덕션 URL**: `https://my-journey-planner.vercel.app`
 
 ---
 
-## 7. 관련 문서
+## 관련 문서
 
 | 문서 | 경로 |
 |------|------|
@@ -169,5 +106,3 @@
 | 디자인 시스템 | `docs/design-system.md` |
 | 리디자인 설계서 | `docs/plans/2026-03-14-design-system-redesign.md` |
 | 리디자인 구현 계획서 | `docs/plans/2026-03-14-design-system-redesign-implementation.md` |
-| AI 플래너 설계 | `docs/02-design/features/ai-travel-planner-prototype.design.md` |
-| 프로젝트 셋업 계획 | `docs/01-plan/features/my-journey-project-setup.plan.md` |

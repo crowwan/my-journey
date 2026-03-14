@@ -1,62 +1,58 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Trash2 } from 'lucide-react';
 import type { TripSummary } from '@/types/trip';
 import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/lib/trip-utils';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import type { CardVariant } from '@/components/home/TripCard';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 interface TripHeroCardProps {
   trip: TripSummary;
   packingProgress?: { checked: number; total: number; percentage: number };
-  variant?: CardVariant;
+  onDelete?: (tripId: string) => void;
 }
 
 // 다가오는/진행 중 여행을 강조하는 히어로 카드
-export function TripHeroCard({ trip, packingProgress, variant = 'A' }: TripHeroCardProps) {
+export function TripHeroCard({ trip, packingProgress, onDelete }: TripHeroCardProps) {
   const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const status = getTripStatus(trip.startDate, trip.endDate);
   const dday = getDDay(trip.startDate, trip.endDate);
   const badgeStyle = getDDayBadgeStyle(status);
 
-  // variant별 카드 컨테이너 스타일
-  const containerClass = {
-    A: 'bg-surface border border-border-light border-l-4 border-l-primary',
-    B: 'bg-surface border border-border-light',
-    C: 'bg-primary-50 border border-primary/20',
-  }[variant];
-
-  // C안 D-day 뱃지 스타일
-  const ddayBadgeClass = variant === 'C'
-    ? 'bg-primary-50 text-primary border border-primary/30'
-    : badgeStyle;
-
   return (
     <div
       onClick={() => router.push(`/trips/${trip.id}`)}
-      className={cn(
-        'relative overflow-hidden rounded-2xl shadow-md cursor-pointer p-6 sm:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]',
-        containerClass
-      )}
+      className="relative overflow-hidden rounded-2xl shadow-md cursor-pointer p-6 sm:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] bg-surface border border-border-light border-l-4 border-l-primary animate-stagger-reveal"
     >
-      {/* B안: 상단 그라데이션 바 */}
-      {variant === 'B' && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary rounded-t-2xl" />
+      {/* 삭제 버튼 */}
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowDeleteDialog(true);
+          }}
+          className="absolute top-4 right-4 p-2 rounded-md cursor-pointer text-text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors"
+        >
+          <Trash2 size={18} />
+        </button>
       )}
 
-      {/* D-day 뱃지 */}
-      <span className={cn(
-        'inline-block text-xs font-bold px-3 py-1 rounded-full mb-4',
-        ddayBadgeClass
-      )}>
-        {dday}
-      </span>
-
-      {/* 여행 제목 */}
-      <h2 className="font-display text-2xl sm:text-3xl font-bold mb-2 leading-tight text-text-primary">
-        {trip.title}
-      </h2>
+      {/* 여행 제목 + D-day 뱃지 */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2 pr-10">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold leading-tight text-text-primary truncate">
+          {trip.title}
+        </h2>
+        <span className={cn(
+          'text-xs font-bold px-3 py-1 rounded-full flex-shrink-0 w-fit',
+          badgeStyle
+        )}>
+          {dday}
+        </span>
+      </div>
 
       {/* 날짜 + 인원 */}
       <p className="text-text-secondary text-sm mb-1">
@@ -95,6 +91,20 @@ export function TripHeroCard({ trip, packingProgress, variant = 'A' }: TripHeroC
           />
         </div>
       )}
+
+      {/* 삭제 확인 다이얼로그 */}
+      <ConfirmDialog
+        open={showDeleteDialog}
+        title="여행 삭제"
+        description={`"${trip.title}"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
+        confirmLabel="삭제"
+        variant="danger"
+        onConfirm={() => {
+          onDelete?.(trip.id);
+          setShowDeleteDialog(false);
+        }}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 }

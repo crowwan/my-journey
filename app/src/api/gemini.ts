@@ -40,8 +40,17 @@ function getModel(): string {
 }
 
 // -- 시스템 프롬프트 ---------------------------------------------
-const CREATE_TRIP_PROMPT = `당신은 전문 여행 플래너 AI입니다.
+function getCreateTripPrompt(): string {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  return `당신은 전문 여행 플래너 AI입니다.
 사용자의 요청에 맞는 상세한 여행 계획을 JSON 형식으로 생성합니다.
+
+## 오늘 날짜
+${todayStr}
+- 사용자가 날짜를 명시하지 않으면 가까운 미래 날짜로 설정하세요.
+- "다음 주", "이번 달" 등 상대적 표현은 오늘 날짜 기준으로 계산하세요.
+- startDate는 반드시 오늘 이후여야 합니다.
 
 ## 역할
 - 현지 맛집, 관광지, 교통편을 실제 정보 기반으로 추천
@@ -145,6 +154,7 @@ Day 1: "#f97316", Day 2: "#6366f1", Day 3: "#10b981", Day 4: "#a78bfa", Day 5: "
 }
 
 ⚠️ 중요: days 배열의 각 항목에 dayNumber(1,2,3...), color(hex), mapSpots(위경도 배열)는 반드시 포함해야 합니다.`;
+}
 
 const EDIT_TRIP_PROMPT = `당신은 여행 플래너 AI입니다.
 사용자의 수정 요청을 분석하여 기존 여행 계획을 업데이트합니다.
@@ -337,7 +347,7 @@ export const geminiApi = {
       model,
       contents,
       config: {
-        systemInstruction: CREATE_TRIP_PROMPT,
+        systemInstruction: getCreateTripPrompt(),
         responseMimeType: 'application/json',
         temperature: 0.7,
       },
