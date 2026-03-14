@@ -14,17 +14,16 @@ import { ChecklistTab } from './tabs/ChecklistTab';
 
 interface TripViewerProps {
   trip: Trip;
-  onEdit?: () => void;
 }
 
-export function TripViewer({ trip, onEdit }: TripViewerProps) {
+export function TripViewer({ trip }: TripViewerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('summary');
   const checkedMap = storage.getPackingChecked(trip.id);
   const packingProgress = getPackingProgress(trip.packing, checkedMap);
 
   return (
     <div>
-      <HeroSection trip={trip} packingProgress={packingProgress} onEdit={onEdit} />
+      <HeroSection trip={trip} packingProgress={packingProgress} />
       <TabBar activeTab={activeTab} onChange={setActiveTab} />
       <div className="max-w-[1100px] mx-auto px-5 py-8">
         {activeTab === 'summary' && <SummaryTab trip={trip} />}

@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { Map } from 'lucide-react';
 import type { Day } from '@/types/trip';
 import { TimelineItemComponent } from './TimelineItem';
 import { openInMapsApp } from '@/lib/map-utils';
@@ -29,12 +30,12 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
     >
       <AccordionItem
         value={`day-${day.dayNumber}`}
-        className="bg-surface border border-border rounded-xl mb-5 overflow-visible last:border-b"
+        className="bg-surface border border-border-light rounded-xl mb-5 overflow-visible last:border-b shadow-sm"
       >
-        <AccordionTrigger className="px-5 py-5 hover:no-underline hover:bg-overlay-light gap-3.5">
+        <AccordionTrigger className="px-5 py-5 hover:no-underline hover:bg-surface-hover gap-3.5 rounded-xl">
           <div className="flex items-center gap-3.5">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-black text-white shrink-0"
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-black text-white shrink-0 shadow-xs"
               style={{ background: color }}
             >
               {day.dayNumber ?? '?'}
@@ -55,7 +56,7 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
                 onClick={() => openInMapsApp(day.mapSpots)}
                 className="flex items-center gap-1.5 text-xs text-cat-transport border border-cat-transport/20 bg-cat-transport/5 rounded-full px-4 py-2 hover:bg-cat-transport/10 transition-colors mt-2 mx-auto"
               >
-                <span>🗺️</span>
+                <Map className="size-3.5" />
                 지도 앱에서 열기
               </button>
             </div>

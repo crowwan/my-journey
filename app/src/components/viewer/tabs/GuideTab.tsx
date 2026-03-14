@@ -1,5 +1,9 @@
 'use client';
 
+import {
+  UtensilsCrossed, Train, Wallet, Plane as PlaneIcon,
+  CreditCard, Lightbulb, Calculator
+} from 'lucide-react';
 import type { Restaurant, TransportSection, TransportPass, BudgetSection } from '@/types/trip';
 import { SectionTitle } from '../shared/SectionTitle';
 import { Tip } from '../shared/Tip';
@@ -29,7 +33,6 @@ function getPassColor(recommendation: TransportPass['recommendation']) {
 }
 
 export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
-  // 각 섹션의 요약 정보 계산
   const restaurantCount = restaurants?.length ?? 0;
   const budgetItems = budget?.items ?? [];
   const budgetTotal = budget?.total;
@@ -41,8 +44,10 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
         {/* 맛집 섹션 */}
         <AccordionItem value="restaurants" className="border-b-0 mb-2">
           <AccordionTrigger className="hover:no-underline px-1 py-3">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🍜</span>
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 rounded-lg bg-cat-food/15 flex items-center justify-center">
+                <UtensilsCrossed className="size-4 text-cat-food" />
+              </span>
               <span className="text-base font-bold text-text-primary">맛집</span>
               <span className="text-sm text-text-tertiary font-normal">
                 ({restaurantCount}곳)
@@ -57,8 +62,10 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
         {/* 교통 섹션 */}
         <AccordionItem value="transport" className="border-b-0 mb-2">
           <AccordionTrigger className="hover:no-underline px-1 py-3">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🚃</span>
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 rounded-lg bg-cat-transport/15 flex items-center justify-center">
+                <Train className="size-4 text-cat-transport" />
+              </span>
               <span className="text-base font-bold text-text-primary">교통</span>
               {routeCount > 0 && (
                 <span className="text-sm text-text-tertiary font-normal">
@@ -75,8 +82,10 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
         {/* 예산 섹션 */}
         <AccordionItem value="budget" className="border-b-0 mb-2">
           <AccordionTrigger className="hover:no-underline px-1 py-3">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">💰</span>
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center">
+                <Wallet className="size-4 text-primary" />
+              </span>
               <span className="text-base font-bold text-text-primary">예산</span>
               {budgetTotal && budgetTotal.minKRW && (
                 <span className="text-sm text-text-tertiary font-normal">
@@ -118,18 +127,18 @@ function RestaurantSection({ restaurants }: { restaurants: Restaurant[] }) {
     <div>
       {sortedDays.map(([dayNumber, dayRestaurants]) => (
         <div key={dayNumber}>
-          <SectionTitle icon="🍜" bgColor="#f472b6">
+          <SectionTitle icon={<UtensilsCrossed className="size-4 text-white" />} bgColor="bg-cat-food">
             Day {dayNumber}
           </SectionTitle>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
             {dayRestaurants.map((restaurant) => (
               <div
                 key={`${dayNumber}-${restaurant.name}`}
-                className="bg-white border border-border rounded-xl p-5 transition-all hover:border-cat-food/30 hover:-translate-y-0.5"
+                className="bg-surface border border-border-light rounded-xl p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
               >
                 {/* 카테고리 + 평점 */}
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs bg-cat-food/15 text-cat-food px-2 py-0.5 rounded-md font-semibold">
+                  <span className="text-xs bg-cat-food/10 text-cat-food px-2.5 py-0.5 rounded-full font-medium">
                     {restaurant.category}
                   </span>
                   <span className="text-sm text-amber-500 font-semibold">
@@ -149,7 +158,7 @@ function RestaurantSection({ restaurants }: { restaurants: Restaurant[] }) {
                   {restaurant.description}
                 </p>
                 {/* 가격대 */}
-                <div className="text-xs text-text-tertiary font-semibold">
+                <div className="text-xs text-text-tertiary font-medium bg-bg-secondary px-2.5 py-1 rounded-full inline-block">
                   {restaurant.priceRange}
                 </div>
               </div>
@@ -182,14 +191,14 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* 집 -> 호텔 경로 */}
       {homeToHotel.length > 0 && (
         <>
-          <SectionTitle icon="🛫" bgColor="#3b82f6">
+          <SectionTitle icon={<PlaneIcon className="size-4 text-white" />} bgColor="bg-cat-transport">
             집 → 호텔 경로
           </SectionTitle>
-          <div className="bg-surface border border-border rounded-xl p-5 mb-3">
+          <div className="bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm">
             <div className="flex flex-wrap items-center gap-2">
               {homeToHotel.map((step, idx) => (
                 <div key={idx} className="flex items-center gap-2">
-                  <div className="bg-bg-tertiary rounded-xl px-4 py-3 text-center min-w-[90px]">
+                  <div className="bg-bg-secondary rounded-xl px-4 py-3 text-center min-w-[90px]">
                     <div className="text-lg mb-0.5">{step.icon}</div>
                     <div className="text-sm font-semibold text-text-primary">{step.title}</div>
                     <div className="text-xs text-text-secondary">{step.subtitle}</div>
@@ -207,13 +216,13 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* 도시간 노선 */}
       {intercityRoutes.length > 0 && (
         <>
-          <SectionTitle icon="🚃" bgColor="#3b82f6">
+          <SectionTitle icon={<Train className="size-4 text-white" />} bgColor="bg-cat-transport">
             도시간 노선
           </SectionTitle>
-          <div className="bg-surface border border-border rounded-xl overflow-hidden mb-3">
+          <div className="bg-surface border border-border-light rounded-xl overflow-hidden mb-3 shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border text-text-tertiary text-xs uppercase tracking-wider">
+                <tr className="border-b border-border-light text-text-tertiary text-xs uppercase tracking-wider">
                   <th className="text-left px-4 py-3 font-semibold">출발</th>
                   <th className="text-left px-4 py-3 font-semibold">도착</th>
                   <th className="text-left px-4 py-3 font-semibold">교통편</th>
@@ -225,7 +234,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
                 {intercityRoutes.map((route, idx) => (
                   <tr
                     key={idx}
-                    className="border-b border-border last:border-b-0 hover:bg-primary-50/50 transition-colors"
+                    className="border-b border-border-light last:border-b-0 hover:bg-surface-hover transition-colors"
                   >
                     <td className="px-4 py-3 text-text-primary font-medium">{route.from}</td>
                     <td className="px-4 py-3 text-text-primary font-medium">{route.to}</td>
@@ -243,7 +252,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* 패스 비교 */}
       {passes.length > 0 && (
         <>
-          <SectionTitle icon="🎫" bgColor="#a78bfa">
+          <SectionTitle icon={<CreditCard className="size-4 text-white" />} bgColor="bg-cat-accommodation">
             패스 비교
           </SectionTitle>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 mb-4">
@@ -256,7 +265,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-base font-bold text-text-primary">{pass.name}</h4>
-                    <span className={`text-xs px-2 py-0.5 rounded-md font-semibold ${color.badge}`}>
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${color.badge}`}>
                       {pass.recommendation === 'recommended'
                         ? '추천'
                         : pass.recommendation === 'neutral'
@@ -279,14 +288,16 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* ICOCA 가이드 */}
       {icocaGuide.length > 0 && (
         <>
-          <SectionTitle icon="💳" bgColor="#22d3ee">
+          <SectionTitle icon={<CreditCard className="size-4 text-white" />} bgColor="bg-cat-activity">
             ICOCA 가이드
           </SectionTitle>
-          <div className="bg-surface border border-border rounded-xl p-5 mb-3">
+          <div className="bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm">
             <ul className="space-y-2">
               {icocaGuide.map((guide, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm">
-                  <span className="text-cat-activity font-bold shrink-0">{idx + 1}.</span>
+                  <span className="w-5 h-5 rounded-full bg-cat-activity/15 text-cat-activity text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {idx + 1}
+                  </span>
                   <span className="text-text-secondary">{guide}</span>
                 </li>
               ))}
@@ -298,7 +309,7 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
       {/* 교통 팁 */}
       {tips.length > 0 && (
         <>
-          <SectionTitle icon="💡" bgColor="#f97316">
+          <SectionTitle icon={<Lightbulb className="size-4 text-white" />} bgColor="bg-primary-500">
             교통 팁
           </SectionTitle>
           {tips.map((tip) => (
@@ -328,16 +339,16 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
 
   return (
     <div>
-      <SectionTitle icon="💰" bgColor="#f97316">
+      <SectionTitle icon={<Wallet className="size-4 text-white" />} bgColor="bg-primary-500">
         예산 항목
       </SectionTitle>
 
       {/* 예산 아이템 리스트 */}
-      <div className="space-y-4 mb-8">
+      <div className="space-y-3 mb-8">
         {items.map((item) => (
           <div
             key={item.label}
-            className="bg-surface border border-border rounded-xl p-4 hover:border-border transition-colors"
+            className="bg-surface border border-border-light rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-xl">{item.icon}</span>
@@ -349,11 +360,11 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
                 <div className="text-xs text-text-secondary mt-0.5">{item.detail}</div>
               </div>
             </div>
-            {/* 비율 바 */}
-            <div className="h-1.5 bg-overlay-light rounded-full overflow-hidden">
+            {/* 비율 바 — primary 그라데이션 */}
+            <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all"
-                style={{ width: `${item.percentage}%`, background: item.color }}
+                className="h-full rounded-full bg-primary-500 transition-all"
+                style={{ width: `${item.percentage}%` }}
               />
             </div>
             <div className="text-right text-xs text-text-tertiary mt-1">{item.percentage}%</div>
@@ -362,10 +373,10 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
       </div>
 
       {/* 총합 카드 */}
-      <SectionTitle icon="🧮" bgColor="#10b981">
+      <SectionTitle icon={<Calculator className="size-4 text-white" />} bgColor="bg-cat-sightseeing">
         예상 총 비용
       </SectionTitle>
-      <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8">
+      <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8 shadow-sm">
         <div className="text-center">
           <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
             예상 범위
@@ -382,7 +393,7 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
       {/* 예산 팁 */}
       {tips.length > 0 && (
         <>
-          <SectionTitle icon="💡" bgColor="#f97316">
+          <SectionTitle icon={<Lightbulb className="size-4 text-white" />} bgColor="bg-primary-500">
             예산 팁
           </SectionTitle>
           {tips.map((tip) => (

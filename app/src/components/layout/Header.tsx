@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { ChevronLeft } from 'lucide-react';
 
 interface HeaderProps {
   title?: string;
@@ -11,16 +12,17 @@ export function Header({ title = 'My Journey', showBack = false }: HeaderProps) 
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border px-4 py-4 pt-3 flex items-center gap-3 shadow-none">
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border-light px-5 py-3 flex items-center gap-3">
       {showBack && (
         <button
           onClick={() => router.back()}
-          className="text-text-secondary hover:text-primary transition-colors text-lg"
+          className="w-9 h-9 flex items-center justify-center rounded-full text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors"
+          aria-label="뒤로가기"
         >
-          &larr;
+          <ChevronLeft className="size-5" />
         </button>
       )}
-      <h1 className="font-sans text-lg font-bold text-text-primary tracking-wide flex-1">
+      <h1 className="font-display text-lg font-bold text-text-primary tracking-wide flex-1">
         {title}
       </h1>
     </header>

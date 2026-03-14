@@ -8,8 +8,8 @@ interface InfoCardProps {
 
 export function InfoCard({ label, value, sub }: InfoCardProps) {
   return (
-    <Card className="rounded-xl py-0 gap-0 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-      <CardContent className="p-5">
+    <Card className="rounded-lg py-0 gap-0 border-border-light shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+      <CardContent className="p-4">
         <div className="text-[0.72rem] text-text-tertiary uppercase tracking-wider font-semibold mb-1">
           {label}
         </div>

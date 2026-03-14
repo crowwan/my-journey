@@ -24,11 +24,11 @@ export function TripCard({ trip, index = 0 }: TripCardProps) {
   return (
     <div
       onClick={() => router.push(`/trips/${trip.id}`)}
-      className="flex-shrink-0 w-[200px] rounded-xl shadow-sm bg-surface border border-border-light p-4 snap-start cursor-pointer transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] animate-stagger-reveal"
+      className="flex-shrink-0 w-[200px] rounded-xl shadow-sm bg-surface border border-border-light p-4 snap-start cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 active:scale-[0.98] animate-stagger-reveal"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* 이니셜 아이콘 */}
-      <div className="w-12 h-12 rounded-xl bg-primary-50 border border-primary/[0.1] flex items-center justify-center mb-3">
+      <div className="w-12 h-12 rounded-xl bg-primary-50 border border-primary/10 flex items-center justify-center mb-3">
         <span className={isEmoji ? 'text-2xl' : 'font-bold text-lg text-primary/80'}>
           {firstGrapheme}
         </span>

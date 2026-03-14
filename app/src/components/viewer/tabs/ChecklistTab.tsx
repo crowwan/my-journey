@@ -1,5 +1,6 @@
 'use client';
 
+import { Luggage, CheckCircle } from 'lucide-react';
 import type { PackingItem, PreTodoItem } from '@/types/trip';
 import { useTripStore } from '@/stores/useTripStore';
 import { storage } from '@/lib/storage';
@@ -38,7 +39,7 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
     return (
       <div className="animate-fade-up">
         <div className="text-center py-12 text-text-tertiary">
-          <div className="text-3xl mb-2">✅</div>
+          <CheckCircle className="size-8 mx-auto mb-2 text-text-tertiary" />
           <p className="text-sm">체크리스트 정보가 아직 없습니다</p>
         </div>
       </div>
@@ -47,16 +48,16 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
 
   return (
     <div className="animate-fade-up">
-      {/* 전체 진행률 바 */}
+      {/* 전체 진행률 바 — primary 그라데이션 */}
       {totalItems > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-text-primary">준비 진행률</span>
             <span className="text-sm font-bold text-primary">{totalChecked}/{totalItems} ({percentage}%)</span>
           </div>
-          <div className="h-3 bg-overlay-light rounded-full overflow-hidden">
+          <div className="h-3 bg-bg-tertiary rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full bg-cat-sightseeing transition-all duration-300"
+              className="h-full rounded-full bg-primary-500 transition-all duration-300"
               style={{ width: `${percentage}%` }}
             />
           </div>
@@ -66,7 +67,7 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
       {/* 준비물 섹션 */}
       {hasPacking && (
         <div className="mb-8">
-          <SectionTitle icon="🧳" bgColor="#a78bfa">
+          <SectionTitle icon={<Luggage className="size-4 text-white" />} bgColor="bg-cat-accommodation">
             준비물
             <span className="text-sm font-normal text-text-secondary ml-2">
               ({packingChecked}/{packingTotal})
@@ -98,15 +99,15 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
                         className={cn(
                           'flex items-center gap-3 px-5 py-3.5 rounded-xl cursor-pointer transition-all',
                           isChecked
-                            ? 'bg-cat-sightseeing/10 border border-cat-sightseeing/20'
-                            : 'bg-surface border border-border hover:border-border'
+                            ? 'bg-primary-50 border border-primary/20'
+                            : 'bg-surface border border-border-light hover:border-border shadow-sm'
                         )}
                       >
                         <Checkbox
                           checked={isChecked}
                           className={cn(
                             'pointer-events-none',
-                            isChecked && 'data-[state=checked]:bg-cat-sightseeing data-[state=checked]:border-cat-sightseeing'
+                            isChecked && 'data-[state=checked]:bg-primary data-[state=checked]:border-primary'
                           )}
                           tabIndex={-1}
                         />
@@ -136,21 +137,21 @@ export function ChecklistTab({ tripId, packing, preTodos }: ChecklistTabProps) {
       {/* 사전 할 일 섹션 */}
       {hasPreTodos && (
         <div>
-          <SectionTitle icon="✅" bgColor="#10b981">
+          <SectionTitle icon={<CheckCircle className="size-4 text-white" />} bgColor="bg-cat-sightseeing">
             출발 전 할 일
           </SectionTitle>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {preTodos.map((todo) => (
               <Card
                 key={todo.order}
-                className="rounded-xl py-0 gap-0 hover:border-cat-sightseeing/30 transition-colors"
+                className="rounded-xl py-0 gap-0 border-border-light shadow-sm hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-6">
+                <CardContent className="p-5">
                   <div className="flex items-start gap-3">
                     {/* 번호 뱃지 */}
                     <Badge
                       variant="secondary"
-                      className="w-8 h-8 rounded-lg bg-cat-sightseeing/20 text-sm font-black text-cat-sightseeing shrink-0 p-0"
+                      className="w-8 h-8 rounded-lg bg-primary-50 text-sm font-bold text-primary shrink-0 p-0"
                     >
                       {todo.order}
                     </Badge>

@@ -22,7 +22,7 @@ export function TimelineItemComponent({ item }: TimelineItemProps) {
         {item.title}
         {item.badge && (
           <span
-            className={`inline-block text-[0.66rem] px-1.5 py-0.5 rounded-md font-semibold ml-1 align-middle ${
+            className={`inline-block text-[0.66rem] px-1.5 py-0.5 rounded-full font-semibold ml-1 align-middle ${
               item.type === 'food'
                 ? 'bg-cat-food/15 text-cat-food'
                 : item.type === 'move'
