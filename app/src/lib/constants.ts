@@ -1,12 +1,9 @@
-// 여행 페이지 7탭 구성
+// 여행 페이지 4탭 구성
 export const TAB_CONFIG = [
-  { id: 'overview', label: '개요', icon: '📋' },
+  { id: 'summary', label: '요약', icon: '📋' },
   { id: 'schedule', label: '일정', icon: '📅' },
-  { id: 'restaurant', label: '맛집', icon: '🍜' },
-  { id: 'transport', label: '교통', icon: '🚃' },
-  { id: 'budget', label: '예산', icon: '💰' },
-  { id: 'packing', label: '준비물', icon: '🧳' },
-  { id: 'pretodo', label: '사전 준비', icon: '✅' },
+  { id: 'guide', label: '가이드', icon: '🧭' },
+  { id: 'checklist', label: '체크리스트', icon: '✅' },
 ] as const;
 
 export type TabId = (typeof TAB_CONFIG)[number]['id'];

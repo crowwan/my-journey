@@ -7,13 +7,10 @@ import { storage } from '@/lib/storage';
 import { getPackingProgress } from '@/lib/trip-utils';
 import { HeroSection } from './HeroSection';
 import { TabBar } from './TabBar';
-import { OverviewTab } from './tabs/OverviewTab';
+import { SummaryTab } from './tabs/SummaryTab';
 import { ScheduleTab } from './tabs/ScheduleTab';
-import { RestaurantTab } from './tabs/RestaurantTab';
-import { TransportTab } from './tabs/TransportTab';
-import { BudgetTab } from './tabs/BudgetTab';
-import { PackingTab } from './tabs/PackingTab';
-import { PreTodoTab } from './tabs/PreTodoTab';
+import { GuideTab } from './tabs/GuideTab';
+import { ChecklistTab } from './tabs/ChecklistTab';
 
 interface TripViewerProps {
   trip: Trip;
@@ -21,7 +18,7 @@ interface TripViewerProps {
 }
 
 export function TripViewer({ trip, onEdit }: TripViewerProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [activeTab, setActiveTab] = useState<TabId>('summary');
   const checkedMap = storage.getPackingChecked(trip.id);
   const packingProgress = getPackingProgress(trip.packing, checkedMap);
 
@@ -30,13 +27,10 @@ export function TripViewer({ trip, onEdit }: TripViewerProps) {
       <HeroSection trip={trip} packingProgress={packingProgress} onEdit={onEdit} />
       <TabBar activeTab={activeTab} onChange={setActiveTab} />
       <div className="max-w-[1100px] mx-auto px-5 py-8">
-        {activeTab === 'overview' && <OverviewTab trip={trip} />}
+        {activeTab === 'summary' && <SummaryTab trip={trip} />}
         {activeTab === 'schedule' && <ScheduleTab days={trip.days} />}
-        {activeTab === 'restaurant' && <RestaurantTab restaurants={trip.restaurants} />}
-        {activeTab === 'transport' && <TransportTab transport={trip.transport} />}
-        {activeTab === 'budget' && <BudgetTab budget={trip.budget} />}
-        {activeTab === 'packing' && <PackingTab tripId={trip.id} packing={trip.packing} />}
-        {activeTab === 'pretodo' && <PreTodoTab preTodos={trip.preTodos} />}
+        {activeTab === 'guide' && <GuideTab restaurants={trip.restaurants} transport={trip.transport} budget={trip.budget} />}
+        {activeTab === 'checklist' && <ChecklistTab tripId={trip.id} packing={trip.packing} preTodos={trip.preTodos} />}
       </div>
     </div>
   );

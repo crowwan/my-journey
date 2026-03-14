@@ -7,11 +7,11 @@ import { InfoGrid } from '../shared/InfoGrid';
 import { InfoCard } from '../shared/InfoCard';
 import { Tip } from '../shared/Tip';
 
-interface OverviewTabProps {
+interface SummaryTabProps {
   trip: Trip;
 }
 
-export function OverviewTab({ trip }: OverviewTabProps) {
+export function SummaryTab({ trip }: SummaryTabProps) {
   const flights = trip.overview?.flights ?? [];
   const accommodation = trip.overview?.accommodation;
   const weather = trip.overview?.weather ?? [];
