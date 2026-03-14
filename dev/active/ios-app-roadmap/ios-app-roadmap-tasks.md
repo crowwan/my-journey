@@ -1,144 +1,153 @@
-# iOS 앱 로드맵 — 작업 체크리스트
+# 리디자인 작업 체크리스트
 
-**최종 갱신**: 2026-03-11
+**최종 갱신**: 2026-03-14 (방향 전환: iOS → 웹앱 + 디자인 시스템 리디자인)
 
 ---
 
-## 완료된 작업
+## 완료된 작업 (v0.1 ~ v0.3)
 
 ### v0.1 MVP
-- [x] Next.js 프로젝트 셋업 (App Router + TypeScript)
-- [x] Zustand 상태 관리 + localStorage 저장
-- [x] AI 채팅 인터페이스 (Gemini API 연동)
-- [x] 여행 계획 자동 생성 (create 모드)
-- [x] 7탭 여행 뷰어 구현
-- [x] 준비물 체크리스트 (체크 상태 localStorage 저장)
-- [x] 스플래시 화면 + 시간대별 인사말
-- [x] 마크다운 채팅 렌더링
-- [x] 모바일 반응형 + 하단 네비게이션
-- [x] Vercel 프로덕션 배포
-- [x] Gemini API Rate Limiting (분당 8회)
+- [x] Next.js App Router + TypeScript
+- [x] Zustand + localStorage
+- [x] AI 채팅 (Gemini API)
+- [x] 7탭 여행 뷰어
+- [x] Vercel 배포
 
 ### v0.2 UX 개선
-- [x] 에러 바운더리 (error.tsx)
-- [x] 전역 에러 처리 (global-error.tsx)
-- [x] Leaflet 지도 (DayMap 컴포넌트)
-- [x] DayCard에 지도 통합 (조건부 렌더링)
-- [x] AI 편집 모드 — HeroSection "AI로 수정하기" 버튼
-- [x] AI 편집 모드 — chat 페이지 edit 모드 지원
-- [x] AI 편집 모드 — ChatContainer edit 모드 UI
+- [x] 에러 바운더리
+- [x] Leaflet 지도
+- [x] AI 편집 모드
 
-### v0.3 Capacitor iOS 설정
-- [x] Capacitor 패키지 설치 (`@capacitor/core@6`, `@capacitor/ios@6`, `@capacitor/cli@6`)
-- [x] `capacitor.config.ts` 생성 (server 모드, Vercel URL)
-- [x] iOS 프로젝트 생성 (`npx cap add ios`)
-- [x] `@capacitor/status-bar@6`, `@capacitor/splash-screen@6` 설치
-- [x] `src/lib/capacitor.ts` — initCapacitor() 함수 (StatusBar + SplashScreen)
-- [x] `CapacitorInit.tsx` 클라이언트 컴포넌트 → layout.tsx에 추가
-- [x] viewport-fit: cover 추가 (layout.tsx)
-- [x] Safe Area 대응 — `contentInset: 'always'` (capacitor.config.ts)
-- [x] Vercel 고정 도메인 설정 (`my-journey-app.vercel.app`)
-- [x] Vercel Deployment Protection OFF
-- [x] .gitignore에 `app/ios/` 추가
-- [x] 시뮬레이터에서 Safe Area 정상 확인
+### v0.3 UI 리팩토링
+- [x] BottomNav 제거 + Header 채팅 버튼
+- [x] TabBar 뒤로가기 별도 행
+- [x] Quick Wins (.ics, 지도 앱 열기, 공유)
+
+### 문서 작성 (2026-03-14)
+- [x] 디자인 시스템 참조 문서 (`docs/design-system.md`)
+- [x] 리디자인 논리 모델/설계서 (`docs/plans/2026-03-14-design-system-redesign.md`)
+- [x] 6 Phase 구현 계획서 (`docs/plans/2026-03-14-design-system-redesign-implementation.md`)
+- [x] CLAUDE.md에 디자인 시스템 참조 규칙 추가
 
 ---
 
-## Phase 1 남은 작업: iOS 앱 래핑 (v0.3)
+## Phase 1: Capacitor 제거 + 클린업 ⬜ (현재 작업)
 
-### UI 레이아웃 리팩토링 — ✅ 완료 (2026-03-11, 커밋 `6ace450`~`2eaf453`)
-- [x] BottomNav 완전 제거 (page.tsx, chat/page.tsx, globals.css에서 제거, 파일은 보존)
-- [x] 홈 네비게이션 단순화 (Header에 채팅 버튼 추가, 새 일정은 기존 NewTripButton 유지)
-- [x] 채팅 페이지 뒤로가기 버튼 (기존 showBack 활용, 추가 작업 없음)
-- [x] TabBar 뒤로가기를 탭 위 별도 행 "← 홈"으로 분리
-- [x] 홈 페이지 min-h-screen 제거 (하단 여백 스크롤 방지)
-- [x] 스플래시: sessionStorage로 세션당 1회만 (커밋 c9d55d0)
-- [x] 빌드 버전 UI footer (커밋 c9d55d0)
+### 패키지 제거
+- [ ] `npm uninstall @capacitor/core @capacitor/ios @capacitor/status-bar @capacitor/splash-screen` (prod)
+- [ ] `npm uninstall @capacitor/cli` (dev)
 
-### iOS Safe Area 대응 — ✅ 완료 (2026-03-11, 커밋 `2eaf453`+`4dd56ec`)
-- [x] JS 기반 `--safe-area-top` CSS 변수 주입 (`initCapacitor()`)
-- [x] Header/TabBar/HeroSection에 var(--safe-area-top) 패딩 적용
-- [x] 홈/채팅 페이지 safe area 확인 완료
-- [x] 여행 상세 페이지 safe area 최종 검증 완료
-- 시행착오: contentInset(sticky 미호환), CSS env()(값 0), viewport-fit 제거(효과 없음) 모두 실패
+### 파일 삭제
+- [ ] `app/src/lib/capacitor.ts` 삭제
+- [ ] `app/src/components/CapacitorInit.tsx` 삭제
+- [ ] `app/capacitor.config.ts` 삭제
+- [ ] `app/ios/` 로컬 폴더 삭제 (gitignore됨)
 
-### iOS 네이티브 마무리
-- [ ] 앱 아이콘 생성 (1024x1024 기본 + 각 사이즈)
-- [ ] 런치 스크린 (LaunchScreen.storyboard)
-- [ ] Info.plist 설정 (앱 이름, 권한 설명 등)
+### 코드 수정
+- [ ] `app/src/app/layout.tsx`: CapacitorInit import/사용 제거
+- [ ] `app/src/app/layout.tsx`: `viewportFit: "cover"` 제거
+- [ ] `app/src/components/layout/Header.tsx`: safe area 패딩 → `pt-3`
+- [ ] `app/src/components/viewer/TabBar.tsx`: safe area 패딩 제거
+- [ ] `app/src/components/viewer/HeroSection.tsx`: safe area 패딩 → `pt-8`
+- [ ] `app/src/lib/map-utils.ts`: Capacitor import 제거, 웹 전용 단순화
 
-### Quick Wins (Phase 1에 포함) — ✅ 완료 (2026-03-11, 커밋 `d9175aa`)
-- [x] `.ics` 캘린더 내보내기 유틸 구현 (`app/src/lib/ics-utils.ts`)
-- [x] "캘린더에 추가" 버튼 (OverviewTab)
-- [x] "지도 앱에서 열기" 딥링크 버튼 (DayCard, 전체 경유지 경로 지원)
-- [x] 공유 기능 (Web Share API + 클립보드 폴백, `@capacitor/share` 불필요)
-
-### App Store 배포
-- [ ] Apple Developer 계정 등록 ($99/년)
-- [ ] 앱 ID & 프로비저닝 프로파일 생성
-- [ ] TestFlight 빌드 업로드
-- [ ] 테스트 (iPhone 실기기)
-- [ ] App Store 심사 제출
-- [ ] 앱 설명, 스크린샷, 키워드 준비
+### 검증
+- [ ] `npm run build` 성공
+- [ ] `grep -r "capacitor" app/src/` → 결과 0건
+- [ ] `grep -r "safe-area-top" app/src/` → 결과 0건
+- [ ] 홈/채팅/여행상세 페이지 정상 동작 확인
 
 ---
 
-## Phase 2: 캘린더 네이티브 연동 (v0.4)
+## Phase 2: 디자인 토큰 시스템 구축 ⬜
 
-- [ ] `@capacitor-community/calendar` 플러그인 설치
-- [ ] 캘린더 접근 권한 요청 UX
-- [ ] Day별 이벤트 생성 (제목, 시간, 위치, 메모)
-- [ ] 전체 여행 일정 한번에 캘린더 추가
-- [ ] 이벤트 중복 생성 방지 로직
-- [ ] (선택) Google Calendar API — OAuth 연동
-
----
-
-## Phase 3: 알림 기능 (v0.5)
-
-- [ ] `@capacitor/local-notifications` 플러그인 설치
-- [ ] 알림 권한 요청 UX
-- [ ] D-day 기반 알림 스케줄러 (D-7, D-1, 당일)
-- [ ] 준비물 미체크 리마인더
-- [ ] 알림 설정 UI (ON/OFF, 시간 선택)
-- [ ] 알림 탭 시 해당 여행 페이지로 딥링크
+- [ ] `globals.css` @theme 블록 재구성 (설계서 TO-BE 색상 체계 적용)
+- [ ] Primary(오렌지) 50~900 스케일 추가
+- [ ] Secondary(틸) 50~900 스케일 추가
+- [ ] Semantic 색상 토큰 (bg, surface, text, border, success/warning/error/info)
+- [ ] Category 색상 토큰 (관광/식사/교통/숙소/쇼핑/액티비티)
+- [ ] Shadow 시스템 (xs~float 6단계)
+- [ ] Border Radius 시스템 (sm~full 6단계)
+- [ ] Playfair Display 폰트 복원 (`--font-display`)
+- [ ] 기존 토큰명 → 새 토큰명 일괄 변환 (~30개 파일)
+- [ ] `npm run build` 성공
+- [ ] 시각적 리그레션 없음 확인
 
 ---
 
-## Phase 4: 지도 고도화 (v0.6)
+## Phase 3: 7탭 → 4탭 재구성 ⬜
 
-- [ ] Google Maps API 키 발급
-- [ ] (선택) DayMap Google Maps 버전 구현
-- [ ] 장소 검색 통합 (Places API)
-- [ ] 경로 안내 — 네이티브 지도 앱 연동
-- [ ] 마커 클릭 시 장소 상세정보 팝업
-- [ ] (선택) 오프라인 지도 캐싱
+- [ ] `constants.ts` TAB_CONFIG 4탭으로 변경
+- [ ] `GuideTab.tsx` 신규 (맛집+교통+예산 통합, 아코디언 서브섹션)
+- [ ] `ChecklistTab.tsx` 신규 (준비물+사전준비 통합, 진행률 바)
+- [ ] `OverviewTab.tsx` → `SummaryTab.tsx` 리네이밍 + 내용 조정
+- [ ] `TabBar.tsx` 4탭 대응 (아이콘: Plane, Calendar, Compass, CheckSquare)
+- [ ] `TripViewer.tsx` 4탭 렌더링으로 수정
+- [ ] 기존 5개 탭(RestaurantTab, TransportTab, BudgetTab, PackingTab, PreTodoTab) → Section 컴포넌트로 전환
+- [ ] `npm run build` 성공
+- [ ] 4탭 전환 정상, 데이터 표시 정상
 
 ---
 
-## Phase 5: 오프라인 & 동기화 (v0.7)
+## Phase 4: 홈 리디자인 ⬜
 
-- [ ] Service Worker 등록
-- [ ] localStorage → IndexedDB 마이그레이션
-- [ ] 오프라인 폴백 페이지
-- [ ] 핵심 페이지 캐싱 전략
-- [ ] (선택) 클라우드 동기화 (Supabase / Firebase)
+- [ ] `TripHeroCard.tsx` 신규 (다가오는 여행 강조 카드)
+- [ ] `HorizontalScroll.tsx` 신규 (수평 스크롤 + 스냅 컨테이너)
+- [ ] `EmptyState.tsx` 신규 (여행 없을 때)
+- [ ] `trip-utils.ts`에 그룹핑 함수 (upcoming/ongoing/past)
+- [ ] `page.tsx` 홈 리디자인 (히어로 카드 + 수평 스크롤)
+- [ ] `TripCard.tsx` 수평 스크롤 대응 수정
+- [ ] 여행 0개/1개/다수 케이스 확인
+
+---
+
+## Phase 5: AI 드로어 통합 ⬜
+
+- [ ] `AIFloatingButton.tsx` 신규 (FAB)
+- [ ] `AIDrawer.tsx` 신규 (드로어 패널)
+- [ ] `useUIStore.ts` 신규 (드로어 열림/닫힘 상태)
+- [ ] `ChatContainer.tsx` 드로어 안으로 이동
+- [ ] `/chat` 페이지 제거 (라우트 삭제)
+- [ ] Header에서 채팅 버튼 제거 (FAB로 대체)
+- [ ] 모바일: 풀스크린 슬라이드 / 데스크탑: 사이드 패널(400px)
+
+---
+
+## Phase 6: 전체 스타일 리디자인 ⬜
+
+- [ ] 모든 컴포넌트에 새 디자인 토큰 적용
+- [ ] Trip.com 스타일 카드 UI
+- [ ] 타임라인 스타일 갱신
+- [ ] HeroSection 스타일 갱신
+- [ ] Header 스타일 갱신
+- [ ] 최종 반응형 테스트 (모바일/데스크탑)
+- [ ] 전체 페이지 스타일 일관성 확인
+
+---
+
+## 폐기된 작업 (iOS 중단)
+
+> 아래 작업은 iOS 앱 중단으로 더 이상 진행하지 않음
+
+- ~~앱 아이콘 생성~~
+- ~~런치 스크린~~
+- ~~Info.plist 설정~~
+- ~~Apple Developer 등록~~
+- ~~TestFlight/App Store 배포~~
+- ~~캘린더 네이티브 연동 (@capacitor-community/calendar)~~
+- ~~로컬 알림 (@capacitor/local-notifications)~~
+- ~~오프라인 지원~~
 
 ---
 
 ## 기능 아이디어 백로그
 
-> 우선순위 미정, 아이디어 수집용
+> 리디자인 완료 후 검토
 
 - [ ] 여행 공유 (URL 링크 or QR 코드)
 - [ ] 여행 PDF 내보내기
-- [ ] 다중 여행 비교
 - [ ] 여행 후기 / 사진 첨부
 - [ ] 환율 계산기
 - [ ] 날씨 실시간 업데이트
-- [ ] 비행기 실시간 추적
 - [ ] 동행자와 공동 편집
-- [ ] 다국어 지원 (영어, 일어)
-- [ ] Apple Watch 컴패니언 앱
-- [ ] 위젯 (D-day 카운트다운)
-- [ ] Siri Shortcuts 연동
+- [ ] 다국어 지원

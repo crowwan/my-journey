@@ -1,6 +1,23 @@
-# iOS 앱 로드맵 — 컨텍스트 & 의존성
+# 프로젝트 컨텍스트 & 의존성
 
-**최종 갱신**: 2026-03-11 (Quick Wins 구현 완료)
+**최종 갱신**: 2026-03-14 (방향 전환: iOS 앱 → 웹앱 전용 + 디자인 시스템 리디자인)
+
+---
+
+## 🚨 방향 전환 (2026-03-14)
+
+### 결정 사항
+- **iOS 앱 중단**: Capacitor/iOS 관련 코드 전면 제거
+- **웹앱 전용**: Vercel 배포만 유지, PWA 불필요
+- **전체 리디자인**: Trip.com 스타일 UI + 디자인 시스템 구축
+- **브랜드 컬러**: 오렌지(`#f97316`) 유지 + 틸(`#0d9488`) 보조색 추가
+
+### 핵심 문서 (반드시 읽을 것)
+| 문서 | 경로 | 용도 |
+|------|------|------|
+| **디자인 시스템** | `docs/design-system.md` | 모든 UI 작업 시 참조 (색상/타이포/컴포넌트) |
+| **리디자인 설계서** | `docs/plans/2026-03-14-design-system-redesign.md` | AS-IS/TO-BE 논리 모델 |
+| **구현 계획서** | `docs/plans/2026-03-14-design-system-redesign-implementation.md` | 6 Phase 구현 순서 |
 
 ---
 
@@ -8,64 +25,84 @@
 
 ### 완료된 기능 (v0.1 ~ v0.3)
 
-#### v0.1 MVP (2026-03-09 배포)
+#### v0.1 MVP (2026-03-09)
 - [x] AI 채팅 인터페이스 (Gemini 2.5 Flash)
 - [x] 여행 계획 자동 생성 (JSON 스키마 기반)
 - [x] 7탭 여행 뷰어 (개요, 일정, 맛집, 교통, 예산, 준비물, 사전준비)
 - [x] 준비물 체크리스트 (localStorage 저장)
 - [x] 스플래시 화면 + 인사말
-- [x] 마크다운 채팅 렌더링
-- [x] 모바일 반응형 UI (하단 네비게이션)
 - [x] Vercel 프로덕션 배포
 - [x] Rate Limiting (분당 8회, fallback 모델)
 
 #### v0.2 UX 개선 (2026-03-10)
-- [x] 에러 바운더리 (error.tsx, global-error.tsx)
-- [x] Leaflet 지도 (DayMap — 번호 마커 + 대시선 경로)
-- [x] AI 편집 모드 (뷰어 → 채팅 edit 모드)
+- [x] 에러 바운더리
+- [x] Leaflet 지도 (DayMap)
+- [x] AI 편집 모드
 
-#### v0.3 Capacitor iOS 설정 (2026-03-10)
-- [x] Capacitor v6 + iOS 프로젝트 초기화
-- [x] StatusBar/SplashScreen 네이티브 플러그인
-- [x] Safe Area CSS 대응 (Header, BottomNav)
-- [x] CapacitorInit 클라이언트 컴포넌트
-- [x] Vercel 고정 도메인 설정
-- [x] Vercel Deployment Protection 비활성화
+#### v0.3 Capacitor iOS (2026-03-10) — ⚠️ 제거 예정
+- [x] Capacitor v6 + iOS 프로젝트 (제거 예정)
+- [x] Safe Area 대응 (제거 예정)
+
+#### v0.3.1 UI 리팩토링 (2026-03-11)
+- [x] BottomNav 제거, Header에 채팅 버튼
+- [x] TabBar 뒤로가기 별도 행
+- [x] Quick Wins (.ics 내보내기, 지도 앱 열기, 공유)
 
 ---
 
-## 2. 핵심 파일 맵
+## 2. 현재 진행 작업: 리디자인 Phase 1 (Capacitor 제거)
+
+### Phase 1 상태: 미시작 → 시작 예정
+
+### Phase 1 작업 내용
+1. Capacitor 패키지 제거 (5개): `@capacitor/core`, `@capacitor/ios`, `@capacitor/status-bar`, `@capacitor/splash-screen`, `@capacitor/cli`
+2. 파일 삭제: `app/src/lib/capacitor.ts`, `app/src/components/CapacitorInit.tsx`, `app/capacitor.config.ts`
+3. 코드 수정:
+   - `app/src/app/layout.tsx`: CapacitorInit import/사용 제거, `viewportFit: "cover"` 제거
+   - `app/src/components/layout/Header.tsx`: `pt-[calc(0.75rem+var(--safe-area-top,0px))]` → `pt-3`
+   - `app/src/components/viewer/TabBar.tsx`: `pt-[var(--safe-area-top,0px)]` 제거
+   - `app/src/components/viewer/HeroSection.tsx`: `pt-[calc(2rem+var(--safe-area-top,0px))]` → `pt-8`
+   - `app/src/lib/map-utils.ts`: Capacitor import 제거, 웹 전용으로 단순화
+4. 폴더 삭제: `app/ios/` (로컬에만 존재)
+
+### 완료 조건 (DoD)
+- `npm run build` 성공
+- Capacitor 관련 import 0개 (`grep -r "capacitor" app/src/`)
+- `--safe-area-top` CSS 변수 참조 0개
+- 기존 기능 (홈, 채팅, 여행 상세) 정상 동작
+
+---
+
+## 3. 전체 리디자인 6 Phase 요약
+
+| Phase | 내용 | 상태 |
+|-------|------|------|
+| **1** | Capacitor 제거 + 클린업 | ⬜ 미시작 |
+| **2** | 디자인 토큰 시스템 구축 | ⬜ 미시작 |
+| **3** | 7탭 → 4탭 재구성 | ⬜ 미시작 |
+| **4** | 홈 리디자인 (히어로+수평 스크롤) | ⬜ 미시작 |
+| **5** | AI 드로어 통합 (FAB + Drawer) | ⬜ 미시작 |
+| **6** | 전체 스타일 리디자인 | ⬜ 미시작 |
+
+---
+
+## 4. 핵심 파일 맵
 
 ### 라우트
 | 파일 | 역할 |
 |------|------|
 | `app/src/app/page.tsx` | 홈 (여행 목록) |
-| `app/src/app/chat/page.tsx` | AI 채팅 (create/edit 모드) |
+| `app/src/app/chat/page.tsx` | AI 채팅 (Phase 5에서 드로어로 통합 후 제거) |
 | `app/src/app/trips/[tripId]/page.tsx` | 여행 상세 |
 | `app/src/app/api/chat/route.ts` | AI API 엔드포인트 |
-| `app/src/app/error.tsx` | 에러 바운더리 |
-| `app/src/app/global-error.tsx` | 전역 에러 |
 | `app/src/app/layout.tsx` | 루트 레이아웃 |
 | `app/src/app/globals.css` | 전역 스타일 |
-
-### Capacitor (v0.3 신규)
-| 파일 | 역할 |
-|------|------|
-| `app/capacitor.config.ts` | Capacitor 설정 (server 모드) |
-| `app/src/lib/capacitor.ts` | 네이티브 초기화 (StatusBar, SplashScreen) |
-| `app/src/components/CapacitorInit.tsx` | useEffect 초기화 클라이언트 컴포넌트 |
-| `app/ios/` | iOS 네이티브 프로젝트 (.gitignore됨) |
 
 ### 상태 관리
 | 파일 | 역할 |
 |------|------|
 | `app/src/stores/useTripStore.ts` | 여행 CRUD + 준비물 체크 |
 | `app/src/stores/useChatStore.ts` | 채팅 메시지 + AI 호출 |
-
-### AI 통합
-| 파일 | 역할 |
-|------|------|
-| `app/src/api/gemini.ts` | Gemini API 래퍼 (create/edit/chat) |
 
 ### 데이터
 | 파일 | 역할 |
@@ -75,227 +112,62 @@
 | `app/src/lib/constants.ts` | 탭 설정, Day 컬러 |
 | `app/src/lib/trip-utils.ts` | D-day 계산, 상태 유틸 |
 
-### Quick Wins 유틸 (v0.3 신규, 커밋 `d9175aa`)
+### 유틸
 | 파일 | 역할 |
 |------|------|
-| `app/src/lib/ics-utils.ts` | .ics 캘린더 내보내기 (RFC 5545, subtitle만 DESCRIPTION) |
-| `app/src/lib/map-utils.ts` | 지도 앱 열기 (Apple Maps/Google Maps, 전체 경유지 경로) |
-| `app/src/lib/share-utils.ts` | 공유 (Web Share API + 클립보드 폴백) |
+| `app/src/lib/ics-utils.ts` | .ics 캘린더 내보내기 |
+| `app/src/lib/map-utils.ts` | 지도 앱 열기 (Phase 1에서 웹 전용으로 수정) |
+| `app/src/lib/share-utils.ts` | 공유 (Web Share API) |
 
-### 컴포넌트 (주요)
+### 제거 대상 (Phase 1)
 | 파일 | 역할 |
 |------|------|
-| `app/src/components/viewer/TripViewer.tsx` | 여행 뷰어 메인 |
-| `app/src/components/viewer/HeroSection.tsx` | 히어로 (D-day, 편집/공유 버튼) |
-| `app/src/components/viewer/schedule/DayCard.tsx` | Day 카드 (지도 + 지도앱 열기 버튼) |
-| `app/src/components/viewer/schedule/DayMap.tsx` | Leaflet 지도 |
-| `app/src/components/viewer/tabs/OverviewTab.tsx` | 개요탭 (캘린더 추가 버튼) |
-| `app/src/components/chat/ChatContainer.tsx` | 채팅 컨테이너 |
-| `app/src/components/layout/BottomNav.tsx` | 하단 네비게이션 |
-| `app/src/components/layout/SplashScreen.tsx` | 스플래시 |
+| `app/src/lib/capacitor.ts` | ❌ 삭제 |
+| `app/src/components/CapacitorInit.tsx` | ❌ 삭제 |
+| `app/capacitor.config.ts` | ❌ 삭제 |
 
 ---
 
-## 3. 기술 의존성
+## 5. 아키텍처 결정 사항
 
-### 현재 패키지 (app/package.json)
+### 유지되는 결정
+- Vercel 프로덕션 배포 (`my-journey-planner.vercel.app`)
+- Gemini API 연동 (create/edit/chat)
+- Leaflet 지도 유지
+- Web Share API 사용
 
-**프로덕션**:
-- next 16.1.6
-- react 19.2.3, react-dom 19.2.3
-- zustand 5.0.11
-- @google/genai 1.42.0
-- leaflet 1.9.4, react-leaflet 5.0.0
-- lucide-react 0.575.0
-- class-variance-authority 0.7.1
-- clsx 2.1.1, tailwind-merge 3.5.0
-- tw-animate-css 1.4.0
-- **@capacitor/core@6** (v0.3 추가)
-- **@capacitor/ios@6** (v0.3 추가)
-- **@capacitor/status-bar@6** (v0.3 추가)
-- **@capacitor/splash-screen@6** (v0.3 추가)
+### 새로운 결정 (2026-03-14)
+- **iOS 중단**: 웹앱만으로 충분, Capacitor 복잡도 제거
+- **디자인 시스템**: Trip.com 스타일, 오렌지+틸 브랜드 컬러
+- **4탭 구조**: 요약/일정/가이드/체크리스트 (기존 7탭 통합)
+- **AI 드로어**: 별도 /chat 페이지 → 플로팅 버튼 + 사이드 드로어
+- **라이트 테마 기본**: 화이트 배경, 깔끔한 카드 UI
+- **Playfair Display 폰트 복원**: 히어로 제목용
 
-**개발**:
-- typescript 5, @types/node, @types/react, @types/react-dom
-- @types/leaflet
-- @eslint/eslintrc, eslint, eslint-config-next
-- @tailwindcss/postcss, tailwindcss 4
-- **@capacitor/cli@6** (v0.3 추가)
-
-### 향후 추가 예정 패키지
-- @capacitor/local-notifications (Phase 3)
-- @capacitor-community/calendar (Phase 2)
+### 폐기된 결정
+- ~~Capacitor server 모드~~ → 웹앱 전용
+- ~~Safe Area JS 변수 방식~~ → 불필요
+- ~~App Store 배포~~ → 중단
 
 ---
 
-## 4. 아키텍처 결정 사항
+## 6. 배포 방식
 
-### 결정 1: WebView 방식 (Capacitor server 모드)
-- **이유**: 웹 코드 100% 재사용, 앱 업데이트 = 웹 배포
-- **트레이드오프**: 오프라인 시 앱 사용 불가 (Phase 5에서 해결)
-- **대안**: static 모드 (앱에 번들) — 오프라인 가능하나 업데이트마다 앱 심사
-
-### 결정 2: Capacitor v6 사용 (v8 아님)
-- **이유**: 현재 Node 20.13.1 환경. Capacitor v8은 Node >= 22 필요
-- **영향**: 기능적 차이 없음, v6도 iOS 18 지원
-
-### 결정 3: Vercel Deployment Protection OFF
-- **이유**: Capacitor WebView에서 Vercel 인증 벽에 막혀 Safari로 리다이렉트됨
-- **영향**: 프로덕션 URL이 공개 접근 가능 (보안 민감 데이터 없으므로 OK)
-
-### 결정 4: 캘린더 — .ics 우선, EventKit 후속
-- **이유**: .ics는 웹에서도 동작하여 즉시 배포 가능
-- **트레이드오프**: 양방향 동기화 불가 (단방향 내보내기만)
-
-### 결정 5: 알림 — 로컬 알림 우선
-- **이유**: 서버 인프라 불필요, Capacitor 플러그인으로 간단 구현
-- **트레이드오프**: 앱 삭제 시 알림 소실
-
-### 결정 6: 지도 — Leaflet 유지 + "지도 앱에서 열기" 추가
-- **이유**: 이미 구현된 Leaflet 활용, 네이티브 지도 앱이 더 나은 UX
-- **트레이드오프**: 앱 내 경로 안내 불가
-
-### 결정 7: 공유 — Web Share API 사용 (@capacitor/share 불필요)
-- **이유**: iOS WKWebView에서 `navigator.share()` 정상 동작, 추가 패키지 불필요
-- **폴백**: 클립보드 복사 + 토스트 메시지
-- **공유 URL**: `https://my-journey-planner.vercel.app/trips/{trip.id}`
-
-### 결정 8: 캘린더 DESCRIPTION — subtitle만 포함
-- **이유**: 타임라인 아이템 전체 포함 시 캘린더 앱에서 내용이 너무 길어짐
-- **변경**: 초기 구현에서 시간별 요약 포함 → subtitle 한 줄로 축소
-
-### 결정 9: 지도 앱 경로 — 전체 경유지 포함
-- **이유**: 첫/끝 2곳만 표시하면 중간 경유지가 빠져 실용성 떨어짐
-- **Apple Maps**: `daddr=장소1+to:장소2+to:장소3`
-- **Google Maps**: `/dir/장소1/장소2/장소3`
-
----
-
-## 5. 배포 방식
-
-### 웹 (Vercel)
-- **프로젝트**: `crowwans-projects/app`
-- **프로덕션 도메인**: `https://my-journey-planner.vercel.app` (프로젝트 도메인, 자동 배포)
-- **자동 생성 도메인**: `app-six-gray-52.vercel.app`
+### 웹 (Vercel) — 유일한 배포 대상
+- **프로덕션 도메인**: `https://my-journey-planner.vercel.app`
 - **배포 트리거**: `git push origin main` → Vercel 자동 배포
 - **Vercel 프로젝트 설정**: root directory = `app/`
-- **환경변수**: `GEMINI_API_KEY` (Vercel 대시보드에서 설정)
-- **Deployment Protection**: OFF (Capacitor WebView 호환 위해)
-
-### iOS (Capacitor)
-- **모드**: server 모드 (Vercel URL을 WKWebView로 로드)
-- **설정 파일**: `app/capacitor.config.ts`
-- **iOS 프로젝트**: `app/ios/` (.gitignore됨, 로컬에서 생성)
-- **빌드 커맨드**:
-  ```bash
-  cd app
-  npx cap sync ios    # 설정/플러그인 동기화
-  npx cap open ios    # Xcode 열기
-  # Xcode에서 Cmd + R로 시뮬레이터 실행
-  ```
-- **로컬 테스트 시**: `capacitor.config.ts`의 URL을 `http://localhost:3000`으로 임시 변경 + `cleartext: true`
-
-### CLI 배포 주의사항
-- `npx vercel --prod`는 프로젝트 루트에서 실행하면 `my-journey` 프로젝트로 감
-- `app/` 디렉토리의 Vercel 프로젝트(`app`)는 git push로만 배포 권장
-- 두 개의 `.vercel/project.json` 존재: 루트(`my-journey`) / `app/`(`app`)
-
-### Vercel 도메인 시행착오 (2026-03-11)
-- ❌ `vercel alias`로 수동 연결 → 배포마다 수동 갱신 필요, 비추천
-- ❌ `.vercel.app` 서브도메인은 전체 사용자 간 유니크 → `my-journey-app`, `myjourney-app` 이미 타인이 점유
-- ✅ `app` 프로젝트 Settings > Domains에 `my-journey-planner.vercel.app` 추가 → 자동 배포 연동
+- **환경변수**: `GEMINI_API_KEY` (Vercel 대시보드)
 
 ---
 
-## 6. 환경 설정
-
-### 현재 환경
-- **배포**: Vercel (vercel.com)
-- **환경변수**: `.env.local` — `GEMINI_API_KEY`
-- **도메인**: `my-journey-planner.vercel.app` (프로젝트 도메인, 자동 업데이트)
-- **Node**: v20.13.1
-
-### iOS 빌드 환경
-- Xcode (최신)
-- CocoaPods (Capacitor sync 시 자동 설치)
-- Apple Developer Account ($99/년) — 아직 미등록
-- 프로비저닝 프로파일 & 인증서 — 아직 미생성
-
----
-
-## 7. WKWebView 캐시 대응
-
-### 문제
-Capacitor server 모드에서 WKWebView가 이전 배포를 캐싱하여 최신 버전이 반영되지 않음.
-
-### 해결: next.config.ts Cache-Control 헤더
-- HTML 페이지에 `no-cache, no-store, must-revalidate` 헤더 적용
-- 정적 에셋(`_next/static`)은 해시 기반이라 캐시 허용
-- `app/ios/` 네이티브 코드 수정 없이 서버 레벨에서 해결
-
-### 그래도 캐시가 남는 경우
-- 앱 완전 종료 후 재실행
-- 앱 삭제 → Xcode에서 재빌드 (Cmd+R)
-- 시뮬레이터: Device > Erase All Content and Settings
-
----
-
-## 8. 시행착오 기록 (Safe Area) — 2026-03-11 최종 갱신
-
-> 다시 시도하지 말 것
-
-- ❌ CSS `env(safe-area-inset-top)` Tailwind arbitrary value → Capacitor WKWebView에서 값이 0
-- ❌ globals.css에 `.safe-top`/`.safe-bottom` 커스텀 클래스 → 효과 없음
-- ❌ `StatusBar.setOverlaysWebView({ overlay: false })` → 효과 없음
-- ❌ `viewport-fit: cover` 제거 → WKWebView가 네이티브 레벨에서 status bar 뒤까지 확장하므로 CSS meta로 제어 불가
-- ❌ `contentInset: 'always'` → 스크롤 콘텐츠는 밀어주지만 **sticky top-0 요소는 노치 뒤에 붙음** + 하단에도 inset 추가되어 불필요한 스크롤
-- ❌ `contentInset: 'always'` + JS safe area 동시 → 이중 패딩
-- ❌ MyViewController.swift 커스텀 클래스 (CAPBridgeViewController 상속) → 앱 실행 불가
-- ❌ `app/ios/`를 git에 포함 → 빌드 아티팩트 포함됨, 되돌림
-- ✅ **JS `--safe-area-top` CSS 변수 방식** — `initCapacitor()`에서 기기 화면 크기로 계산, sticky 헤더에 직접 패딩 (검증 대기)
-
-### Safe Area 최종 구현 (커밋 `2eaf453`)
-```
-initCapacitor() → iOS 기기 화면 크기로 safe area 계산
-  → document.documentElement.style.setProperty('--safe-area-top', '47px' 또는 '59px')
-  → Header: pt-[calc(0.75rem+var(--safe-area-top,0px))]
-  → TabBar: pt-[var(--safe-area-top,0px)]
-  → 웹에서는 변수 미설정 → 0px (영향 없음)
-```
-
-### ⚠️ 중요: Capacitor server 모드 테스트 순서
-1. `git push origin main` → Vercel 배포 시작
-2. Vercel 배포 완료 대기 (1~2분)
-3. `cd app && npx cap sync ios` → 네이티브 설정 동기화
-4. Xcode에서 리빌드 (Cmd+R)
-5. **Vercel 배포 전에 iOS 리빌드하면 이전 웹 코드가 로드됨!**
-
-## 9. 현재 상태 & 다음 단계
-
-### 해결된 이슈
-- BottomNav 제거 + Header에 채팅 버튼 (커밋 `6ace450`)
-- TabBar 뒤로가기 별도 행 분리 (커밋 `ff7079c`)
-- Vercel Deployment Protection: OFF로 WebView 로딩 정상화
-- Vercel 고정 도메인: `my-journey-planner.vercel.app`
-
-### 검증 대기
-- Safe Area: JS `--safe-area-top` 방식 — Vercel 배포 후 iOS 리빌드 검증 필요
-
-### 다음 즉시 단계
-1. **Safe Area 최종 검증** (Vercel 배포 완료 후 iOS 리빌드)
-2. 앱 아이콘 & 런치 스크린 제작 (디자인 에셋 필요)
-3. Info.plist 설정 (세로 모드 고정, 수출 규정 플래그)
-4. Apple Developer 등록 → TestFlight 배포
-
----
-
-## 8. 관련 문서
+## 7. 관련 문서
 
 | 문서 | 경로 |
 |------|------|
 | 프로젝트 규칙 | `CLAUDE.md` |
 | 디자인 시스템 | `docs/design-system.md` |
-| MVP 배포 계획 | `docs/01-plan/features/mvp-deployment.plan.md` |
+| 리디자인 설계서 | `docs/plans/2026-03-14-design-system-redesign.md` |
+| 리디자인 구현 계획서 | `docs/plans/2026-03-14-design-system-redesign-implementation.md` |
 | AI 플래너 설계 | `docs/02-design/features/ai-travel-planner-prototype.design.md` |
 | 프로젝트 셋업 계획 | `docs/01-plan/features/my-journey-project-setup.plan.md` |
-| Quick Wins 구현 계획 | `docs/plans/2026-03-11-ios-quick-wins.md` |
