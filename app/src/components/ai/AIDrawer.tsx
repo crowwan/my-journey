@@ -3,7 +3,6 @@
 import { useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { ChatContainer } from '@/components/chat/ChatContainer';
-import { useChatStore } from '@/stores/useChatStore';
 
 interface AIDrawerProps {
   isOpen: boolean;
@@ -14,13 +13,10 @@ interface AIDrawerProps {
 
 // 오른쪽 슬라이드 드로어 — 모바일 풀스크린, 데스크탑 사이드 패널
 export function AIDrawer({ isOpen, onClose, mode = 'create', tripId }: AIDrawerProps) {
-  const clearMessages = useChatStore((s) => s.clearMessages);
-
-  // 드로어 닫을 때 채팅 초기화
+  // 드로어 닫을 때 대화는 유지 (세션 영속화)
   const handleClose = useCallback(() => {
     onClose();
-    clearMessages();
-  }, [onClose, clearMessages]);
+  }, [onClose]);
 
   // ESC 키로 닫기
   useEffect(() => {

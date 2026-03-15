@@ -1,7 +1,6 @@
 'use client';
 
 import { useUIStore } from '@/stores/useUIStore';
-import { useChatStore } from '@/stores/useChatStore';
 import { AIFloatingButton } from './AIFloatingButton';
 import { AIDrawer } from './AIDrawer';
 
@@ -12,13 +11,12 @@ export function AIDrawerProvider() {
   const tripId = useUIStore((s) => s.aiDrawerTripId);
   const openAIDrawer = useUIStore((s) => s.openAIDrawer);
   const closeAIDrawer = useUIStore((s) => s.closeAIDrawer);
-  const clearMessages = useChatStore((s) => s.clearMessages);
 
   // FAB 토글 — 열려있으면 닫기, 닫혀있으면 열기
+  // 닫을 때 대화는 유지 (세션 영속화)
   const handleToggle = () => {
     if (isOpen) {
       closeAIDrawer();
-      clearMessages();
     } else {
       openAIDrawer();
     }
