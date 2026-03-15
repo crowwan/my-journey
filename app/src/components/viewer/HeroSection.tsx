@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Share2, ChevronLeft } from 'lucide-react';
+import { Share2, ChevronLeft, Pencil } from 'lucide-react';
 import type { Trip } from '@/types/trip';
 import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/lib/trip-utils';
 import { shareTrip } from '@/lib/share-utils';
+import { useUIStore } from '@/stores/useUIStore';
+import { useChatStore } from '@/stores/useChatStore';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -17,6 +19,9 @@ interface HeroSectionProps {
 
 export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
   const router = useRouter();
+  const openAISplitView = useUIStore((s) => s.openAISplitView);
+  const clearMessages = useChatStore((s) => s.clearMessages);
+  const addSystemMessage = useChatStore((s) => s.addSystemMessage);
   const status = getTripStatus(trip.startDate, trip.endDate);
   const dday = getDDay(trip.startDate, trip.endDate);
   const badgeStyle = getDDayBadgeStyle(status);
@@ -31,6 +36,15 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
       setToastMessage('링크가 복사되었습니다');
       setTimeout(() => setToastMessage(null), 2000);
     }
+  };
+
+  // AI로 수정 버튼 핸들러
+  const handleAIEdit = () => {
+    // 기존 대화 초기화 후 edit 모드 시작
+    clearMessages();
+    openAISplitView('edit', trip.id);
+    // 시스템 메시지로 수정 대상 안내
+    addSystemMessage(`'${trip.title}' 여행을 수정합니다. 어떤 부분을 변경할까요?`);
   };
 
   return (
@@ -57,14 +71,23 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
             {dday}
           </Badge>
         </div>
-        {/* 공유 아이콘 버튼 — 데스크탑에서만 */}
-        <button
-          onClick={handleShare}
-          className="hidden sm:flex items-center justify-center size-9 rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors shrink-0"
-          aria-label="공유하기"
-        >
-          <Share2 className="size-4" />
-        </button>
+        {/* 액션 버튼 — 데스크탑에서만 */}
+        <div className="hidden sm:flex items-center gap-1">
+          <button
+            onClick={handleAIEdit}
+            className="flex items-center justify-center size-9 rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors shrink-0"
+            aria-label="AI로 수정"
+          >
+            <Pencil className="size-4" />
+          </button>
+          <button
+            onClick={handleShare}
+            className="flex items-center justify-center size-9 rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors shrink-0"
+            aria-label="공유하기"
+          >
+            <Share2 className="size-4" />
+          </button>
+        </div>
       </div>
 
       {/* 2행: 날짜 · 인원 · 태그 */}
@@ -94,14 +117,23 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
         </div>
       )}
 
-      {/* 공유 버튼 — 모바일에서만 텍스트 버튼 */}
-      <button
-        onClick={handleShare}
-        className="sm:hidden flex items-center gap-1.5 text-xs text-text-secondary border border-border rounded-full px-4 py-2 hover:bg-bg-secondary hover:text-text-primary transition-colors mt-3"
-      >
-        <Share2 className="size-3.5" />
-        공유하기
-      </button>
+      {/* 액션 버튼 — 모바일에서만 텍스트 버튼 */}
+      <div className="sm:hidden flex items-center gap-2 mt-3">
+        <button
+          onClick={handleAIEdit}
+          className="flex items-center gap-1.5 text-xs text-text-secondary border border-border rounded-full px-4 py-2 hover:bg-bg-secondary hover:text-text-primary transition-colors"
+        >
+          <Pencil className="size-3.5" />
+          AI로 수정
+        </button>
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-1.5 text-xs text-text-secondary border border-border rounded-full px-4 py-2 hover:bg-bg-secondary hover:text-text-primary transition-colors"
+        >
+          <Share2 className="size-3.5" />
+          공유하기
+        </button>
+      </div>
 
       {/* 클립보드 복사 토스트 */}
       {toastMessage && (

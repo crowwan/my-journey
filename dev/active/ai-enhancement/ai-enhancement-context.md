@@ -23,7 +23,8 @@
 
 | 파일 | 역할 | Phase |
 |------|------|-------|
-| `src/components/chat/QuickSetupForm.tsx` | 목적지/기간/인원 입력 폼 (create 모드 초기 화면) | 1 |
+| `src/components/chat/QuickSetupForm.tsx` | 목적지/날짜/인원 입력 폼 (create 모드 초기 화면) | 1 ✅ |
+| `src/components/ai/AISplitView.tsx` | Split View (좌 TripViewer + 우 ChatContainer) | 2 |
 
 ### 상태 관리
 
@@ -67,9 +68,11 @@
 - **이유**: 부분 merge (TripAction 적용)는 action 타입별 로직이 복잡하고, Gemini 응답의 일관성도 보장 어려움. 전체 Trip JSON 재생성이 단순하고 안정적.
 - **트레이드오프**: 토큰 사용량 증가 → 프로토타입 단계에서 허용 가능
 
-### D3: 드로어 상태 3단계
+### D3: Split View (드로어 최소화 대체)
 
-- **이유**: 사용자가 AI 대화 중 다른 여행 참조 필요 → 최소화 상태 필수. 닫기와 최소화를 구분하여 의도치 않은 대화 손실 방지.
+- **이유**: 드로어 최소화보다 Split View가 더 자연스러운 UX. 여행 전체를 보면서 수정 대화 가능.
+- **대안 검토**: 드로어 3-상태(open/minimized/closed) → 최소화해도 뷰어를 볼 수 없음, Split View가 우월
+- **모바일**: 화면 작아서 split 불가 → 기존 드로어 유지
 
 ### D4: TripAction 타입 유지
 

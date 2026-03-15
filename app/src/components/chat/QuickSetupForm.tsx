@@ -3,17 +3,30 @@
 import { useState } from 'react';
 import { Plane, Sparkles, ArrowRight } from 'lucide-react';
 
-// -- 기간 옵션 (1박2일 ~ 7박8일) ------------------------------------------
-const DURATION_OPTIONS = Array.from({ length: 7 }, (_, i) => ({
-  nights: i + 1,
-  label: `${i + 1}박 ${i + 2}일`,
-}));
-
 // -- 인원 옵션 (1명 ~ 10명) ------------------------------------------------
 const TRAVELER_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
   count: i + 1,
   label: `${i + 1}명`,
 }));
+
+// 오늘 날짜를 YYYY-MM-DD 형식으로 반환
+function getTodayISO(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// 날짜 차이 계산 (일 수)
+function diffDays(start: string, end: string): number {
+  const s = new Date(start);
+  const e = new Date(end);
+  return Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+// 날짜를 읽기 좋은 형식으로 (3월 15일)
+function formatDateKR(dateStr: string): string {
+  const d = new Date(dateStr);
+  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
 
 interface QuickSetupFormProps {
   onSubmit: (prompt: string) => void;
@@ -21,23 +34,39 @@ interface QuickSetupFormProps {
   disabled?: boolean;
 }
 
-// 빠른 여행 설정 폼 — 목적지/기간/인원을 입력받아 프롬프트로 변환
+// 빠른 여행 설정 폼 — 목적지/날짜/인원을 입력받아 프롬프트로 변환
 export function QuickSetupForm({ onSubmit, onSkip, disabled = false }: QuickSetupFormProps) {
+  const today = getTodayISO();
   const [destination, setDestination] = useState('');
-  const [nights, setNights] = useState(2);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [travelers, setTravelers] = useState(1);
+
+  // 기간 표시 텍스트
+  const durationText = startDate && endDate && endDate >= startDate
+    ? (() => {
+        const days = diffDays(startDate, endDate) + 1;
+        const nights = days - 1;
+        return nights > 0
+          ? `${formatDateKR(startDate)} ~ ${formatDateKR(endDate)} (${nights}박 ${days}일)`
+          : `${formatDateKR(startDate)} (당일치기)`;
+      })()
+    : null;
 
   // 폼 제출 시 프롬프트 텍스트 조립
   const handleSubmit = () => {
     const trimmed = destination.trim();
-    if (!trimmed) return;
+    if (!trimmed || !startDate || !endDate) return;
 
-    const days = nights + 1;
-    const prompt = `목적지: ${trimmed}, 기간: ${nights}박 ${days}일, 인원: ${travelers}명. 여행 계획을 생성해주세요.`;
+    const days = diffDays(startDate, endDate) + 1;
+    const nights = days - 1;
+    const durationStr = nights > 0 ? `${nights}박 ${days}일` : '당일치기';
+
+    const prompt = `목적지: ${trimmed}, 기간: ${startDate} ~ ${endDate} (${durationStr}), 인원: ${travelers}명. 여행 계획을 생성해주세요.`;
     onSubmit(prompt);
   };
 
-  const isValid = destination.trim().length > 0;
+  const isValid = destination.trim().length > 0 && startDate && endDate && endDate >= startDate;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[40vh] text-center px-4">
@@ -65,33 +94,54 @@ export function QuickSetupForm({ onSubmit, onSkip, disabled = false }: QuickSetu
             type="text"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
-            placeholder="예: 도쿄, 방콕, 파리"
+            placeholder="예: 도쿄, 제주도, 파리"
             disabled={disabled}
             className="w-full rounded-md border border-border bg-bg px-3 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors disabled:opacity-50"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && isValid) handleSubmit();
-            }}
           />
         </div>
 
-        {/* 기간 드롭다운 */}
-        <div className="text-left">
-          <label className="text-xs font-medium text-text-secondary mb-1.5 block">
-            기간
-          </label>
-          <select
-            value={nights}
-            onChange={(e) => setNights(Number(e.target.value))}
-            disabled={disabled}
-            className="w-full rounded-md border border-border bg-bg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors disabled:opacity-50 appearance-none"
-          >
-            {DURATION_OPTIONS.map((opt) => (
-              <option key={opt.nights} value={opt.nights}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+        {/* 출발일 / 귀국일 */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-left">
+            <label className="text-xs font-medium text-text-secondary mb-1.5 block">
+              출발일
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              min={today}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                // 귀국일이 출발일보다 이전이면 초기화
+                if (endDate && e.target.value > endDate) {
+                  setEndDate('');
+                }
+              }}
+              disabled={disabled}
+              className="w-full rounded-md border border-border bg-bg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors disabled:opacity-50"
+            />
+          </div>
+          <div className="text-left">
+            <label className="text-xs font-medium text-text-secondary mb-1.5 block">
+              귀국일
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              min={startDate || today}
+              onChange={(e) => setEndDate(e.target.value)}
+              disabled={disabled || !startDate}
+              className="w-full rounded-md border border-border bg-bg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors disabled:opacity-50"
+            />
+          </div>
         </div>
+
+        {/* 기간 요약 */}
+        {durationText && (
+          <p className="text-xs text-primary text-left">
+            {durationText}
+          </p>
+        )}
 
         {/* 인원 드롭다운 */}
         <div className="text-left">

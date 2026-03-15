@@ -1,6 +1,7 @@
 'use client';
 
 import type { ChatMessage as ChatMessageType } from '@/types/trip';
+import { useUIStore } from '@/stores/useUIStore';
 import { TripPreviewCard } from './TripPreviewCard';
 
 interface ChatMessageProps {
@@ -73,6 +74,8 @@ function parseMarkdown(text: string): React.ReactNode[] {
 
 export function ChatMessage({ message, isLatestPreview = true }: ChatMessageProps) {
   const { role, content, timestamp, tripPreview } = message;
+  // Split View 모드에서는 TripPreviewCard 숨김 (좌측 뷰어가 역할 대체)
+  const aiViewMode = useUIStore((s) => s.aiViewMode);
 
   // 시스템/에러 메시지
   if (role === 'system') {
@@ -101,8 +104,8 @@ export function ChatMessage({ message, isLatestPreview = true }: ChatMessageProp
           {parseMarkdown(content)}
         </div>
 
-        {/* 여행 프리뷰 카드 */}
-        {tripPreview && (
+        {/* 여행 프리뷰 카드 — Split View에서는 숨김 (좌측 뷰어가 대체) */}
+        {tripPreview && aiViewMode !== 'split' && (
           <div className="mt-2">
             <TripPreviewCard trip={tripPreview} isLatest={isLatestPreview} />
           </div>

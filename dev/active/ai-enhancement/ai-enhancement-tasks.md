@@ -33,70 +33,67 @@
 
 ---
 
-## Phase 2: 드로어 최소화 + 멀티태스킹
-
-- [ ] 2.1 useUIStore: isAIDrawerOpen boolean → aiDrawerState 3-상태로 변경
-  - 'open' | 'minimized' | 'closed'
-  - 기존 openAIDrawer/closeAIDrawer 시그니처 유지 (하위 호환)
-- [ ] 2.2 AIDrawer 헤더에 최소화 버튼 (─ 아이콘) 추가
-  - X 버튼 옆에 배치
-- [ ] 2.3 최소화 시: 드로어 translate-x-full + body.overflow 복원
-- [ ] 2.4 AIFloatingButton: minimized 상태 시 배지 표시
-  - 작은 초록 도트 또는 메시지 카운트
-- [ ] 2.5 FAB 클릭 동작 변경
-  - closed → open (기존)
-  - open → minimized (최소화)
-  - minimized → open (복원)
-- [ ] 2.6 데스크탑: 드로어 열림 시 오버레이 제거 + 본문 너비 축소 (사이드바 모드)
-- [ ] 2.7 모바일: 최소화 → 풀스크린 해제, FAB 배지
-- [ ] 2.8 빌드 + 린트 확인
-
----
-
-## Phase 3: 생성 결과 대화 내 수정
+## Phase 3: 생성 결과 대화 내 수정 ✅
 
 - [x] 3.1 생성 완료 후에도 ChatInput 활성 유지 [2026-03-15]
-  - ChatInput은 이미 항상 활성 상태 (별도 비활성화 로직 없음)
-  - showCreateButton은 generatedTrip이 있으면 이미 숨김 → 수정 불필요
 - [x] 3.2 생성 후 메시지 전송 시 자동 edit 모드 전환 [2026-03-15]
-  - ChatContainer.handleSend: generatedTrip이 있으면 sendMessage(text, 'edit', generatedTrip) 호출
-- [x] 3.3 Gemini edit 프롬프트 수정 [2026-03-15]
-  - EDIT_TRIP_PROMPT → getEditTripPrompt() 함수로 변경 (오늘 날짜 포함)
-  - replace_trip 방식: 수정된 전체 Trip JSON 반환 (create와 동일한 스키마)
-  - "변경 요청된 부분만 수정, 나머지 100% 동일 유지" 강조
-  - editTrip 반환 타입: EditTripResult { message, trip } (기존 action 대신)
-  - 기존 Trip ID + createdAt 유지
-- [x] 3.4 API route: edit 응답에서 trip 필드로 전체 Trip 반환 [2026-03-15]
-  - editTrip 반환 타입 변경으로 자동 적용 (route.ts spread 패턴)
-  - useChatStore ChatApiResponse에서 action 필드 제거
-- [x] 3.5 수정 결과 → 새 TripPreviewCard 표시 [2026-03-15]
-  - TripPreviewCard에 isLatest prop 추가 (기본값 true)
-  - isLatest=false → "이전 버전" 비활성 버튼 표시
-  - ChatMessage에 isLatestPreview prop 전달
-  - ChatContainer에서 lastPreviewMessageId 계산 → 마지막 tripPreview만 저장 가능
+- [x] 3.3 Gemini edit 프롬프트 수정 (replace_trip 방식) [2026-03-15]
+- [x] 3.4 API route: edit 응답에서 trip 필드 반환 [2026-03-15]
+- [x] 3.5 수정 결과 → 새 TripPreviewCard 표시 + isLatest [2026-03-15]
 - [x] 3.6 빌드 + 린트 확인 [2026-03-15]
-  - lint: 0 errors (기존 warning 1개 유지)
-  - build: 성공
 - [ ] 3.7 생성 → 수정 → 재수정 → 저장 E2E 수동 테스트
 
 ---
 
-## Phase 4: 기존 여행 수정 (edit 모드 완성)
+## Phase 2: Split View + 기존 여행 수정 (Phase 2+4 통합)
 
-- [ ] 4.1 HeroSection에 "AI로 수정" 버튼 추가
-  - Pencil 아이콘 + 텍스트
-- [ ] 4.2 버튼 클릭 → openAIDrawer('edit', tripId)
-- [ ] 4.3 edit 모드 시작 시 시스템 메시지 자동 추가
-  - "'{trip.title}' 여행을 수정합니다. 수정하고 싶은 부분을 말씀해주세요."
-- [ ] 4.4 edit 모드에서 대화 전송 시 tripContext 자동 주입
-  - trips.get(tripId)로 최신 데이터 로드
-- [ ] 4.5 TripPreviewCard: edit 모드 시 기존 Trip ID 유지
-  - 새 ID 생성 대신 tripId 전달
-  - "수정 저장하기" 텍스트로 변경
-- [ ] 4.6 저장 시 기존 여행 업데이트 (saveTrip → 같은 ID로 덮어쓰기)
-- [ ] 4.7 저장 후 상세 페이지 새로고침 (router.refresh 또는 store 갱신)
-- [ ] 4.8 빌드 + 린트 확인
-- [ ] 4.9 기존 여행 → AI 수정 → 저장 → 반영 E2E 수동 테스트
+### Split View 기반
+- [x] 2.1 useUIStore에 `aiViewMode: 'drawer' | 'split'` 추가 [2026-03-15]
+  - setAIViewMode, openAISplitView 액션 추가
+  - closeAIDrawer 시 aiViewMode를 'drawer'로 복원
+- [x] 2.2 AISplitView 컴포넌트 생성 [2026-03-15]
+  - 좌측: TripViewer (trip prop) + 헤더(닫기/저장), 우측: ChatContainer
+  - 전체 화면 fixed flex 레이아웃 (좌 flex-1, 우 w-[400px])
+  - ESC 키 닫기, body 스크롤 방지
+- [x] 2.3 TripViewer 스크롤 분리 [2026-03-15]
+  - scrollContainerRef prop 추가 (optional RefObject)
+  - 있으면 내부 스크롤, 없으면 window.scrollTo (하위 호환)
+- [x] 2.4 AIDrawerProvider: generatedTrip 생성 시 Split View 자동 전환 [2026-03-15]
+  - useSyncExternalStore로 데스크탑 감지 (린트 호환)
+  - 데스크탑(>=640px) + generatedTrip 존재 + drawer 모드 → 자동 split 전환
+
+### 초안 생성 → Split View
+- [x] 2.5 초안 생성 완료 → Split View에서 TripViewer 실시간 표시 [2026-03-15]
+  - AISplitView에서 useChatStore.generatedTrip 구독 → TripViewer에 전달
+- [x] 2.6 수정 대화 → generatedTrip 갱신 → 왼쪽 뷰어 자동 반영 [2026-03-15]
+  - generatedTrip 변경 시 TripViewer 자동 리렌더링
+- [x] 2.7 Split View 내 저장 버튼 [2026-03-15]
+  - 헤더 우측에 Save 아이콘 + "여행 저장하기"/"수정 저장하기" 버튼
+  - 저장 → localStorage + Split View 해제 + 상세 페이지 이동
+- [x] 2.8 Split View에서 TripPreviewCard 숨김 [2026-03-15]
+  - ChatMessage에서 aiViewMode === 'split'이면 tripPreview 미렌더링
+
+### 기존 여행 수정
+- [x] 2.9 HeroSection에 "AI로 수정" 버튼 추가 [2026-03-15]
+  - 데스크탑: Pencil 아이콘 버튼 (공유 옆)
+  - 모바일: 텍스트 버튼 "AI로 수정" (공유 옆)
+- [x] 2.10 "AI로 수정" → Split View (edit 모드) 진입 [2026-03-15]
+  - openAISplitView('edit', trip.id) 호출
+  - 기존 Trip을 좌측 TripViewer + 우측 채팅
+- [x] 2.11 edit 시작 시 시스템 메시지 자동 추가 [2026-03-15]
+  - clearMessages() 후 addSystemMessage("'{trip.title}' 여행을 수정합니다.")
+- [x] 2.12 edit 저장 → 기존 Trip ID 유지 + 덮어쓰기 [2026-03-15]
+  - AISplitView의 handleSave에서 generatedTrip ?? existingTrip 저장
+
+### 모바일 + 마무리
+- [x] 2.13 모바일(< 640px): Split View 미적용, 기존 드로어 유지 [2026-03-15]
+  - AIDrawerProvider에서 useIsDesktop() 체크 → 모바일이면 AIDrawer 유지
+- [x] 2.14 빌드 + 린트 확인 [2026-03-15]
+  - lint: 0 errors (기존 warning 1개 유지)
+  - build: 성공
+- [ ] 2.15 E2E 수동 테스트
+  - 새 여행: Quick Setup → 초안 → Split View → 수정 → 저장
+  - 기존 여행: 상세 → AI 수정 → Split View → 수정 → 저장
 
 ---
 
