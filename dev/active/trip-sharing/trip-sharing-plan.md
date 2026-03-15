@@ -1,263 +1,303 @@
-# 여행 공유 기능 - 전략 계획
+# 여행 공유 기능 - 전략 계획 (정적 HTML 방식)
 
 ## 개요
 
-여행 일정을 URL로 공유하여 누구나 읽기 전용으로 볼 수 있는 기능을 구현한다. 현재 localStorage 기반 구조에서 Supabase를 도입하여 공유 데이터를 서버에 저장하고, 향후 전체 데이터 마이그레이션의 기반을 마련한다.
+여행 일정을 **자체 완결형 HTML 파일**로 내보내어 공유하는 기능을 구현한다. Trip 데이터를 CSS/데이터가 모두 인라인된 독립 HTML 파일로 변환하고, 다운로드 또는 Web Share API로 공유할 수 있게 한다. Supabase 등 외부 인프라 없이 순수 클라이언트 사이드에서 동작한다.
 
 ## 현재 상태 (AS-IS)
 
 ### 데이터 저장
-- **모든 Trip 데이터가 localStorage에 저장** (`trip:{id}` 키)
+- 모든 Trip 데이터가 localStorage에 저장 (`trip:{id}` 키)
 - `app/src/lib/storage.ts`가 localStorage CRUD를 담당
 - `useTripStore`(Zustand)가 메모리 캐시 + storage 래퍼 역할
 
 ### 기존 공유 기능
 - `app/src/lib/share-utils.ts`에 `shareTrip()` 함수 존재
-- **현재는 URL만 공유** (`https://my-journey-planner.vercel.app/trips/{tripId}`)
+- 현재는 URL만 공유 (`https://my-journey-planner.vercel.app/trips/{tripId}`)
 - Web Share API 또는 클립보드 복사 폴백
-- **문제**: 공유받은 사람의 localStorage에 해당 Trip이 없으므로 "데이터를 불러오는 중..." 무한 대기
-
-### 라우트 구조
-- `/trips/[tripId]/page.tsx` - localStorage에서 Trip 로드 후 `TripViewer` 렌더링
-- `/api/chat/route.ts` - Gemini AI 채팅 API (유일한 서버 API)
+- **문제**: 공유받은 사람의 localStorage에 해당 Trip이 없으므로 빈 화면
 
 ### 뷰어 구조
-- `TripViewer` 컴포넌트가 Trip 객체를 받아 4탭 렌더링
+- `TripViewer` 컴포넌트가 Trip 객체를 받아 4탭(요약/일정/가이드/체크리스트) 렌더링
 - `HeroSection`에 공유 버튼 이미 존재 (Share2 아이콘)
-- 뷰어 자체는 Trip 객체만 받으면 동작 (데이터 소스에 무관)
+- 각 탭의 UI를 HTML 생성 시 참고해야 함
+
+### 디자인 시스템
+- Primary: `#f97316` (orange), Secondary: `#0d9488` (teal)
+- Font: Noto Sans KR (body), Playfair Display (hero title)
+- 반응형 640px 기준
+- Day 색상 순환: Day1 `#f97316`, Day2 `#6366f1`, Day3 `#10b981`, Day4 `#a78bfa`, Day5 `#f472b6`
 
 ## 제안 솔루션 (TO-BE)
 
-### 전략: Supabase 단계적 도입
+### 전략: 정적 HTML 내보내기
 
-**즉시 Supabase를 도입하되, 공유 전용 테이블로 시작한다.**
+Trip 데이터를 **자체 완결형 HTML 파일**로 변환한다. CSS, 데이터, 폰트 참조 모두 HTML 내에 포함하여 어디서든 열 수 있는 독립 파일을 생성한다.
 
-이유:
-1. "중간 단계" (JSON blob 서버, Vercel KV 등)는 어차피 Supabase로 재마이그레이션 필요 = 이중 작업
-2. Supabase 무료 티어(500MB, 50K row)로 공유 기능에 충분
-3. 향후 전체 Trip 데이터 마이그레이션 시 인프라가 이미 준비됨
-4. Supabase SDK가 Next.js와 잘 통합됨
+**선택 이유**:
+1. 서버 인프라 불필요 (Supabase, KV 등 없음)
+2. 오프라인에서도 볼 수 있음
+3. 파일 단위로 카카오톡, 이메일, 에어드롭 등 모든 채널로 공유 가능
+4. Supabase는 향후 전체 데이터 저장 방식 변경 시 별도 도입 예정
 
 ### 아키텍처
 
 ```
-[공유하는 사용자]                          [공유받는 사용자]
-     │                                         │
-     ├─ "공유하기" 클릭                         ├─ 공유 URL 접속
-     │                                         │   /shared/[shareId]
-     ├─ localStorage Trip 데이터               │
-     │   + shareId 생성                        ├─ Next.js Route Handler
-     │                                         │   GET /api/shared/[shareId]
-     ├─ POST /api/shared                       │
-     │   Trip JSON → Supabase                  ├─ Supabase에서 Trip 조회
-     │                                         │
-     ├─ shareId 반환                           ├─ SharedTripViewer 렌더링
-     │   → URL 복사/공유                       │   (읽기 전용 TripViewer)
-     └─                                       └─
+[사용자]
+   │
+   ├─ "공유하기" 버튼 클릭
+   │
+   ├─ Trip 객체
+   │   └─ trip-to-html.ts (변환 유틸)
+   │       ├─ 히어로 섹션 HTML
+   │       ├─ 요약 섹션 HTML (항공편, 숙소, 날씨, 일정 요약)
+   │       ├─ 일정 섹션 HTML (Day별 타임라인)
+   │       ├─ 가이드 섹션 HTML (맛집, 교통, 예산)
+   │       ├─ 체크리스트 섹션 HTML (준비물, 사전 할 일)
+   │       ├─ <style> 블록 (디자인 시스템 CSS)
+   │       └─ 워터마크/푸터
+   │
+   ├─ HTML 문자열 생성 완료
+   │
+   └─ 공유 옵션 모달
+       ├─ [다운로드] → Blob + <a download> → .html 파일 저장
+       ├─ [공유하기] → Web Share API (File 객체로 전달)
+       └─ [클립보드] → HTML 텍스트 복사 (폴백)
 ```
 
-### URL 구조
+### HTML 파일 구조
 
-**`/shared/[shareId]`** 별도 라우트 선택.
+현재 앱의 **4탭 구조를 그대로 재현**한다. 소량의 `<script>`로 탭 전환을 구현하여 앱과 동일한 UX를 제공한다.
 
-| 옵션 | URL 예시 | 장점 | 단점 |
-|------|---------|------|------|
-| A. 별도 라우트 | `/shared/abc123` | 권한 분리 명확, SEO 가능 | 새 라우트 필요 |
-| B. 쿼리 파라미터 | `/trips/id?shared=true` | 기존 라우트 재사용 | 권한 분기 복잡 |
-| C. 서브도메인 | `share.my-journey.vercel.app` | 완전 분리 | 인프라 복잡 |
-
-**옵션 A 선택 이유**: 공유 페이지는 로그인 불필요 + SEO 메타태그 필요 + 편집 기능 제외 등 기존 Trip 페이지와 요구사항이 다름.
-
-### shareId 설계
-
-- **형식**: nanoid 12자리 (`V1StGXR8_Z5j`)
-- **고유성**: Supabase unique constraint
-- **URL**: `https://my-journey-planner.vercel.app/shared/V1StGXR8_Z5j`
-
-### Supabase 스키마 (공유 전용)
-
-```sql
--- 공유된 여행 스냅샷 저장
-CREATE TABLE shared_trips (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  share_id TEXT UNIQUE NOT NULL,        -- URL용 짧은 ID
-  trip_data JSONB NOT NULL,             -- Trip 전체 JSON 스냅샷
-  title TEXT NOT NULL,                  -- 검색/목록용
-  destination TEXT NOT NULL,            -- 검색/목록용
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ,              -- NULL이면 영구
-  view_count INTEGER DEFAULT 0,
-  original_trip_id TEXT,               -- localStorage의 원본 Trip ID (참고용)
-  version INTEGER DEFAULT 1            -- 재공유 시 버전 관리
-);
-
--- shareId 검색 인덱스
-CREATE INDEX idx_shared_trips_share_id ON shared_trips(share_id);
--- 만료 정리용 인덱스
-CREATE INDEX idx_shared_trips_expires_at ON shared_trips(expires_at);
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{trip.title} | My Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>/* 디자인 시스템 CSS + 탭 UI CSS */</style>
+</head>
+<body>
+  <!-- 히어로: 제목, 날짜, 인원, 태그 -->
+  <!-- 탭 바: 요약 | 일정 | 가이드 | 체크리스트 -->
+  <div class="tab-bar">
+    <button class="tab active" data-tab="summary">요약</button>
+    <button class="tab" data-tab="schedule">일정</button>
+    <button class="tab" data-tab="guide">가이드</button>
+    <button class="tab" data-tab="checklist">체크리스트</button>
+  </div>
+  <!-- 탭 패널들 -->
+  <div class="tab-panel active" id="summary"><!-- 항공편, 숙소, 날씨, 팁 --></div>
+  <div class="tab-panel" id="schedule"><!-- Day별 타임라인 --></div>
+  <div class="tab-panel" id="guide"><!-- 맛집, 교통, 예산 --></div>
+  <div class="tab-panel" id="checklist"><!-- 준비물, 사전 할 일 --></div>
+  <!-- 푸터: My Journey 워터마크 -->
+  <script>
+    // 탭 전환 (~15줄)
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab, .tab-panel').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
 ```
 
-**Trip 전체를 JSONB로 저장하는 이유**:
-- 현재 Trip 스키마가 복잡 (20+ 중첩 인터페이스) → 정규화 비용 大
-- 공유 스냅샷은 불변 (수정 불필요) → JSONB가 적합
-- 향후 Trip 테이블 정규화 시 shared_trips는 그대로 유지 가능
+**4탭 구조 선택 이유**: 앱과 동일한 UX를 제공하여 공유받은 사람도 자연스러운 탐색이 가능하다. JS 15줄 정도면 탭 전환이 완성되므로 복잡도 증가 미미.
 
-### 공유 데이터 생명주기
+### CSS 전략
 
-| 정책 | 값 | 근거 |
-|------|-----|------|
-| 기본 만료 | 없음 (영구) | 개인 프로젝트, 스토리지 부담 작음 |
-| 수동 삭제 | 공유한 사용자가 삭제 가능 | localStorage에 shareId 매핑 저장 |
-| 재공유 | 기존 공유 갱신 (같은 shareId) | 링크 유지 + 최신 데이터 반영 |
-| 크기 제한 | Trip JSON 최대 1MB | Supabase row 크기 고려 |
+Tailwind 클래스 대신 **`<style>` 블록에 순수 CSS**를 작성한다.
+
+- 디자인 시스템의 CSS 변수(색상, radius, shadow)를 `:root`에 정의
+- 컴포넌트별 클래스를 `.card`, `.badge`, `.timeline` 등으로 정의
+- 반응형: `@media (min-width: 640px)` 하나만 사용 (디자인 시스템 일관)
+- Google Fonts CDN 링크 포함 (유일한 외부 의존성, 오프라인 시 시스템 폰트 폴백)
+
+### 지도 대체 전략
+
+Leaflet 지도는 HTML에 포함 불가하므로:
+- 각 장소 이름을 **Google Maps 검색 링크**로 변환 (`https://www.google.com/maps/search/?api=1&query={name}`)
+- 숙소, 맛집도 동일하게 Google Maps 링크 제공
+- `mapSpots`의 `name` 필드를 활용
+
+### 공유 방식
+
+1. **HTML 파일 다운로드**: `Blob` + `<a download>` → `{trip.title}.html` 저장
+2. **Web Share API (File)**: `navigator.share({ files: [htmlFile] })` — 모바일에서 카카오톡, 에어드롭 등으로 직접 공유
+3. **클립보드 복사 폴백**: Web Share API 미지원 시 HTML 텍스트 클립보드 복사 (실용성 낮음, 주로 다운로드 권장)
+
+### HTML 크기 예상
+
+| 구성 요소 | 예상 크기 |
+|-----------|----------|
+| `<style>` CSS | ~8-12KB |
+| 히어로 + 요약 | ~3-5KB |
+| 일정 (5일 기준) | ~10-20KB |
+| 가이드 (맛집+교통+예산) | ~5-10KB |
+| 체크리스트 | ~2-4KB |
+| **합계** | **~30-50KB** |
+
+가벼운 HTML 파일로 이메일 첨부, 메신저 전송에 문제 없는 크기.
 
 ## 구현 단계
 
-### Phase 1: Supabase 인프라 + API (3일)
+### Phase 1: HTML 생성 엔진 (3일)
 
-**목표**: Supabase 연동 + 공유 API 엔드포인트 완성
+**목표**: Trip 객체를 자체 완결형 HTML 문자열로 변환하는 유틸리티 완성
 
-#### 1-1. Supabase 프로젝트 설정 - 규모: M
-- Supabase 프로젝트 생성 (my-journey)
-- `shared_trips` 테이블 생성 (위 스키마)
-- RLS(Row Level Security) 정책: 읽기는 public, 쓰기는 anon key + service role
-- 환경변수: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-- Vercel에 환경변수 등록
+#### 1-1. HTML 생성 유틸리티 기초 - 규모: M
+- 파일: `app/src/lib/trip-to-html.ts`
+- Trip 객체를 받아 완전한 HTML 문자열을 반환하는 `generateTripHtml(trip: Trip): string` 함수
+- HTML 문서 뼈대 생성: `<!DOCTYPE>`, `<head>` (charset, viewport, title, Google Fonts 링크), `<body>`
+- `<style>` 블록: CSS 변수 (`:root`에 디자인 시스템 색상, radius, shadow), 기본 리셋, 타이포그래피, 반응형 기본 규칙
+- 헬퍼 함수: `escapeHtml(str)` (XSS 방지), `formatDate(dateStr)` (날짜 포맷)
 
-#### 1-2. Supabase 클라이언트 설정 - 규모: S
-- `@supabase/supabase-js` 패키지 설치
-- `app/src/lib/supabase.ts` - 서버용 Supabase 클라이언트 생성
-- 서버 컴포넌트/API Route에서만 사용 (클라이언트 번들에 service key 노출 방지)
+#### 1-2. 히어로 + 요약 섹션 HTML 생성 - 규모: L
+- 파일: `app/src/lib/trip-to-html.ts` (내부 함수)
+- 히어로: 제목 (Playfair Display), 날짜 범위, 인원, 태그
+- 항공편: 가는 편/오는 편 카드 (출발지-도착지, 시간, 소요시간, 비고). 빈 경우 섹션 숨김
+- 숙소: 이름, 주소, 지역, 근처 역 뱃지. Google Maps 링크. 빈 경우 섹션 숨김
+- 날씨: 수평 스크롤 카드 (요일, 아이콘 텍스트 폴백, 기온)
+- 일정 요약: Day 번호 + 제목 + 부제목 그리드
+- 여행 팁: 접을 수 있는 `<details>` 요소 활용
 
-#### 1-3. 공유 생성 API - 규모: M
-- `app/src/app/api/shared/route.ts` - POST: Trip JSON 수신 -> shareId 생성 -> Supabase 저장
-- nanoid 12자리 생성 (충돌 시 재시도)
-- 응답: `{ shareId, shareUrl }`
-- Trip JSON 크기 검증 (1MB 제한)
+#### 1-3. 일정 섹션 HTML 생성 - 규모: L
+- 파일: `app/src/lib/trip-to-html.ts` (내부 함수)
+- Day별 카드: Day 번호 (bold), 날짜, 제목, 부제목
+- 타임라인: CSS pseudo-element 기반 좌측 수직 라인 + 점 (spot=초록, food=핑크, move=파랑, default=주황)
+- 각 타임라인 아이템: 시간, 제목, 설명, 비용 뱃지, 카테고리 뱃지
+- 장소 링크: `mapSpots`의 name을 Google Maps 검색 링크로 변환하여 "장소 보기" 링크 제공
+- Day 색상: `getDayColor(dayNumber)` 로직 인라인 적용
 
-#### 1-4. 공유 조회 API - 규모: S
-- `app/src/app/api/shared/[shareId]/route.ts` - GET: shareId로 Trip 조회
-- view_count 증가 (비동기, 응답 차단 안 함)
-- 만료 체크 (expires_at이 있고 지났으면 404)
-- 응답: Trip JSON
+#### 1-4. 가이드 + 체크리스트 섹션 HTML 생성 - 규모: L
+- 파일: `app/src/lib/trip-to-html.ts` (내부 함수)
+- 맛집: Day별 그룹핑, 카테고리 뱃지, 평점 별표, 설명, 가격대. Google Maps 링크
+- 교통: 집→호텔 경로 (수평 스텝), 도시간 노선 테이블, 패스 비교 카드, ICOCA 가이드, 교통 팁
+- 예산: 항목별 금액 + 비율 바, 총 비용 카드, 예산 팁
+- 체크리스트: 카테고리별 준비물 리스트 (체크박스 UI, 읽기 전용), 사전 할 일 (번호 뱃지 + 제목 + 설명)
 
-### Phase 2: 공유 페이지 + UI (2일)
+### Phase 2: 공유 UI + 플로우 (2일)
 
-**목표**: 공유 URL 접속 시 읽기 전용 뷰어 표시
+**목표**: HeroSection 공유 버튼 → HTML 생성 → 다운로드/공유 모달
 
-#### 2-1. 공유 페이지 라우트 - 규모: M
-- `app/src/app/shared/[shareId]/page.tsx` - Server Component
-- API 호출로 Trip 데이터 fetch
-- Next.js `generateMetadata`로 OG 태그 생성 (제목, 목적지, 날짜)
-- 에러 처리: 존재하지 않는 shareId -> 404 페이지
-- 만료된 공유 -> "이 공유 링크가 만료되었습니다" 안내
+#### 2-1. 공유 모달 컴포넌트 - 규모: M
+- 파일: `app/src/components/viewer/ShareModal.tsx`
+- 모달 UI: 디자인 시스템 준수 (bg-surface, rounded-2xl, shadow-lg)
+- 옵션 버튼 2-3개:
+  - "HTML 파일 다운로드" (Download 아이콘) — 항상 표시
+  - "공유하기" (Share2 아이콘) — Web Share API 지원 시만 표시 (주로 모바일)
+  - "클립보드 복사" (Copy 아이콘) — Web Share API 미지원 시 폴백
+- 파일명: `{trip.title}.html` (특수문자 제거)
+- 로딩 상태: HTML 생성 중 스피너 표시
+- 성공/실패 토스트
 
-#### 2-2. SharedTripViewer 컴포넌트 - 규모: M
-- 기존 `TripViewer`를 래핑하는 읽기 전용 뷰어
-- **제거할 요소**: "AI로 수정" 버튼, 인라인 편집 버튼, 체크리스트 체크 기능
-- **추가할 요소**: "My Journey로 보기" 워터마크/배너, "내 여행에 복사" 버튼
-- HeroSection을 `SharedHeroSection`으로 대체 (편집 기능 제거, 공유 출처 표시)
+#### 2-2. share-utils.ts 전면 교체 - 규모: M
+- 파일: `app/src/lib/share-utils.ts`
+- `generateAndDownloadHtml(trip: Trip): void` — HTML 생성 + Blob + 다운로드
+- `generateAndShareHtml(trip: Trip): Promise<ShareResult>` — HTML 생성 + Web Share API (File 객체)
+- `copyShareUrl(trip: Trip): Promise<ShareResult>` — 기존 URL 복사 방식 유지 (보조)
+- `sanitizeFilename(title: string): string` — 파일명 안전 처리
+- 기존 `shareTrip()` 함수 시그니처 변경 (모달에서 직접 호출하는 방식으로)
 
-#### 2-3. 공유하기 플로우 업데이트 - 규모: M
-- `app/src/lib/share-utils.ts` 수정: `shareTrip()` -> Supabase에 업로드 후 shareUrl 반환
-- HeroSection 공유 버튼: 로딩 상태 표시 (업로드 중)
-- 성공 시: shareUrl 클립보드 복사 + 토스트 "공유 링크가 복사되었습니다"
-- 실패 시: "공유에 실패했습니다. 다시 시도해주세요" 토스트
-- localStorage에 `shared:{tripId}` -> shareId 매핑 저장 (재공유 시 같은 링크 유지)
+#### 2-3. HeroSection 공유 버튼 연동 - 규모: S
+- 파일: `app/src/components/viewer/HeroSection.tsx`
+- 공유 버튼 클릭 시 ShareModal 열기 (기존 `handleShare` 로직 교체)
+- 모달 open/close 상태 관리 (`useState`)
+- 모바일/데스크탑 모두 동일 플로우
 
-### Phase 3: 공유 관리 + 고도화 (2일)
+### Phase 3: 품질 + 고도화 (2일)
 
-**목표**: 공유 상태 관리, 재공유, OG 이미지
+**목표**: HTML 출력 품질 개선, 브랜딩, 반응형 검증
 
-#### 3-1. 공유 상태 관리 - 규모: M
-- localStorage에 공유 매핑 저장: `shared:{tripId}` -> `{ shareId, sharedAt, shareUrl }`
-- HeroSection 공유 버튼 상태 분기: 미공유 시 "공유하기" / 공유 후 "링크 복사" + "공유 해제"
-- 공유 해제: Supabase에서 삭제 + localStorage 매핑 제거
+#### 3-1. HTML 반응형 + 스타일 정교화 - 규모: M
+- 파일: `app/src/lib/trip-to-html.ts`
+- 모바일(< 640px)에서 카드 1열, 데스크탑에서 2열 그리드
+- 수평 스크롤 영역 (날씨, 교통 경로) 터치 스크롤 지원
+- print 미디어 쿼리: 인쇄 시 깔끔한 레이아웃 (배경색 유지, 페이지 나눔)
+- 다크 모드 미적용 (앱과 동일)
 
-#### 3-2. 재공유 (업데이트) - 규모: S
-- 이미 공유된 Trip 수정 후 "공유 업데이트" 버튼
-- 같은 shareId로 trip_data 업데이트 (version 증가)
-- 토스트: "공유된 여행이 업데이트되었습니다"
+#### 3-2. 워터마크 + 브랜딩 - 규모: S
+- 파일: `app/src/lib/trip-to-html.ts`
+- 푸터: "My Journey에서 만들었어요" + 앱 URL 링크
+- 상단 로고/텍스트: "My Journey" 브랜드 마크 (텍스트만, 이미지 없음)
+- 공유일시 표시: "YYYY.MM.DD 공유됨"
+- 메타 태그: `<meta name="generator" content="My Journey">`
 
-#### 3-3. OG 메타태그 + 소셜 미리보기 - 규모: M
-- `app/src/app/shared/[shareId]/page.tsx`에서 `generateMetadata` 구현
-- title: `{trip.title} | My Journey`
-- description: `{destination} {startDate}~{endDate} {dayCount}일 여행`
-- og:image: Vercel OG로 동적 이미지 생성 (여행 제목 + 목적지 + 날짜)
-- `app/src/app/api/og/route.tsx` - Vercel OG 이미지 생성 API
-
-#### 3-4. "내 여행에 복사" 기능 - 규모: S
-- 공유 페이지에서 "내 여행에 복사" 버튼
-- Trip 데이터를 새 ID로 localStorage에 저장
-- 홈(`/`)으로 리다이렉트 + 토스트 "여행이 복사되었습니다"
+#### 3-3. 접근성 + 에지 케이스 - 규모: S
+- 파일: `app/src/lib/trip-to-html.ts`
+- 빈 섹션 처리: 항공편/숙소/맛집 등이 없으면 해당 섹션 생략 (빈 카드 표시 안 함)
+- 이모지 처리: `emoji-to-icon.tsx`의 이모지 → 텍스트 매핑 활용 (아이콘 라이브러리 없으므로 이모지 그대로 또는 텍스트 대체)
+- HTML 유효성: `<!DOCTYPE html>`, 올바른 charset, lang="ko"
+- XSS 방지: 모든 사용자 입력 값 `escapeHtml()` 처리
 
 ## 위험 평가
 
 ### 높음
-- **Supabase 무료 티어 제한**: 500MB 스토리지, 2GB 전송/월
-  - 대응: Trip JSON 평균 50-100KB → 5,000~10,000개 공유 가능. 개인 프로젝트로 충분
-  - 모니터링: Supabase 대시보드에서 사용량 확인
-
-- **API Key 노출**: `SUPABASE_SERVICE_ROLE_KEY`가 클라이언트에 노출되면 DB 직접 접근 가능
-  - 대응: 서버 컴포넌트/API Route에서만 service key 사용. 클라이언트는 API Route 통해서만 접근
+- **HTML 스타일 품질**: React 컴포넌트의 Tailwind 스타일을 순수 CSS로 재현하면 미묘한 차이 발생 가능
+  - 대응: 디자인 시스템 CSS 변수를 그대로 사용. 핵심 컴포넌트(카드, 뱃지, 타임라인)만 정확히 재현하고 나머지는 단순화
+  - 검증: 생성된 HTML을 브라우저에서 직접 열어 TripViewer와 비교 검수
 
 ### 보통
-- **대용량 Trip JSON**: 매우 상세한 여행의 경우 JSON이 클 수 있음
-  - 대응: 1MB 크기 제한 + 에러 메시지. 실제 Trip은 50-200KB 수준
-
-- **shareId 충돌**: nanoid 12자리 충돌 확률 극히 낮음
-  - 대응: Supabase unique constraint + 충돌 시 재생성 (최대 3회)
-
-- **기존 공유 링크 호환**: 현재 `/trips/{tripId}` URL로 공유한 사용자 존재 가능
-  - 대응: 기존 링크는 그대로 동작 (localStorage 기반). 새 공유만 `/shared/` 사용
+- **이모지/아이콘 렌더링**: lucide-react 아이콘을 HTML에서 사용 불가
+  - 대응: 이모지 문자 그대로 사용 (날씨 아이콘 등) + CSS로 스타일링. lucide 아이콘은 유니코드/SVG 인라인 또는 텍스트 대체
+- **Google Fonts CDN 의존**: 오프라인 환경에서 폰트 로드 불가
+  - 대응: CSS `font-family`에 시스템 폰트 폴백 체인 포함 (`system-ui, -apple-system, sans-serif`)
+- **대용량 Trip**: 매우 상세한 여행 (10일+, 많은 맛집)의 경우 HTML 파일이 클 수 있음
+  - 대응: 실제 Trip은 30-50KB 예상. 100KB 초과해도 공유에 문제 없는 크기
 
 ### 낮음
-- **Supabase 서비스 장애**: 공유 페이지 접근 불가
-  - 대응: 에러 페이지에 "잠시 후 다시 시도" 안내. 로컬 데이터는 영향 없음
+- **Web Share API File 지원**: 일부 브라우저에서 File 공유 미지원
+  - 대응: `navigator.canShare({ files })` 체크 후 미지원 시 다운로드 옵션만 표시
+- **파일명 특수문자**: 한글, 특수문자가 포함된 파일명 처리
+  - 대응: `sanitizeFilename()` 유틸로 안전한 문자만 허용
 
 ## 성공 지표
 
 | 지표 | 목표 |
 |------|------|
-| 공유 링크 생성 시간 | < 2초 |
-| 공유 페이지 로드 시간 | < 1.5초 (FCP) |
-| OG 미리보기 | 카카오톡, 슬랙, iMessage에서 정상 표시 |
-| 에러율 | 공유 생성 실패 < 1% |
-| 기존 기능 영향 | 0 (localStorage 기반 기능 변경 없음) |
+| HTML 생성 시간 | < 500ms (클라이언트 사이드) |
+| HTML 파일 크기 | < 100KB (일반적인 5일 여행 기준) |
+| 모바일 HTML 렌더링 | 카카오톡 인앱 브라우저에서 정상 표시 |
+| 디자인 일관성 | TripViewer와 80%+ 유사도 (시각적 비교) |
+| 기존 기능 영향 | 0 (기존 코드 변경 최소화) |
 
 ## 의존성
 
 ### 코드 의존성
 - `inline-edit` 작업과 독립적 (병렬 진행 가능)
-- `TripViewer` 컴포넌트 재사용 (props 추가만 필요)
-- `share-utils.ts` 수정 (기존 함수 시그니처 유지, 내부 로직 변경)
+- `HeroSection.tsx` 수정 (공유 버튼 동작 변경) — inline-edit와 충돌 가능성 낮음 (다른 영역)
+- `share-utils.ts` 전면 교체 (기존 함수 제거 후 재작성)
+- `trip.ts` 타입 변경 없음 (읽기만)
 
 ### 외부 의존성
-- **Supabase 프로젝트 생성** (무료 티어)
-- **패키지**: `@supabase/supabase-js`, `nanoid`
-- **Vercel 환경변수 등록**: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- **없음** (추가 npm 패키지 불필요)
+- Google Fonts CDN (기존 사용 중, HTML 내 link 태그로 참조)
 
-## Supabase 전체 마이그레이션 로드맵
+## 기존 Supabase 계획과의 관계
 
-이 공유 기능은 Supabase 도입의 **1단계**이다. 향후 로드맵:
+이 정적 HTML 방식은 Supabase와 **완전히 독립적**이다.
 
-| 단계 | 범위 | 시기 |
-|------|------|------|
-| **1단계** (이번) | 공유 전용 테이블 (`shared_trips`) | 지금 |
-| **2단계** | Trip 테이블 정규화 + localStorage -> Supabase 동기화 | 공유 안정화 후 |
-| **3단계** | 사용자 인증 (Supabase Auth) + 개인 Trip 클라우드 저장 | 2단계 이후 |
-| **4단계** | 공동 편집 (Realtime) | 3단계 이후 |
+| 항목 | 정적 HTML (이번) | Supabase (향후) |
+|------|-----------------|----------------|
+| 목적 | 여행 일정 공유 (파일) | 전체 데이터 클라우드 저장 |
+| 인프라 | 없음 | Supabase 프로젝트 |
+| 공유 방식 | HTML 파일 전송 | URL 기반 (DB 조회) |
+| 도입 시기 | 지금 | 데이터 저장 방식 전체 변경 시 |
+| 공존 가능 | O | Supabase 도입 후에도 HTML 내보내기 유지 가능 |
 
-이번 작업에서 **2단계를 염두에 둔 설계**:
-- `supabase.ts` 클라이언트를 별도 모듈로 분리 → 2단계에서 재사용
-- Trip 타입(`trip.ts`)을 변경하지 않음 → 2단계에서 DB 스키마를 Trip 타입에 맞춤
-- `storage.ts`의 인터페이스 유지 → 2단계에서 Supabase 백엔드로 교체만 하면 됨
+Supabase 도입 시에도 HTML 내보내기 기능은 "오프라인 공유", "백업" 용도로 계속 유용하므로 별도 기능으로 유지한다.
 
 ## 타임라인
 
 | Phase | 기간 | 산출물 |
 |-------|------|--------|
-| Phase 1: 인프라 + API | 3일 | Supabase 연동, 공유 생성/조회 API |
-| Phase 2: 페이지 + UI | 2일 | 공유 페이지, 읽기 전용 뷰어, 공유 플로우 |
-| Phase 3: 관리 + 고도화 | 2일 | 공유 상태 관리, OG 이미지, 복사 기능 |
+| Phase 1: HTML 생성 엔진 | 3일 | `trip-to-html.ts` 유틸리티 (전체 섹션 HTML 변환) |
+| Phase 2: 공유 UI + 플로우 | 2일 | ShareModal, share-utils 교체, HeroSection 연동 |
+| Phase 3: 품질 + 고도화 | 2일 | 반응형 검증, 워터마크, 에지 케이스 처리 |
 | **총계** | **7일** | **3개 Phase** |

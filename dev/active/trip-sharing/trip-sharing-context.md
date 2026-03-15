@@ -2,89 +2,85 @@
 
 ## 상태
 - 단계: 계획 수립 완료, 구현 미착수
-- 진행률: 0 / 14 작업 완료
+- 진행률: 0 / 11 작업 완료
 - 최종 수정: 2026-03-15
 
 ## 주요 파일
 
 ### 수정 대상
-- `app/src/lib/share-utils.ts` - 공유 로직 전면 교체 (Web Share API -> Supabase 업로드 + URL 생성)
-- `app/src/components/viewer/HeroSection.tsx` - 공유 버튼 상태 분기 (미공유/공유됨/업데이트 필요)
-- `app/src/components/viewer/TripViewer.tsx` - readOnly prop 추가 (편집 기능 조건부 숨김)
-- `app/src/lib/storage.ts` - 공유 매핑 저장/조회 함수 추가 (`shared:{tripId}`)
+- `app/src/lib/share-utils.ts` — 공유 로직 전면 교체 (URL 공유 → HTML 파일 생성 + 다운로드/공유)
+- `app/src/components/viewer/HeroSection.tsx` — 공유 버튼 클릭 시 ShareModal 열기로 변경
 
 ### 신규 생성
-- `app/src/lib/supabase.ts` - Supabase 서버 클라이언트 (service role key)
-- `app/src/app/api/shared/route.ts` - POST: Trip 공유 생성 API
-- `app/src/app/api/shared/[shareId]/route.ts` - GET: 공유 Trip 조회 API
-- `app/src/app/shared/[shareId]/page.tsx` - 공유 페이지 (Server Component)
-- `app/src/components/viewer/SharedTripViewer.tsx` - 읽기 전용 뷰어 래퍼
-- `app/src/components/viewer/SharedHeroSection.tsx` - 공유 페이지용 히어로 (편집 버튼 없음)
-- `app/src/app/api/og/route.tsx` - Vercel OG 이미지 생성 API
+- `app/src/lib/trip-to-html.ts` — Trip → HTML 문자열 변환 핵심 유틸리티
+- `app/src/components/viewer/ShareModal.tsx` — 공유 옵션 모달 (다운로드/공유하기/클립보드)
 
-### 변경 없음 (재사용)
-- `app/src/types/trip.ts` - Trip 타입 그대로 사용 (JSONB에 직렬화)
-- `app/src/stores/useTripStore.ts` - 기존 localStorage 로직 유지
-- `app/src/components/viewer/TabBar.tsx` - 공유 페이지에서도 동일 사용
-- `app/src/components/viewer/tabs/*` - 4개 탭 컴포넌트 그대로 사용
+### 변경 없음 (참조만)
+- `app/src/types/trip.ts` — Trip 타입 (HTML 생성 시 읽기용)
+- `app/src/components/viewer/TripViewer.tsx` — 뷰어 구조 참고 (HTML 섹션 순서)
+- `app/src/components/viewer/tabs/SummaryTab.tsx` — 요약 섹션 UI 참고
+- `app/src/components/viewer/tabs/ScheduleTab.tsx` — 일정 섹션 UI 참고
+- `app/src/components/viewer/tabs/GuideTab.tsx` — 가이드 섹션 UI 참고
+- `app/src/components/viewer/tabs/ChecklistTab.tsx` — 체크리스트 섹션 UI 참고
+- `app/src/components/viewer/schedule/DayCard.tsx` — Day 카드 + 타임라인 UI 참고
+- `app/src/lib/emoji-to-icon.tsx` — 이모지 매핑 참고 (HTML에서는 이모지 텍스트 사용)
+- `app/src/lib/trip-utils.ts` — D-Day 계산, Day 색상 로직 참고
+- `docs/design-system.md` — 전체 디자인 시스템 (CSS 변수, 컴포넌트 스타일)
 
 ## 주요 결정
 
-### 1. Supabase 즉시 도입 (중간 단계 생략) (2026-03-15)
-- **근거**: Vercel KV, JSON blob 등 중간 솔루션은 어차피 Supabase 마이그레이션 시 재작업 필요. 처음부터 최종 인프라를 사용하는 것이 총 공수 절감
+### 1. 정적 HTML 파일 방식 선택 (Supabase 도입 안 함) (2026-03-15)
+- **근거**: Supabase는 공유 전용이 아니라 전체 데이터 저장 방식 변경 시 별도 도입 예정. 공유만을 위한 서버 인프라 도입은 과도
 - **대안 검토**:
-  - Vercel KV: 간단하지만 Supabase와 이중 인프라. 비용 발생 가능
-  - Vercel Blob: 파일 스토리지 성격. DB 기능 없음
-  - JSON 파일 서버: 보안/관리 어려움
-  - Firebase: Supabase 대비 장점 없음 (이미 Supabase 결정)
-- **트레이드오프**: 초기 설정 비용 약간 높음 (+0.5일), 하지만 마이그레이션 비용 0
+  - Supabase 즉시 도입: 공유 전용으로만 쓰면 향후 전체 마이그레이션 시 이중 작업
+  - Vercel KV / Blob: 추가 비용 발생 가능, 어차피 Supabase로 교체 예정
+  - JSON 파일 서버: 보안/관리 부담
+- **트레이드오프**: URL 기반 실시간 공유 불가 (파일 전송 방식), 하지만 오프라인 동작 + 인프라 비용 0
 
-### 2. `/shared/[shareId]` 별도 라우트 (2026-03-15)
-- **근거**: 공유 페이지는 인증 불필요, OG 메타태그 필요, 편집 기능 제외 등 기존 `/trips/[tripId]`와 요구사항이 다름
+### 2. 탭 UI 대신 단일 스크롤 페이지 (2026-03-15)
+- **근거**: 정적 HTML에서 탭 전환은 JavaScript 필요. 단일 스크롤 페이지가 JS 없이도 동작하고, 인쇄에도 유리
 - **대안 검토**:
-  - `/trips/[tripId]?shared=true`: 하나의 페이지에서 분기 → 복잡도 증가
-  - 쿼리 기반은 SEO/OG 메타태그 처리가 어려움
-- **트레이드오프**: 새 라우트 + 뷰어 래퍼 필요, 하지만 관심사 분리 깔끔
+  - CSS-only 탭 (`:target` + radio): 가능하지만 URL fragment 변경 등 복잡도 높음
+  - JS 포함 탭: HTML 파일에 인라인 JS 추가 가능하나, 보안 우려 (일부 메일 클라이언트에서 JS 차단)
+- **트레이드오프**: 페이지가 길어짐, 하지만 앵커 링크로 섹션 이동 가능
 
-### 3. Trip JSON을 JSONB로 통째 저장 (2026-03-15)
-- **근거**: Trip 스키마가 20+ 인터페이스로 복잡. 공유 스냅샷은 불변 데이터 → 정규화 불필요
+### 3. `<style>` 블록 방식 CSS (인라인 스타일 아님) (2026-03-15)
+- **근거**: 인라인 스타일(`style=""`)은 반응형 미디어 쿼리 불가 + 코드 중복 심함. `<style>` 블록이면 반응형 + 클래스 재사용 가능
 - **대안 검토**:
-  - 정규화 저장: Trip, Day, TimelineItem 등 별도 테이블 → 공유만을 위해 과도
-  - 향후 Trip 테이블은 정규화하되, shared_trips는 스냅샷으로 유지
-- **트레이드오프**: 검색 어려움 (JSONB 내부 쿼리 필요), 하지만 공유 목적에는 불필요
+  - 인라인 스타일: 이메일 클라이언트 호환성 좋지만 반응형 불가
+  - 외부 CSS 파일: 자체 완결형이 아님
+- **트레이드오프**: 이메일 본문으로 직접 보내기에는 부적합 (파일 첨부로 대체)
 
-### 4. nanoid 12자리 shareId (2026-03-15)
-- **근거**: UUID는 URL에 너무 김 (36자). nanoid 12자리는 충분히 짧고 충돌 확률 극히 낮음 (62^12 = 3.2 * 10^21)
+### 4. Google Fonts CDN 링크 포함 (2026-03-15)
+- **근거**: 폰트를 Base64로 인라인하면 파일 크기가 MB 단위로 증가. CDN 링크는 ~100B로 가벼움
 - **대안 검토**:
-  - UUID v4: 안전하지만 URL이 길어짐
-  - 숫자 ID: 순차 예측 가능 → 보안 우려
-  - 8자리: 충돌 확률 약간 높아짐
-- **트레이드오프**: 외부 패키지 (nanoid) 추가 필요
+  - 폰트 인라인 (Base64): 완전 오프라인 지원, 하지만 파일 크기 5MB+
+  - 폰트 없이 시스템 폰트만: 디자인 일관성 저하
+- **트레이드오프**: 완전한 오프라인 지원 불가 (시스템 폰트 폴백으로 충분히 읽을 수 있음)
 
-### 5. 기본 만료 없음 (영구 공유) (2026-03-15)
-- **근거**: 개인 프로젝트로 대량 트래픽 예상 안 됨. Supabase 무료 500MB로 5,000+ 공유 가능
+### 5. 이모지 텍스트 유지 (SVG 인라인 안 함) (2026-03-15)
+- **근거**: lucide-react 아이콘을 SVG로 인라인하면 복잡도 증가 + 파일 크기 증가. 이모지 문자는 모든 현대 브라우저/OS에서 지원
 - **대안 검토**:
-  - 30일 만료: 관리 용이하지만 사용자 불편
-  - 90일 만료: 절충안
-- **트레이드오프**: 스토리지 누적 가능, 하지만 개인 프로젝트 규모에서 문제 없음. 필요시 만료 정책 추가 용이 (expires_at 컬럼 존재)
+  - SVG 인라인: 정확한 아이콘 재현, 하지만 각 아이콘 SVG 경로를 하드코딩해야 함
+  - 아이콘 폰트 CDN: 외부 의존성 추가
+- **트레이드오프**: lucide 아이콘의 깔끔한 느낌 대신 OS별 이모지 차이 발생. 섹션 제목 등 핵심 아이콘은 유니코드 심볼이나 간단한 인라인 SVG로 대체 가능
 
 ## 알려진 이슈
 
-### 차단 요인
-- 없음. Supabase 프로젝트 생성은 무료이며 즉시 가능
+### 잠재적 문제
+- 카카오톡 인앱 브라우저에서 HTML 파일 직접 열기 동작이 OS/버전별로 다를 수 있음 → 테스트 필요
+- Web Share API의 File 공유는 Safari 15+, Chrome 93+에서 지원. 구형 브라우저는 다운로드만 가능
+- 일부 이메일 클라이언트는 HTML 첨부파일을 보안 차단할 수 있음 → "다운로드 후 전송" 안내
 
-### 향후 고려사항
-- Supabase 2단계 마이그레이션 시 `shared_trips`와 `trips` 테이블 간 관계 정의 필요
-- 사용자 인증 도입 시 공유 권한 모델 재설계 (현재는 링크 아는 사람 누구나 접근)
-- Trip 데이터 변경 시 공유된 스냅샷 자동 갱신 여부 (현재는 수동 "공유 업데이트")
-- `inline-edit` 작업과 병렬 진행 가능하나, HeroSection 수정 시 충돌 가능 → 순서 조율 필요
+### 향후 개선 가능
+- Supabase 도입 후 URL 기반 공유 추가 (HTML 내보내기와 병행)
+- PDF 내보내기 (html2pdf.js 등 활용)
+- 공유 HTML에 QR 코드 삽입 (My Journey 앱 링크)
+- `inline-edit` 작업과 HeroSection 충돌 가능성 낮음 (공유 버튼 onClick만 변경)
 
 ## 외부 의존성
 
 | 의존성 | 용도 | 비고 |
 |--------|------|------|
-| Supabase (supabase.com) | DB + 스토리지 | 무료 티어 사용 |
-| `@supabase/supabase-js` | Supabase SDK | npm 패키지 |
-| `nanoid` | shareId 생성 | npm 패키지. 경량 (130B) |
-| `@vercel/og` | OG 이미지 생성 | Next.js 내장 (Phase 3) |
-| Vercel 환경변수 | Supabase 키 저장 | 대시보드에서 설정 |
+| Google Fonts CDN | HTML 내 폰트 로드 | 기존 사용 중, 오프라인 시 시스템 폰트 폴백 |
+| 추가 npm 패키지 | **없음** | 순수 TypeScript 문자열 조립 |
