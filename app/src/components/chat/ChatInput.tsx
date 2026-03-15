@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState, useCallback, type KeyboardEvent } from 'react';
 
 interface ChatInputProps {
   onSend: (text: string) => void;
@@ -10,25 +9,12 @@ interface ChatInputProps {
 
 export function ChatInput({ onSend, disabled }: ChatInputProps) {
   const [text, setText] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // textarea 높이 자동 조절 (최대 4줄)
-  const adjustHeight = useCallback(() => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-    textarea.style.height = 'auto';
-    const maxHeight = 96;
-    textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
-  }, []);
 
   const handleSend = useCallback(() => {
     const trimmed = text.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setText('');
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
   }, [text, disabled, onSend]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -40,27 +26,33 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
 
   return (
     <div className="shrink-0 bg-white border-t border-border px-4 py-3">
-      <div className="max-w-[1100px] mx-auto flex items-end gap-2">
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            adjustHeight();
-          }}
-          onKeyDown={handleKeyDown}
-          placeholder="여행 계획을 알려주세요..."
-          disabled={disabled}
-          rows={1}
-          className="flex-1 bg-surface text-text-primary text-sm rounded-xl px-4 py-3 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
-        />
-        <Button
+      <div className="flex items-end gap-2">
+        <div className="flex-1 min-w-0 relative rounded-xl border border-border bg-surface overflow-hidden focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-colors">
+          {/* 높이 계산용 숨겨진 div — textarea와 동일한 스타일 */}
+          <div
+            aria-hidden
+            className="invisible whitespace-pre-wrap break-words text-sm px-4 py-2 min-h-[40px] max-h-[120px]"
+          >
+            {text || 'ㅤ'}
+          </div>
+          {/* 실제 textarea — 숨겨진 div 위에 절대 배치 */}
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="여행 계획을 알려주세요..."
+            disabled={disabled}
+            rows={1}
+            className="absolute inset-0 w-full h-full bg-transparent text-text-primary text-sm px-4 py-2 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 scrollbar-hide"
+          />
+        </div>
+        <button
           onClick={handleSend}
           disabled={disabled || !text.trim()}
-          className="rounded-xl px-5 py-3 bg-primary text-white hover:bg-primary/90 shadow-sm hover:shadow-md shrink-0"
+          className="shrink-0 rounded-xl px-4 py-2 bg-primary text-white text-sm font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors"
         >
           전송
-        </Button>
+        </button>
       </div>
     </div>
   );
