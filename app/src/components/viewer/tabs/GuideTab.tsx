@@ -4,6 +4,7 @@ import {
   UtensilsCrossed, Train, Wallet, Plane as PlaneIcon,
   CreditCard, Calculator, ExternalLink, Plus, Trash2
 } from 'lucide-react';
+import { CustomSelect } from '@/components/ui/custom-select';
 import type {
   Trip, Restaurant, TransportSection, TransportPass, TransportStep,
   TransportRoute, BudgetSection, BudgetItem
@@ -18,6 +19,64 @@ import { cn } from '@/lib/utils';
 
 interface GuideTabProps {
   trip: Trip;
+}
+
+// 예산 아이콘 허용 목록 (Gemini 프롬프트와 동일)
+const BUDGET_EMOJI_OPTIONS = [
+  { emoji: '🚆', label: '교통' },
+  { emoji: '🍽️', label: '식비' },
+  { emoji: '🎫', label: '입장료' },
+  { emoji: '☕', label: '간식/카페' },
+  { emoji: '🛍️', label: '쇼핑' },
+  { emoji: '💰', label: '예비비' },
+];
+
+// 교통 아이콘 허용 목록
+const TRANSPORT_EMOJI_OPTIONS = [
+  { emoji: '✈️', label: '비행기' },
+  { emoji: '🚆', label: '기차' },
+  { emoji: '🚌', label: '버스' },
+  { emoji: '🚗', label: '자동차' },
+  { emoji: '🚇', label: '지하철' },
+  { emoji: '🚊', label: '트램' },
+  { emoji: '🚶', label: '도보' },
+  { emoji: '🚢', label: '배' },
+  { emoji: '🛫', label: '출발' },
+  { emoji: '🛬', label: '도착' },
+  { emoji: '🏨', label: '호텔' },
+  { emoji: '🏠', label: '집' },
+];
+
+// 이모지 선택 드롭다운 — CustomSelect 기반, 이모지만 크게 표시
+function EmojiPicker({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (emoji: string) => void;
+  options: { emoji: string; label: string }[];
+}) {
+  // 현재 값이 옵션에 없으면 기본 옵션으로 추가
+  const selectOptions = [
+    ...(!options.some((o) => o.emoji === value)
+      ? [{ value, label: value, icon: value }]
+      : []),
+    ...options.map((o) => ({
+      value: o.emoji,
+      label: o.label,
+      icon: o.emoji,
+    })),
+  ];
+
+  return (
+    <CustomSelect
+      value={value}
+      onChange={onChange}
+      options={selectOptions}
+      emojiMode
+    />
+  );
 }
 
 // ============================================================
@@ -90,17 +149,16 @@ function RestaurantEditCard({
         </div>
         <div>
           <label className="text-xs text-text-tertiary block mb-1">Day</label>
-          <select
-            value={restaurant.dayNumber}
-            onChange={(e) => onUpdate('dayNumber', Number(e.target.value))}
-            className="text-sm bg-bg-secondary border border-border rounded-md px-2 py-1 text-text-primary outline-none focus:border-primary w-full"
-          >
-            {Array.from({ length: dayCount }, (_, i) => i + 1).map((d) => (
-              <option key={d} value={d}>
-                Day {d}
-              </option>
-            ))}
-          </select>
+          <CustomSelect
+            value={String(restaurant.dayNumber)}
+            onChange={(v) => onUpdate('dayNumber', Number(v))}
+            size="sm"
+            options={Array.from({ length: dayCount }, (_, i) => ({
+              value: String(i + 1),
+              label: `Day ${i + 1}`,
+            }))}
+            className="w-full"
+          />
         </div>
       </div>
 
@@ -178,11 +236,10 @@ function BudgetEditCard({
       <div className="grid grid-cols-[60px_1fr] gap-3 mb-3">
         <div>
           <label className="text-xs text-text-tertiary block mb-1">아이콘</label>
-          <InlineInput
+          <EmojiPicker
             value={item.icon}
             onChange={(v) => onUpdate('icon', v)}
-            className="text-sm text-text-primary w-full text-center"
-            placeholder="🚆"
+            options={BUDGET_EMOJI_OPTIONS}
           />
         </div>
         <div>
@@ -207,8 +264,8 @@ function BudgetEditCard({
         />
       </div>
 
-      {/* 금액 + 비율 + 색상 */}
-      <div className="grid grid-cols-3 gap-3 mb-3">
+      {/* 금액 + 비율 */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
         <div>
           <label className="text-xs text-text-tertiary block mb-1">금액</label>
           <InlineInput
@@ -233,15 +290,6 @@ function BudgetEditCard({
             type="number"
             className="text-sm text-text-primary w-full"
             placeholder="30"
-          />
-        </div>
-        <div>
-          <label className="text-xs text-text-tertiary block mb-1">색상</label>
-          <input
-            type="color"
-            value={item.color || '#f97316'}
-            onChange={(e) => onUpdate('color', e.target.value)}
-            className="w-full h-8 rounded-md border border-border cursor-pointer bg-transparent"
           />
         </div>
       </div>
@@ -278,11 +326,10 @@ function TransportStepEditCard({
       <div className="grid grid-cols-[60px_1fr] gap-3 mb-3">
         <div>
           <label className="text-xs text-text-tertiary block mb-1">아이콘</label>
-          <InlineInput
+          <EmojiPicker
             value={step.icon}
             onChange={(v) => onUpdate('icon', v)}
-            className="text-sm text-text-primary w-full text-center"
-            placeholder="🚃"
+            options={TRANSPORT_EMOJI_OPTIONS}
           />
         </div>
         <div>
@@ -432,15 +479,17 @@ function PassEditCard({
       </div>
       <div className="mb-3">
         <label className="text-xs text-text-tertiary block mb-1">추천도</label>
-        <select
+        <CustomSelect
           value={pass.recommendation}
-          onChange={(e) => onUpdate('recommendation', e.target.value)}
-          className="text-sm bg-bg-secondary border border-border rounded-md px-2 py-1 text-text-primary outline-none focus:border-primary w-full"
-        >
-          <option value="recommended">추천</option>
-          <option value="neutral">보통</option>
-          <option value="not-recommended">비추천</option>
-        </select>
+          onChange={(v) => onUpdate('recommendation', v)}
+          size="sm"
+          options={[
+            { value: 'recommended', label: '추천' },
+            { value: 'neutral', label: '보통' },
+            { value: 'not-recommended', label: '비추천' },
+          ]}
+          className="w-full"
+        />
       </div>
       <div className="mb-3">
         <label className="text-xs text-text-tertiary block mb-1">이유</label>

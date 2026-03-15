@@ -79,7 +79,7 @@ export interface TimelineItem {
   description?: string;
   type: TimelineItemType;
   cost?: number;
-  currency?: 'JPY' | 'KRW';
+  currency?: string;
   badge?: string;
 }
 

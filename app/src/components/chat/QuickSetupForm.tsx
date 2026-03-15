@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Plane, Sparkles, ArrowRight } from 'lucide-react';
+import { CustomSelect } from '@/components/ui/custom-select';
 
 // -- 인원 옵션 (1명 ~ 10명) ------------------------------------------------
 const TRAVELER_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
@@ -148,18 +149,15 @@ export function QuickSetupForm({ onSubmit, onSkip, disabled = false }: QuickSetu
           <label className="text-xs font-medium text-text-secondary mb-1.5 block">
             인원
           </label>
-          <select
-            value={travelers}
-            onChange={(e) => setTravelers(Number(e.target.value))}
+          <CustomSelect
+            value={String(travelers)}
+            onChange={(v) => setTravelers(Number(v))}
             disabled={disabled}
-            className="w-full rounded-md border border-border bg-bg px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-colors disabled:opacity-50 appearance-none"
-          >
-            {TRAVELER_OPTIONS.map((opt) => (
-              <option key={opt.count} value={opt.count}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            options={TRAVELER_OPTIONS.map((opt) => ({
+              value: String(opt.count),
+              label: opt.label,
+            }))}
+          />
         </div>
 
         {/* 액션 버튼 */}

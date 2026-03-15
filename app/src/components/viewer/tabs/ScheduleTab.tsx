@@ -1,6 +1,7 @@
 'use client';
 
 import { Plus, Trash2 } from 'lucide-react';
+import { CustomSelect } from '@/components/ui/custom-select';
 import type { Trip, TimelineItem, TimelineItemType } from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 import { SectionEditHeader } from '../SectionEditHeader';
@@ -102,17 +103,16 @@ function TimelineEditRow({
         </div>
 
         {/* 타입 드롭다운 */}
-        <select
+        <CustomSelect
           value={item.type}
-          onChange={(e) => onUpdate('type', e.target.value)}
-          className="text-xs bg-bg-secondary border border-border rounded-md px-2 py-1 text-text-primary outline-none focus:border-primary shrink-0"
-        >
-          {TIMELINE_TYPE_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => onUpdate('type', v)}
+          size="sm"
+          options={TIMELINE_TYPE_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: opt.label,
+          }))}
+          className="shrink-0 w-20"
+        />
 
         {/* 삭제 버튼 */}
         <button
@@ -140,8 +140,24 @@ function TimelineEditRow({
           <InlineInput
             value={item.cost !== undefined ? String(item.cost) : ''}
             onChange={(v) => onUpdate('cost', v)}
-            className="text-xs text-text-secondary w-20"
+            className="text-xs text-text-secondary w-16"
             placeholder="0"
+          />
+          <CustomSelect
+            value={item.currency ?? 'KRW'}
+            onChange={(v) => onUpdate('currency', v)}
+            size="sm"
+            options={[
+              { value: 'KRW', label: 'KRW' },
+              { value: 'JPY', label: 'JPY' },
+              { value: 'USD', label: 'USD' },
+              { value: 'EUR', label: 'EUR' },
+              { value: 'THB', label: 'THB' },
+              { value: 'CNY', label: 'CNY' },
+              { value: 'TWD', label: 'TWD' },
+              { value: 'VND', label: 'VND' },
+            ]}
+            className="w-16"
           />
         </div>
       </div>

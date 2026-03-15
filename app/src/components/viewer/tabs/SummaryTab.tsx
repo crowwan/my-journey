@@ -1,6 +1,7 @@
 'use client';
 
 import { Plane, Hotel, CloudSun, CalendarDays, ExternalLink, Plus, Trash2, X } from 'lucide-react';
+import { CustomSelect } from '@/components/ui/custom-select';
 import type { Trip, Flight, Accommodation } from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 
@@ -63,14 +64,15 @@ function FlightEditCard({
       {/* 방향 선택 */}
       <div className="flex items-center gap-2 mb-4">
         <span className="text-xs text-text-tertiary font-semibold">방향</span>
-        <select
+        <CustomSelect
           value={flight.direction}
-          onChange={(e) => onUpdate(index, 'direction', e.target.value)}
-          className="text-xs bg-bg-secondary border border-border rounded-md px-2 py-1 text-text-primary outline-none focus:border-primary"
-        >
-          <option value="outbound">가는 편</option>
-          <option value="inbound">오는 편</option>
-        </select>
+          onChange={(v) => onUpdate(index, 'direction', v)}
+          size="sm"
+          options={[
+            { value: 'outbound', label: '가는 편' },
+            { value: 'inbound', label: '오는 편' },
+          ]}
+        />
       </div>
 
       {/* 출발지 → 도착지 */}
