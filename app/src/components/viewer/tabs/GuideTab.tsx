@@ -2,13 +2,16 @@
 
 import {
   UtensilsCrossed, Train, Wallet, Plane as PlaneIcon,
-  CreditCard, Calculator, ExternalLink
+  CreditCard, Calculator, ExternalLink, Plus, Trash2
 } from 'lucide-react';
-import type { Restaurant, TransportSection, TransportPass, BudgetSection } from '@/types/trip';
+import type { Trip, Restaurant, TransportSection, TransportPass, BudgetSection } from '@/types/trip';
+import { useEditStore } from '@/stores/useEditStore';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
+import { SectionEditHeader } from '../SectionEditHeader';
 import { SectionTitle } from '../shared/SectionTitle';
 import { Tip } from '../shared/Tip';
 import { TipsAccordion } from '../shared/TipsAccordion';
+import { cn } from '@/lib/utils';
 import {
   Accordion,
   AccordionContent,
@@ -17,9 +20,147 @@ import {
 } from '@/components/ui/accordion';
 
 interface GuideTabProps {
-  restaurants: Restaurant[];
-  transport: TransportSection;
-  budget: BudgetSection;
+  trip: Trip;
+}
+
+// ============================================================
+// 편집 모드용 인라인 input (SummaryTab과 동일 패턴)
+// ============================================================
+function InlineInput({
+  value,
+  onChange,
+  className,
+  placeholder,
+  type = 'text',
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+  placeholder?: string;
+  type?: 'text' | 'number';
+}) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={cn(
+        'bg-transparent border-b border-dashed border-primary/40 outline-none focus:border-primary transition-colors',
+        className,
+      )}
+      placeholder={placeholder}
+    />
+  );
+}
+
+// ============================================================
+// 맛집 편집 카드
+// ============================================================
+function RestaurantEditCard({
+  restaurant,
+  dayCount,
+  onUpdate,
+  onDelete,
+}: {
+  restaurant: Restaurant;
+  dayCount: number;
+  onUpdate: (field: keyof Restaurant, value: string | number) => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="bg-surface border border-dashed border-border rounded-xl p-5 mb-3 hover:border-primary/30 transition-all">
+      {/* 이름 */}
+      <div className="mb-3">
+        <label className="text-xs text-text-tertiary block mb-1">이름</label>
+        <InlineInput
+          value={restaurant.name}
+          onChange={(v) => onUpdate('name', v)}
+          className="text-sm font-bold text-text-primary w-full"
+          placeholder="맛집 이름"
+        />
+      </div>
+
+      {/* 카테고리 + Day 번호 */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">카테고리</label>
+          <InlineInput
+            value={restaurant.category}
+            onChange={(v) => onUpdate('category', v)}
+            className="text-sm text-text-primary w-full"
+            placeholder="라멘, 스시 등"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">Day</label>
+          <select
+            value={restaurant.dayNumber}
+            onChange={(e) => onUpdate('dayNumber', Number(e.target.value))}
+            className="text-sm bg-bg-secondary border border-border rounded-md px-2 py-1 text-text-primary outline-none focus:border-primary w-full"
+          >
+            {Array.from({ length: dayCount }, (_, i) => i + 1).map((d) => (
+              <option key={d} value={d}>
+                Day {d}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* 설명 */}
+      <div className="mb-3">
+        <label className="text-xs text-text-tertiary block mb-1">설명</label>
+        <InlineInput
+          value={restaurant.description}
+          onChange={(v) => onUpdate('description', v)}
+          className="text-sm text-text-secondary w-full"
+          placeholder="맛집 설명"
+        />
+      </div>
+
+      {/* 평점 + 가격대 */}
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">평점 (0~5)</label>
+          <InlineInput
+            value={String(restaurant.rating)}
+            onChange={(v) => {
+              const num = parseFloat(v);
+              if (!isNaN(num) && num >= 0 && num <= 5) {
+                onUpdate('rating', num);
+              } else if (v === '') {
+                onUpdate('rating', 0);
+              }
+            }}
+            type="number"
+            className="text-sm text-text-primary w-full"
+            placeholder="4.5"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">가격대</label>
+          <InlineInput
+            value={restaurant.priceRange}
+            onChange={(v) => onUpdate('priceRange', v)}
+            className="text-sm text-text-primary w-full"
+            placeholder="~1,000엔"
+          />
+        </div>
+      </div>
+
+      {/* 삭제 버튼 */}
+      <div className="flex justify-end">
+        <button
+          onClick={onDelete}
+          className="flex items-center gap-1 text-xs text-error hover:bg-error/10 rounded-md px-2 py-1 transition-colors"
+          aria-label="맛집 삭제"
+        >
+          <Trash2 className="size-3.5" />
+          삭제
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // 패스 추천 상태별 색상 매핑
@@ -34,32 +175,99 @@ function getPassColor(recommendation: TransportPass['recommendation']) {
   }
 }
 
-export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
-  const restaurantCount = restaurants?.length ?? 0;
-  const budgetItems = budget?.items ?? [];
+export function GuideTab({ trip }: GuideTabProps) {
+  const restaurants = trip.restaurants ?? [];
+  const transport = trip.transport;
+  const budget = trip.budget;
+
+  const editingSection = useEditStore((s) => s.editingSection);
+  const updateEditingTrip = useEditStore((s) => s.updateEditingTrip);
+
+  const restaurantCount = restaurants.length;
   const budgetTotal = budget?.total;
   const routeCount = (transport?.intercityRoutes?.length ?? 0) + (transport?.homeToHotel?.length ?? 0);
 
+  const isRestaurantsEdit = editingSection === 'restaurants';
+  const dayCount = trip.days?.length ?? 1;
+
+  // 맛집 필드 업데이트
+  const handleRestaurantUpdate = (index: number, field: keyof Restaurant, value: string | number) => {
+    updateEditingTrip((t) => {
+      const newRestaurants = (t.restaurants ?? []).map((r, i) =>
+        i === index ? { ...r, [field]: value } : r,
+      );
+      return { ...t, restaurants: newRestaurants };
+    });
+  };
+
+  // 맛집 삭제
+  const handleRestaurantDelete = (index: number) => {
+    updateEditingTrip((t) => {
+      const newRestaurants = (t.restaurants ?? []).filter((_, i) => i !== index);
+      return { ...t, restaurants: newRestaurants };
+    });
+  };
+
+  // 맛집 추가
+  const handleRestaurantAdd = () => {
+    updateEditingTrip((t) => {
+      const newRestaurant: Restaurant = {
+        dayNumber: 1,
+        category: '',
+        name: '',
+        rating: 0,
+        description: '',
+        priceRange: '',
+      };
+      return { ...t, restaurants: [...(t.restaurants ?? []), newRestaurant] };
+    });
+  };
+
   return (
     <div className="animate-fade-up">
-      <Accordion type="multiple" defaultValue={['restaurants', 'transport', 'budget']}>
-        {/* 맛집 섹션 */}
-        <AccordionItem value="restaurants" className="border-b-0 mb-2">
-          <AccordionTrigger className="hover:no-underline px-1 py-3">
-            <div className="flex items-center gap-2.5">
-              <UtensilsCrossed className="size-4 text-text-secondary" />
-              <span className="text-lg font-semibold text-text-primary">맛집</span>
-              <span className="text-sm text-text-tertiary font-normal">
-                ({restaurantCount}곳)
-              </span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4">
-            <RestaurantSection restaurants={restaurants} />
-          </AccordionContent>
-        </AccordionItem>
+      {/* 맛집 섹션 — 편집 가능 */}
+      <SectionEditHeader
+        title="맛집"
+        icon={<UtensilsCrossed className="size-4" />}
+        section="restaurants"
+        trip={trip}
+        suffix={
+          restaurantCount > 0 ? (
+            <span className="text-sm font-normal text-text-secondary ml-2">
+              ({restaurantCount}곳)
+            </span>
+          ) : undefined
+        }
+      />
 
-        {/* 교통 섹션 */}
+      {isRestaurantsEdit ? (
+        // 편집 모드: 맛집 편집 카드
+        <>
+          {restaurants.map((restaurant, index) => (
+            <RestaurantEditCard
+              key={`restaurant-edit-${index}`}
+              restaurant={restaurant}
+              dayCount={dayCount}
+              onUpdate={(field, value) => handleRestaurantUpdate(index, field, value)}
+              onDelete={() => handleRestaurantDelete(index)}
+            />
+          ))}
+          {/* 맛집 추가 버튼 */}
+          <button
+            onClick={handleRestaurantAdd}
+            className="w-full flex items-center justify-center gap-2 px-5 py-4 rounded-xl border border-dashed border-primary/30 bg-primary-50/30 text-sm text-primary hover:bg-primary-50 transition-colors mb-3"
+          >
+            <Plus className="size-4" />
+            맛집 추가
+          </button>
+        </>
+      ) : (
+        // 읽기 모드: 기존 맛집 표시
+        <RestaurantSection restaurants={restaurants} />
+      )}
+
+      {/* 교통 섹션 — 읽기 전용 (Phase 4에서 편집 추가) */}
+      <Accordion type="multiple" defaultValue={['transport', 'budget']}>
         <AccordionItem value="transport" className="border-b-0 mb-2">
           <AccordionTrigger className="hover:no-underline px-1 py-3">
             <div className="flex items-center gap-2.5">
@@ -99,7 +307,7 @@ export function GuideTab({ restaurants, transport, budget }: GuideTabProps) {
   );
 }
 
-// --- 맛집 서브 섹션 ---
+// --- 맛집 서브 섹션 (읽기 모드) ---
 function RestaurantSection({ restaurants }: { restaurants: Restaurant[] }) {
   if (!restaurants || restaurants.length === 0) {
     return (

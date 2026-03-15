@@ -49,8 +49,8 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
       }} />
       <div className="max-w-[1100px] mx-auto px-5 py-8">
         {activeTab === 'summary' && <SummaryTab trip={displayTrip} />}
-        {activeTab === 'schedule' && <ScheduleTab days={displayTrip.days} />}
-        {activeTab === 'guide' && <GuideTab restaurants={displayTrip.restaurants} transport={displayTrip.transport} budget={displayTrip.budget} />}
+        {activeTab === 'schedule' && <ScheduleTab trip={displayTrip} />}
+        {activeTab === 'guide' && <GuideTab trip={displayTrip} />}
         {activeTab === 'checklist' && <ChecklistTab trip={displayTrip} />}
       </div>
     </div>
