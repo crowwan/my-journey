@@ -59,10 +59,16 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
     }
   }, [messages, isLoading]);
 
-  // 메시지 전송 (편집 모드일 때 tripContext 포함)
+  // 메시지 전송
+  // - edit 모드 + tripContext → 기존 여행 수정
+  // - generatedTrip이 있으면 → 자동으로 edit 모드 전환 (생성 후 수정 요청)
+  // - 그 외 → 일반 대화
   const handleSend = (text: string) => {
     if (mode === 'edit' && tripContext) {
       sendMessage(text, 'edit', tripContext);
+    } else if (generatedTrip) {
+      // 생성 완료 후 추가 메시지 → 자동 edit 모드로 전환
+      sendMessage(text, 'edit', generatedTrip);
     } else {
       sendMessage(text, mode === 'edit' ? 'edit' : 'chat');
     }
@@ -87,6 +93,14 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
   const handleCreateTrip = () => {
     sendMessage('여행 계획을 생성해줘', 'create');
   };
+
+  // tripPreview가 있는 마지막 메시지 ID를 찾아 최신 프리뷰만 저장 가능하도록 함
+  const lastPreviewMessageId = (() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].tripPreview) return messages[i].id;
+    }
+    return null;
+  })();
 
   const isEmpty = messages.length === 0;
   const hasMessages = messages.length > 0;
@@ -179,7 +193,11 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
           // 메시지 목록
           <div className="max-w-[1100px] mx-auto space-y-1">
             {messages.map((msg) => (
-              <ChatMessage key={msg.id} message={msg} />
+              <ChatMessage
+                key={msg.id}
+                message={msg}
+                isLatestPreview={!msg.tripPreview || msg.id === lastPreviewMessageId}
+              />
             ))}
             {isLoading && <TypingIndicator />}
           </div>

@@ -5,7 +5,7 @@
 // ============================================================
 
 import { GoogleGenAI } from '@google/genai';
-import type { Trip, TripAction, TripActionType, ChatMessage } from '@/types/trip';
+import type { Trip, ChatMessage } from '@/types/trip';
 
 // -- SDK 초기화 (lazy) --------------------------------------------
 // Vercel 빌드 시 환경변수 없이도 모듈 로드가 가능하도록 지연 초기화
@@ -156,34 +156,38 @@ Day 1: "#f97316", Day 2: "#6366f1", Day 3: "#10b981", Day 4: "#a78bfa", Day 5: "
 ⚠️ 중요: days 배열의 각 항목에 dayNumber(1,2,3...), color(hex), mapSpots(위경도 배열)는 반드시 포함해야 합니다.`;
 }
 
-const EDIT_TRIP_PROMPT = `당신은 여행 플래너 AI입니다.
-사용자의 수정 요청을 분석하여 기존 여행 계획을 업데이트합니다.
+// edit 모드: 수정 요청을 반영한 전체 Trip JSON을 반환 (replace_trip 방식)
+// create와 동일한 응답 스키마를 사용하여 복잡한 부분 merge 로직을 회피
+function getEditTripPrompt(tripJson: string): string {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  return `당신은 전문 여행 플래너 AI입니다.
+사용자의 수정 요청을 반영하여 기존 여행 계획을 업데이트합니다.
+
+## 오늘 날짜
+${todayStr}
 
 ## 현재 여행 데이터
-{TRIP_JSON}
+${tripJson}
 
 ## 수정 규칙
-1. 변경 최소화: 요청된 부분만 수정
-2. 일관성 유지: 시간 변경 시 이후 일정도 조정, 맛집 변경 시 restaurants도 동기화
-3. action 타입:
-   - "update_item": 단일 타임라인 항목 수정
-   - "update_day": 하루 전체 변경
-   - "add_item": 항목 추가
-   - "remove_item": 항목 삭제
-   - "update_restaurant": 맛집 목록 변경
-   - "update_budget": 예산 변경
-   - "update_overview": 개요 변경
-   - "update_transport": 교통 변경
-   - "replace_trip": 대규모 변경
+1. **변경 요청된 부분만 수정**하고, 나머지는 기존과 100% 동일하게 유지
+2. 시간 변경 시 이후 일정도 자연스럽게 조정
+3. 맛집 변경 시 restaurants 배열도 동기화
+4. 일정 추가/삭제 시 mapSpots도 동기화
+5. 구조, 포맷, 필드명은 기존 데이터와 동일하게 유지
 
-## 응답 형식
+## 중요
+- 수정하지 않은 부분은 **절대** 임의로 변경하지 마세요
+- 전체 Trip JSON을 create와 동일한 형식으로 반환합니다
+- 추가 텍스트 없이 JSON만 반환합니다
+
+## 응답 JSON 스키마 (create와 동일)
 {
-  "message": "변경 내용 설명",
-  "action": "update_item",
-  "dayNumber": 1,
-  "itemIndex": 5,
-  "data": { ... 해당 부분 데이터 }
+  "message": "string - 수정 내용 설명 (어떤 부분이 변경되었는지)",
+  "trip": { ... 수정이 반영된 전체 Trip 객체 (기존과 동일한 구조) }
 }`;
+}
 
 const CHAT_SYSTEM_PROMPT =
   '당신은 친절한 여행 플래너 AI입니다. 사용자와 자연스럽게 대화하며 여행 계획을 도와주세요. 목적지, 기간, 인원, 예산, 취향 등을 자연스럽게 물어보세요. 충분한 정보가 모이면 "여행 계획을 만들어볼까요?"라고 제안하세요. 한국어로 대화합니다.';
@@ -194,13 +198,7 @@ interface GeminiCreateResponseDTO {
   trip: Record<string, unknown>;
 }
 
-interface GeminiEditResponseDTO {
-  message: string;
-  action: string;
-  dayNumber?: number;
-  itemIndex?: number;
-  data?: unknown;
-}
+// edit 응답도 create와 동일한 DTO 사용 (replace_trip 방식)
 
 // -- Day 색상 순환 팔레트 ------------------------------------------
 const DAY_COLORS = ['#f97316', '#6366f1', '#10b981', '#a78bfa', '#f472b6'];
@@ -306,15 +304,8 @@ function toTrip(dto: Record<string, unknown>, id?: string): Trip {
   };
 }
 
-function toTripAction(dto: GeminiEditResponseDTO): TripAction {
-  return {
-    action: dto.action as TripActionType,
-    message: dto.message ?? '',
-    dayNumber: dto.dayNumber,
-    itemIndex: dto.itemIndex,
-    data: dto.data,
-  };
-}
+// toTripAction은 replace_trip 방식 전환으로 더 이상 사용하지 않음
+// TripAction 타입은 향후 부분 업데이트 최적화 시 재활용 가능하므로 유지
 
 // -- ChatMessage -> Gemini Contents 변환 -------------------------
 function toGeminiContents(messages: ChatMessage[]) {
@@ -332,9 +323,10 @@ export interface CreateTripResult {
   trip: Trip;
 }
 
+// edit 결과도 create와 동일한 형태 (replace_trip 방식)
 export interface EditTripResult {
   message: string;
-  action: TripAction;
+  trip: Trip;
 }
 
 export const geminiApi = {
@@ -362,10 +354,10 @@ export const geminiApi = {
     };
   },
 
-  // 기존 여행 수정
+  // 기존 여행 수정 (replace_trip 방식: 수정된 전체 Trip JSON 반환)
   editTrip: async (messages: ChatMessage[], currentTrip: Trip): Promise<EditTripResult> => {
     const model = getModel();
-    const systemPrompt = EDIT_TRIP_PROMPT.replace('{TRIP_JSON}', JSON.stringify(currentTrip));
+    const systemPrompt = getEditTripPrompt(JSON.stringify(currentTrip));
     const contents = toGeminiContents(messages);
 
     const response = await getAI().models.generateContent({
@@ -379,11 +371,15 @@ export const geminiApi = {
     });
 
     const text = response.text ?? '{}';
-    const parsed: GeminiEditResponseDTO = JSON.parse(text);
+    const parsed: GeminiCreateResponseDTO = JSON.parse(text);
 
     return {
       message: parsed.message ?? '수정을 완료했습니다.',
-      action: toTripAction(parsed),
+      // 기존 Trip의 ID와 생성일을 유지하여 덮어쓰기 저장 가능
+      trip: {
+        ...toTrip(parsed.trip ?? {}, currentTrip.id),
+        createdAt: currentTrip.createdAt,
+      },
     };
   },
 

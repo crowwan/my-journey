@@ -55,18 +55,28 @@
 
 ## Phase 3: 생성 결과 대화 내 수정
 
-- [ ] 3.1 생성 완료 후에도 ChatInput 활성 유지
-  - showCreateButton 로직 수정 (generatedTrip이 있어도 입력 가능)
-- [ ] 3.2 생성 후 메시지 전송 시 자동 edit 모드 전환
-  - generatedTrip이 있으면 mode를 'edit'으로, tripContext를 generatedTrip으로 설정
-- [ ] 3.3 Gemini edit 프롬프트 수정
-  - replace_trip 방식: 수정된 전체 Trip JSON 반환
-  - "변경 요청된 부분만 수정, 나머지 유지" 강조
-- [ ] 3.4 API route: edit 응답에서 trip 필드로 전체 Trip 반환
-  - 기존 action 필드 대신 trip 필드 사용
-- [ ] 3.5 수정 결과 → 새 TripPreviewCard 표시
-  - 이전 TripPreviewCard의 저장 버튼 비활성화 (최신만 저장 가능)
-- [ ] 3.6 빌드 + 린트 확인
+- [x] 3.1 생성 완료 후에도 ChatInput 활성 유지 [2026-03-15]
+  - ChatInput은 이미 항상 활성 상태 (별도 비활성화 로직 없음)
+  - showCreateButton은 generatedTrip이 있으면 이미 숨김 → 수정 불필요
+- [x] 3.2 생성 후 메시지 전송 시 자동 edit 모드 전환 [2026-03-15]
+  - ChatContainer.handleSend: generatedTrip이 있으면 sendMessage(text, 'edit', generatedTrip) 호출
+- [x] 3.3 Gemini edit 프롬프트 수정 [2026-03-15]
+  - EDIT_TRIP_PROMPT → getEditTripPrompt() 함수로 변경 (오늘 날짜 포함)
+  - replace_trip 방식: 수정된 전체 Trip JSON 반환 (create와 동일한 스키마)
+  - "변경 요청된 부분만 수정, 나머지 100% 동일 유지" 강조
+  - editTrip 반환 타입: EditTripResult { message, trip } (기존 action 대신)
+  - 기존 Trip ID + createdAt 유지
+- [x] 3.4 API route: edit 응답에서 trip 필드로 전체 Trip 반환 [2026-03-15]
+  - editTrip 반환 타입 변경으로 자동 적용 (route.ts spread 패턴)
+  - useChatStore ChatApiResponse에서 action 필드 제거
+- [x] 3.5 수정 결과 → 새 TripPreviewCard 표시 [2026-03-15]
+  - TripPreviewCard에 isLatest prop 추가 (기본값 true)
+  - isLatest=false → "이전 버전" 비활성 버튼 표시
+  - ChatMessage에 isLatestPreview prop 전달
+  - ChatContainer에서 lastPreviewMessageId 계산 → 마지막 tripPreview만 저장 가능
+- [x] 3.6 빌드 + 린트 확인 [2026-03-15]
+  - lint: 0 errors (기존 warning 1개 유지)
+  - build: 성공
 - [ ] 3.7 생성 → 수정 → 재수정 → 저장 E2E 수동 테스트
 
 ---

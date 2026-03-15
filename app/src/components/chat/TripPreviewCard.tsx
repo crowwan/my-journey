@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 
 interface TripPreviewCardProps {
   trip: Trip;
+  // 여러 개의 TripPreviewCard가 있을 때, 마지막(최신) 것만 저장 가능
+  isLatest?: boolean;
 }
 
 // 날짜 범위를 읽기 좋은 형식으로 변환
@@ -21,7 +23,7 @@ function formatDateRange(startDate: string, endDate: string): string {
   return `${fmt(start)} ~ ${fmt(end)}`;
 }
 
-export function TripPreviewCard({ trip }: TripPreviewCardProps) {
+export function TripPreviewCard({ trip, isLatest = true }: TripPreviewCardProps) {
   const router = useRouter();
   const saveTrip = useTripStore((s) => s.saveTrip);
   const closeAIDrawer = useUIStore((s) => s.closeAIDrawer);
@@ -59,13 +61,22 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
           </div>
         )}
 
-        {/* 저장 버튼 */}
-        <Button
-          onClick={handleSave}
-          className="w-full rounded-xl bg-primary text-white hover:bg-primary-600 shadow-sm hover:shadow-md"
-        >
-          여행 저장하기
-        </Button>
+        {/* 저장 버튼 — 최신 프리뷰에서만 활성화 */}
+        {isLatest ? (
+          <Button
+            onClick={handleSave}
+            className="w-full rounded-xl bg-primary text-white hover:bg-primary-600 shadow-sm hover:shadow-md"
+          >
+            여행 저장하기
+          </Button>
+        ) : (
+          <Button
+            disabled
+            className="w-full rounded-xl opacity-50 cursor-not-allowed"
+          >
+            이전 버전
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

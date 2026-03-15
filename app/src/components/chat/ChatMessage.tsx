@@ -5,6 +5,8 @@ import { TripPreviewCard } from './TripPreviewCard';
 
 interface ChatMessageProps {
   message: ChatMessageType;
+  // tripPreview가 있는 메시지 중 마지막(최신)인지 여부
+  isLatestPreview?: boolean;
 }
 
 // 타임스탬프를 HH:MM 형식으로 변환
@@ -69,7 +71,7 @@ function parseMarkdown(text: string): React.ReactNode[] {
   });
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, isLatestPreview = true }: ChatMessageProps) {
   const { role, content, timestamp, tripPreview } = message;
 
   // 시스템/에러 메시지
@@ -102,7 +104,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         {/* 여행 프리뷰 카드 */}
         {tripPreview && (
           <div className="mt-2">
-            <TripPreviewCard trip={tripPreview} />
+            <TripPreviewCard trip={tripPreview} isLatest={isLatestPreview} />
           </div>
         )}
 

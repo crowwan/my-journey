@@ -7,14 +7,14 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { ChatMessage, Trip, TripAction } from '@/types/trip';
+import type { ChatMessage, Trip } from '@/types/trip';
 
 // -- API 응답 타입 -----------------------------------------------
+// edit 모드도 create와 동일하게 trip 필드를 반환 (replace_trip 방식)
 interface ChatApiResponse {
   success: boolean;
   message?: string;
   trip?: Trip;
-  action?: TripAction;
   error?: string;
 }
 
@@ -86,7 +86,6 @@ export const useChatStore = create<ChatState>()(
             content: data.message ?? '',
             timestamp: Date.now(),
             tripPreview: data.trip,
-            tripAction: data.action,
           };
 
           set((state) => ({
