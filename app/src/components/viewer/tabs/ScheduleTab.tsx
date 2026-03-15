@@ -77,44 +77,20 @@ function TimelineEditRow({
         borderColor,
       )}
     >
-      <div className="flex items-start gap-3">
-        {/* 시간 */}
+      {/* 1행: 시간 + 제목 */}
+      <div className="flex items-center gap-2 mb-2">
         <InlineInput
           value={item.time}
           onChange={(v) => onUpdate('time', v)}
-          className="text-xs font-semibold text-primary w-16 shrink-0"
+          className="text-xs font-semibold text-primary w-14 shrink-0"
           placeholder="09:00"
         />
-
-        {/* 제목 + 설명 */}
-        <div className="flex-1 min-w-0">
-          <InlineInput
-            value={item.title}
-            onChange={(v) => onUpdate('title', v)}
-            className="text-sm font-semibold text-text-primary w-full mb-1"
-            placeholder="제목"
-          />
-          <InlineInput
-            value={item.description ?? ''}
-            onChange={(v) => onUpdate('description', v)}
-            className="text-sm text-text-secondary w-full"
-            placeholder="설명 (선택사항)"
-          />
-        </div>
-
-        {/* 타입 드롭다운 */}
-        <CustomSelect
-          value={item.type}
-          onChange={(v) => onUpdate('type', v)}
-          size="sm"
-          options={TIMELINE_TYPE_OPTIONS.map((opt) => ({
-            value: opt.value,
-            label: opt.label,
-          }))}
-          className="shrink-0 w-20"
+        <InlineInput
+          value={item.title}
+          onChange={(v) => onUpdate('title', v)}
+          className="text-sm font-semibold text-text-primary flex-1 min-w-0"
+          placeholder="제목"
         />
-
-        {/* 삭제 버튼 */}
         <button
           onClick={onDelete}
           className="p-1.5 text-text-tertiary hover:text-error hover:bg-error/10 rounded-md transition-colors shrink-0"
@@ -124,42 +100,34 @@ function TimelineEditRow({
         </button>
       </div>
 
-      {/* 뱃지 + 비용 (선택적) */}
-      <div className="flex items-center gap-3 mt-2 ml-[4.75rem]">
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-text-tertiary">뱃지:</span>
-          <InlineInput
-            value={item.badge ?? ''}
-            onChange={(v) => onUpdate('badge', v)}
-            className="text-xs text-text-secondary w-24"
-            placeholder="없음"
-          />
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-text-tertiary">비용:</span>
-          <InlineInput
-            value={item.cost !== undefined ? String(item.cost) : ''}
-            onChange={(v) => onUpdate('cost', v)}
-            className="text-xs text-text-secondary w-16"
-            placeholder="0"
-          />
-          <CustomSelect
-            value={item.currency ?? 'KRW'}
-            onChange={(v) => onUpdate('currency', v)}
-            size="sm"
-            options={[
-              { value: 'KRW', label: 'KRW' },
-              { value: 'JPY', label: 'JPY' },
-              { value: 'USD', label: 'USD' },
-              { value: 'EUR', label: 'EUR' },
-              { value: 'THB', label: 'THB' },
-              { value: 'CNY', label: 'CNY' },
-              { value: 'TWD', label: 'TWD' },
-              { value: 'VND', label: 'VND' },
-            ]}
-            className="w-16"
-          />
-        </div>
+      {/* 2행: 설명 */}
+      <div className="mb-2">
+        <InlineInput
+          value={item.description ?? ''}
+          onChange={(v) => onUpdate('description', v)}
+          className="text-sm text-text-secondary w-full"
+          placeholder="설명 (선택사항)"
+        />
+      </div>
+
+      {/* 3행: 타입 + 뱃지 */}
+      <div className="flex flex-wrap items-center gap-2">
+        <CustomSelect
+          value={item.type}
+          onChange={(v) => onUpdate('type', v)}
+          size="sm"
+          options={TIMELINE_TYPE_OPTIONS.map((opt) => ({
+            value: opt.value,
+            label: opt.label,
+          }))}
+          className="w-20"
+        />
+        <InlineInput
+          value={item.badge ?? ''}
+          onChange={(v) => onUpdate('badge', v)}
+          className="text-xs text-text-secondary w-20"
+          placeholder="뱃지"
+        />
       </div>
     </div>
   );

@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Share2, ChevronLeft, Pencil } from 'lucide-react';
 import type { Trip } from '@/types/trip';
 import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/lib/trip-utils';
-import { shareTrip } from '@/lib/share-utils';
 import { useUIStore } from '@/stores/useUIStore';
 import { useChatStore } from '@/stores/useChatStore';
 import { useEditStore } from '@/stores/useEditStore';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { ShareModal } from './ShareModal';
 import { cn } from '@/lib/utils';
 
 interface HeroSectionProps {
@@ -31,16 +31,12 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
   // 섹션 편집 중이면 AI 수정 비활성화
   const isSectionEditing = editingSection !== null;
 
-  // 클립보드 복사 토스트 메시지 상태
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // 공유 모달 상태
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
-  // 공유 버튼 핸들러
-  const handleShare = async () => {
-    const result = await shareTrip(trip);
-    if (result.method === 'clipboard') {
-      setToastMessage('링크가 복사되었습니다');
-      setTimeout(() => setToastMessage(null), 2000);
-    }
+  // 공유 버튼 핸들러 — 모달 열기
+  const handleShare = () => {
+    setShareModalOpen(true);
   };
 
   // AI로 수정 버튼 핸들러
@@ -152,12 +148,12 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
         </button>
       </div>
 
-      {/* 클립보드 복사 토스트 */}
-      {toastMessage && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-text-primary text-white text-sm px-4 py-2 rounded-full shadow-lg z-[100]">
-          {toastMessage}
-        </div>
-      )}
+      {/* 공유 모달 */}
+      <ShareModal
+        trip={trip}
+        open={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+      />
     </div>
   );
 }

@@ -112,7 +112,7 @@ export interface TransportSection {
   intercityRoutes: TransportRoute[];
   passes: TransportPass[];
   passVerdict: string;
-  icocaGuide: string[];
+  icocaGuide?: string[];
   tips: string[];
 }
 

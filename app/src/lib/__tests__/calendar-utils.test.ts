@@ -60,7 +60,7 @@ describe('getCalendarBars', () => {
     overview: { flights: [], accommodation: { name: '', address: '', area: '', nearbyStations: [] }, weather: [], tips: [] },
     days: color ? [{ dayNumber: 1, date: startDate, title: '', subtitle: '', color, items: [], mapSpots: [] }] : [],
     restaurants: [],
-    transport: { homeToHotel: [], intercityRoutes: [], passes: [], passVerdict: '', icocaGuide: [], tips: [] },
+    transport: { homeToHotel: [], intercityRoutes: [], passes: [], passVerdict: '', tips: [] },
     budget: { items: [], total: { min: '', max: '', minKRW: '', maxKRW: '' }, tips: [] },
     packing: [],
     preTodos: [],

@@ -24,6 +24,7 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('summary');
   const editingSection = useEditStore((s) => s.editingSection);
   const editingTrip = useEditStore((s) => s.editingTrip);
+  const cancelSectionEdit = useEditStore((s) => s.cancelSectionEdit);
 
   // 편집 중인 섹션이 있으면 editingTrip 사용, 아닐 때는 원본 trip 사용
   const displayTrip = editingSection && editingTrip ? editingTrip : trip;
@@ -44,6 +45,7 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
     <div>
       <HeroSection trip={displayTrip} packingProgress={packingProgress} />
       <TabBar activeTab={activeTab} onChange={(tab) => {
+        if (editingSection) cancelSectionEdit();
         setActiveTab(tab);
         scrollToTop();
       }} />

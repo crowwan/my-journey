@@ -155,7 +155,6 @@ Day 1: "#f97316", Day 2: "#6366f1", Day 3: "#10b981", Day 4: "#a78bfa", Day 5: "
       "intercityRoutes": [{"from": "string", "to": "string", "method": "string", "duration": "string", "cost": "string"}],
       "passes": [{"name": "string", "price": "string", "recommendation": "recommended|neutral|not-recommended", "reason": "string"}],
       "passVerdict": "string",
-      "icocaGuide": ["string"],
       "tips": ["string"]
     },
     "budget": {
@@ -289,7 +288,6 @@ function normalizeTransport(raw: unknown): Trip['transport'] {
     intercityRoutes: Array.isArray(t.intercityRoutes) ? t.intercityRoutes as Trip['transport']['intercityRoutes'] : [],
     passes: Array.isArray(t.passes) ? t.passes as Trip['transport']['passes'] : [],
     passVerdict: typeof t.passVerdict === 'string' ? t.passVerdict : '',
-    icocaGuide: Array.isArray(t.icocaGuide) ? t.icocaGuide as string[] : [],
     tips: Array.isArray(t.tips) ? t.tips as string[] : [],
   };
 }

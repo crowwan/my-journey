@@ -264,34 +264,16 @@ function BudgetEditCard({
         />
       </div>
 
-      {/* 금액 + 비율 */}
-      <div className="grid grid-cols-2 gap-3 mb-3">
-        <div>
-          <label className="text-xs text-text-tertiary block mb-1">금액</label>
-          <InlineInput
-            value={item.amount}
-            onChange={(v) => onUpdate('amount', v)}
-            className="text-sm text-primary font-bold w-full"
-            placeholder="¥3,000"
-          />
-        </div>
-        <div>
-          <label className="text-xs text-text-tertiary block mb-1">비율 (%)</label>
-          <InlineInput
-            value={String(item.percentage)}
-            onChange={(v) => {
-              const num = parseFloat(v);
-              if (!isNaN(num) && num >= 0 && num <= 100) {
-                onUpdate('percentage', num);
-              } else if (v === '') {
-                onUpdate('percentage', 0);
-              }
-            }}
-            type="number"
-            className="text-sm text-text-primary w-full"
-            placeholder="30"
-          />
-        </div>
+      {/* 금액 */}
+      <div className="mb-3">
+        <label className="text-xs text-text-tertiary block mb-1">금액</label>
+        <InlineInput
+          value={item.amount}
+          onChange={(v) => onUpdate('amount', v)}
+          className="text-sm text-primary font-bold w-full"
+          placeholder="¥3,000"
+        />
+        <span className="text-[10px] text-text-tertiary mt-0.5 block">비율 {item.percentage}% (자동 계산)</span>
       </div>
 
       {/* 삭제 버튼 */}
@@ -514,51 +496,6 @@ function PassEditCard({
   );
 }
 
-// ============================================================
-// 팁 편집 리스트 (공용: 예산/교통 팁)
-// ============================================================
-function TipsEditList({
-  tips,
-  onUpdate,
-  onDelete,
-  onAdd,
-}: {
-  tips: string[];
-  onUpdate: (index: number, value: string) => void;
-  onDelete: (index: number) => void;
-  onAdd: () => void;
-}) {
-  return (
-    <div className="mb-3">
-      {tips.map((tip, idx) => (
-        <div key={idx} className="flex items-center gap-2 mb-2">
-          <span className="text-xs text-text-tertiary shrink-0 w-5 text-center">{idx + 1}</span>
-          <InlineInput
-            value={tip}
-            onChange={(v) => onUpdate(idx, v)}
-            className="text-sm text-text-secondary flex-1"
-            placeholder="팁 내용"
-          />
-          <button
-            onClick={() => onDelete(idx)}
-            className="text-error hover:bg-error/10 rounded-md p-1 transition-colors shrink-0"
-            aria-label="팁 삭제"
-          >
-            <Trash2 className="size-3.5" />
-          </button>
-        </div>
-      ))}
-      <button
-        onClick={onAdd}
-        className="flex items-center gap-1 text-xs text-primary hover:bg-primary-50 rounded-md px-2 py-1 transition-colors"
-      >
-        <Plus className="size-3.5" />
-        팁 추가
-      </button>
-    </div>
-  );
-}
-
 // 패스 추천 상태별 색상 매핑
 function getPassColor(recommendation: TransportPass['recommendation']) {
   switch (recommendation) {
@@ -626,28 +563,6 @@ export function GuideTab({ trip }: GuideTabProps) {
         ...t.budget,
         total: { ...(t.budget?.total ?? { min: '', max: '', minKRW: '', maxKRW: '' }), [field]: value },
       },
-    }));
-  };
-
-  const handleBudgetTipUpdate = (index: number, value: string) => {
-    updateEditingTrip((t) => {
-      const newTips = [...(t.budget?.tips ?? [])];
-      newTips[index] = value;
-      return { ...t, budget: { ...t.budget, tips: newTips } };
-    });
-  };
-
-  const handleBudgetTipDelete = (index: number) => {
-    updateEditingTrip((t) => ({
-      ...t,
-      budget: { ...t.budget, tips: (t.budget?.tips ?? []).filter((_, i) => i !== index) },
-    }));
-  };
-
-  const handleBudgetTipAdd = () => {
-    updateEditingTrip((t) => ({
-      ...t,
-      budget: { ...t.budget, tips: [...(t.budget?.tips ?? []), ''] },
     }));
   };
 
@@ -721,56 +636,6 @@ export function GuideTab({ trip }: GuideTabProps) {
     });
   };
 
-  const handleTransportTipUpdate = (index: number, value: string) => {
-    updateEditingTrip((t) => {
-      const newTips = [...(t.transport?.tips ?? [])];
-      newTips[index] = value;
-      return { ...t, transport: { ...t.transport, tips: newTips } };
-    });
-  };
-
-  const handleTransportTipDelete = (index: number) => {
-    updateEditingTrip((t) => ({
-      ...t,
-      transport: { ...t.transport, tips: (t.transport?.tips ?? []).filter((_, i) => i !== index) },
-    }));
-  };
-
-  const handleTransportTipAdd = () => {
-    updateEditingTrip((t) => ({
-      ...t,
-      transport: { ...t.transport, tips: [...(t.transport?.tips ?? []), ''] },
-    }));
-  };
-
-  const handlePassVerdictUpdate = (value: string) => {
-    updateEditingTrip((t) => ({
-      ...t,
-      transport: { ...t.transport, passVerdict: value },
-    }));
-  };
-
-  const handleIcocaGuideUpdate = (index: number, value: string) => {
-    updateEditingTrip((t) => {
-      const newGuide = [...(t.transport?.icocaGuide ?? [])];
-      newGuide[index] = value;
-      return { ...t, transport: { ...t.transport, icocaGuide: newGuide } };
-    });
-  };
-
-  const handleIcocaGuideDelete = (index: number) => {
-    updateEditingTrip((t) => ({
-      ...t,
-      transport: { ...t.transport, icocaGuide: (t.transport?.icocaGuide ?? []).filter((_, i) => i !== index) },
-    }));
-  };
-
-  const handleIcocaGuideAdd = () => {
-    updateEditingTrip((t) => ({
-      ...t,
-      transport: { ...t.transport, icocaGuide: [...(t.transport?.icocaGuide ?? []), ''] },
-    }));
-  };
 
   // 맛집 필드 업데이트
   const handleRestaurantUpdate = (index: number, field: keyof Restaurant, value: string | number) => {
@@ -875,13 +740,6 @@ export function GuideTab({ trip }: GuideTabProps) {
           onPassUpdate={handlePassUpdate}
           onPassDelete={handlePassDelete}
           onPassAdd={handlePassAdd}
-          onPassVerdictUpdate={handlePassVerdictUpdate}
-          onIcocaUpdate={handleIcocaGuideUpdate}
-          onIcocaDelete={handleIcocaGuideDelete}
-          onIcocaAdd={handleIcocaGuideAdd}
-          onTipUpdate={handleTransportTipUpdate}
-          onTipDelete={handleTransportTipDelete}
-          onTipAdd={handleTransportTipAdd}
         />
       ) : (
         <TransportSection_ transport={transport} />
@@ -909,9 +767,6 @@ export function GuideTab({ trip }: GuideTabProps) {
           onItemDelete={handleBudgetItemDelete}
           onItemAdd={handleBudgetItemAdd}
           onTotalUpdate={handleBudgetTotalUpdate}
-          onTipUpdate={handleBudgetTipUpdate}
-          onTipDelete={handleBudgetTipDelete}
-          onTipAdd={handleBudgetTipAdd}
         />
       ) : (
         <BudgetSection_ budget={budget} />
@@ -1000,7 +855,6 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
   const homeToHotel = transport?.homeToHotel ?? [];
   const intercityRoutes = transport?.intercityRoutes ?? [];
   const passes = transport?.passes ?? [];
-  const icocaGuide = transport?.icocaGuide ?? [];
   const tips = transport?.tips ?? [];
 
   if (homeToHotel.length === 0 && intercityRoutes.length === 0 && passes.length === 0) {
@@ -1108,27 +962,6 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
         </>
       )}
 
-      {/* ICOCA 가이드 */}
-      {icocaGuide.length > 0 && (
-        <>
-          <SectionTitle icon={<CreditCard className="size-4" />}>
-            ICOCA 가이드
-          </SectionTitle>
-          <div className="bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm">
-            <ul className="space-y-2">
-              {icocaGuide.map((guide, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm">
-                  <span className="w-5 h-5 rounded-full bg-cat-activity/15 text-cat-activity text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                    {idx + 1}
-                  </span>
-                  <span className="text-text-secondary">{guide}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      )}
-
       {/* 교통 팁 */}
       <TipsAccordion tips={tips} title="교통 팁" />
     </div>
@@ -1147,13 +980,6 @@ function TransportEditSection({
   onPassUpdate,
   onPassDelete,
   onPassAdd,
-  onPassVerdictUpdate,
-  onIcocaUpdate,
-  onIcocaDelete,
-  onIcocaAdd,
-  onTipUpdate,
-  onTipDelete,
-  onTipAdd,
 }: {
   transport: TransportSection;
   onStepUpdate: (index: number, field: keyof TransportStep, value: string) => void;
@@ -1165,19 +991,10 @@ function TransportEditSection({
   onPassUpdate: (index: number, field: keyof TransportPass, value: string) => void;
   onPassDelete: (index: number) => void;
   onPassAdd: () => void;
-  onPassVerdictUpdate: (value: string) => void;
-  onIcocaUpdate: (index: number, value: string) => void;
-  onIcocaDelete: (index: number) => void;
-  onIcocaAdd: () => void;
-  onTipUpdate: (index: number, value: string) => void;
-  onTipDelete: (index: number) => void;
-  onTipAdd: () => void;
 }) {
   const homeToHotel = transport?.homeToHotel ?? [];
   const intercityRoutes = transport?.intercityRoutes ?? [];
   const passes = transport?.passes ?? [];
-  const icocaGuide = transport?.icocaGuide ?? [];
-  const tips = transport?.tips ?? [];
 
   return (
     <div>
@@ -1241,38 +1058,6 @@ function TransportEditSection({
         패스 추가
       </button>
 
-      {/* 패스 결론 */}
-      <div className="mb-4">
-        <label className="text-xs text-text-tertiary block mb-1">패스 결론</label>
-        <InlineInput
-          value={transport?.passVerdict ?? ''}
-          onChange={onPassVerdictUpdate}
-          className="text-sm text-text-secondary w-full"
-          placeholder="패스 종합 의견"
-        />
-      </div>
-
-      {/* ICOCA 가이드 편집 */}
-      <SectionTitle icon={<CreditCard className="size-4" />}>
-        ICOCA 가이드
-      </SectionTitle>
-      <TipsEditList
-        tips={icocaGuide}
-        onUpdate={onIcocaUpdate}
-        onDelete={onIcocaDelete}
-        onAdd={onIcocaAdd}
-      />
-
-      {/* 교통 팁 편집 */}
-      <SectionTitle icon={<Train className="size-4" />}>
-        교통 팁
-      </SectionTitle>
-      <TipsEditList
-        tips={tips}
-        onUpdate={onTipUpdate}
-        onDelete={onTipDelete}
-        onAdd={onTipAdd}
-      />
     </div>
   );
 }
@@ -1284,22 +1069,15 @@ function BudgetEditSection({
   onItemDelete,
   onItemAdd,
   onTotalUpdate,
-  onTipUpdate,
-  onTipDelete,
-  onTipAdd,
 }: {
   budget: BudgetSection;
   onItemUpdate: (index: number, field: keyof BudgetItem, value: string | number) => void;
   onItemDelete: (index: number) => void;
   onItemAdd: () => void;
   onTotalUpdate: (field: string, value: string) => void;
-  onTipUpdate: (index: number, value: string) => void;
-  onTipDelete: (index: number) => void;
-  onTipAdd: () => void;
 }) {
   const items = budget?.items ?? [];
   const total = budget?.total ?? { min: '', max: '', minKRW: '', maxKRW: '' };
-  const tips = budget?.tips ?? [];
 
   return (
     <div>
@@ -1371,16 +1149,6 @@ function BudgetEditSection({
         </div>
       </div>
 
-      {/* 예산 팁 편집 */}
-      <SectionTitle icon={<Wallet className="size-4" />}>
-        예산 팁
-      </SectionTitle>
-      <TipsEditList
-        tips={tips}
-        onUpdate={onTipUpdate}
-        onDelete={onTipDelete}
-        onAdd={onTipAdd}
-      />
     </div>
   );
 }
@@ -1422,11 +1190,11 @@ function BudgetSection_({ budget }: { budget: BudgetSection }) {
                 <div className="text-xs text-text-secondary mt-0.5">{item.detail}</div>
               </div>
             </div>
-            {/* 비율 바 — primary 그라데이션 */}
+            {/* 비율 바 — 아이템별 색상 */}
             <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full bg-primary-500 transition-all"
-                style={{ width: `${item.percentage}%` }}
+                className="h-full rounded-full transition-all"
+                style={{ width: `${item.percentage}%`, backgroundColor: item.color || '#f97316' }}
               />
             </div>
             <div className="text-right text-xs text-text-tertiary mt-1">{item.percentage}%</div>
