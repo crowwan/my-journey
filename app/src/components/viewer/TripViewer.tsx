@@ -7,7 +7,6 @@ import { storage } from '@/lib/storage';
 import { getPackingProgress } from '@/lib/trip-utils';
 import { useEditStore } from '@/stores/useEditStore';
 import { HeroSection } from './HeroSection';
-import { EditBar } from './EditBar';
 import { TabBar } from './TabBar';
 import { SummaryTab } from './tabs/SummaryTab';
 import { ScheduleTab } from './tabs/ScheduleTab';
@@ -23,11 +22,11 @@ interface TripViewerProps {
 
 export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('summary');
-  const isEditMode = useEditStore((s) => s.isEditMode);
+  const editingSection = useEditStore((s) => s.editingSection);
   const editingTrip = useEditStore((s) => s.editingTrip);
 
-  // 편집 모드일 때는 editingTrip 사용, 아닐 때는 원본 trip 사용
-  const displayTrip = isEditMode && editingTrip ? editingTrip : trip;
+  // 편집 중인 섹션이 있으면 editingTrip 사용, 아닐 때는 원본 trip 사용
+  const displayTrip = editingSection && editingTrip ? editingTrip : trip;
 
   const checkedMap = storage.getPackingChecked(displayTrip.id);
   const packingProgress = getPackingProgress(displayTrip.packing, checkedMap);
@@ -43,8 +42,6 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
 
   return (
     <div>
-      {/* 편집 모드 시 상단 저장/취소 바 */}
-      {isEditMode && <EditBar />}
       <HeroSection trip={displayTrip} packingProgress={packingProgress} />
       <TabBar activeTab={activeTab} onChange={(tab) => {
         setActiveTab(tab);
@@ -54,7 +51,7 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
         {activeTab === 'summary' && <SummaryTab trip={displayTrip} />}
         {activeTab === 'schedule' && <ScheduleTab days={displayTrip.days} />}
         {activeTab === 'guide' && <GuideTab restaurants={displayTrip.restaurants} transport={displayTrip.transport} budget={displayTrip.budget} />}
-        {activeTab === 'checklist' && <ChecklistTab tripId={displayTrip.id} packing={displayTrip.packing} preTodos={displayTrip.preTodos} isEditMode={isEditMode} />}
+        {activeTab === 'checklist' && <ChecklistTab trip={displayTrip} />}
       </div>
     </div>
   );

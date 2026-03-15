@@ -16,6 +16,16 @@
 - [x] 1.8 저장/취소 동작 검증 (saveEdit → useTripStore.saveTrip + updatedAt 갱신) [2026-03-15]
 - [x] 1.9 빌드 + 린트 확인 (0 errors, 빌드 성공) [2026-03-15]
 
+### Phase 1 리팩토링: 전체 편집 → 섹션별 편집
+
+- [x] 1.R1 useEditStore: `isEditMode` → `editingSection: string | null` 방식으로 변경 [2026-03-15]
+- [x] 1.R2 SectionEditHeader 컴포넌트 생성 (제목 + 편집/저장/취소 버튼 통합) [2026-03-15]
+- [x] 1.R3 HeroSection "편집" 버튼 제거, AI 버튼은 섹션 편집 중 비활성화 [2026-03-15]
+- [x] 1.R4 EditBar 컴포넌트 삭제 [2026-03-15]
+- [x] 1.R5 TripViewer: EditBar 제거, editingSection 기반 editingTrip 분기 [2026-03-15]
+- [x] 1.R6 ChecklistTab: isEditMode prop 제거, SectionEditHeader 적용 (packing/preTodos 독립 편집) [2026-03-15]
+- [x] 1.R7 빌드 + 린트 확인 (0 errors, 빌드 성공) [2026-03-15]
+
 ---
 
 ## Phase 2: 항공편 + 숙소

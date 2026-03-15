@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Share2, ChevronLeft, Pencil, PenLine } from 'lucide-react';
+import { Share2, ChevronLeft, Pencil } from 'lucide-react';
 import type { Trip } from '@/types/trip';
 import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/lib/trip-utils';
 import { shareTrip } from '@/lib/share-utils';
@@ -23,11 +23,13 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
   const openAISplitView = useUIStore((s) => s.openAISplitView);
   const clearMessages = useChatStore((s) => s.clearMessages);
   const addSystemMessage = useChatStore((s) => s.addSystemMessage);
-  const isEditMode = useEditStore((s) => s.isEditMode);
-  const enterEditMode = useEditStore((s) => s.enterEditMode);
+  const editingSection = useEditStore((s) => s.editingSection);
   const status = getTripStatus(trip.startDate, trip.endDate);
   const dday = getDDay(trip.startDate, trip.endDate);
   const badgeStyle = getDDayBadgeStyle(status);
+
+  // 섹션 편집 중이면 AI 수정 비활성화
+  const isSectionEditing = editingSection !== null;
 
   // 클립보드 복사 토스트 메시지 상태
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -62,7 +64,7 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
         <span>홈</span>
       </button>
 
-      {/* 1행: 제목 + D-day + 공유 (데스크탑) */}
+      {/* 1행: 제목 + D-day + 액션 버튼 (데스크탑) */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           {/* 제목 */}
@@ -74,27 +76,14 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
             {dday}
           </Badge>
         </div>
-        {/* 액션 버튼 — 데스크탑에서만 */}
+        {/* 액션 버튼 -- 데스크탑에서만 */}
         <div className="hidden sm:flex items-center gap-1">
           <button
-            onClick={() => enterEditMode(trip)}
-            disabled={isEditMode}
-            className={cn(
-              'flex items-center justify-center size-9 rounded-md transition-colors shrink-0',
-              isEditMode
-                ? 'text-text-tertiary cursor-not-allowed'
-                : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
-            )}
-            aria-label="편집"
-          >
-            <PenLine className="size-4" />
-          </button>
-          <button
             onClick={handleAIEdit}
-            disabled={isEditMode}
+            disabled={isSectionEditing}
             className={cn(
               'flex items-center justify-center size-9 rounded-md transition-colors shrink-0',
-              isEditMode
+              isSectionEditing
                 ? 'text-text-tertiary cursor-not-allowed'
                 : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
             )}
@@ -112,7 +101,7 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
         </div>
       </div>
 
-      {/* 2행: 날짜 · 인원 · 태그 */}
+      {/* 2행: 날짜 + 인원 + 태그 */}
       <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-2 text-sm text-text-secondary">
         <span>
           {trip.startDate.replace(/-/g, '.')} — {trip.endDate.replace(/-/g, '.')}
@@ -129,7 +118,7 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
         )}
       </div>
 
-      {/* 3행: 준비물 진행률 — 있을 때만 */}
+      {/* 3행: 준비물 진행률 -- 있을 때만 */}
       {packingProgress && packingProgress.total > 0 && (
         <div className="flex items-center gap-2 mt-3">
           <Progress value={packingProgress.percentage} className="flex-1 h-1 bg-bg-tertiary" />
@@ -139,27 +128,14 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
         </div>
       )}
 
-      {/* 액션 버튼 — 모바일에서만 텍스트 버튼 */}
+      {/* 액션 버튼 -- 모바일에서만 텍스트 버튼 */}
       <div className="sm:hidden flex items-center gap-2 mt-3">
         <button
-          onClick={() => enterEditMode(trip)}
-          disabled={isEditMode}
-          className={cn(
-            'flex items-center gap-1.5 text-xs border rounded-full px-4 py-2 transition-colors',
-            isEditMode
-              ? 'text-text-tertiary border-border-light cursor-not-allowed'
-              : 'text-text-secondary border-border hover:bg-bg-secondary hover:text-text-primary'
-          )}
-        >
-          <PenLine className="size-3.5" />
-          편집
-        </button>
-        <button
           onClick={handleAIEdit}
-          disabled={isEditMode}
+          disabled={isSectionEditing}
           className={cn(
             'flex items-center gap-1.5 text-xs border rounded-full px-4 py-2 transition-colors',
-            isEditMode
+            isSectionEditing
               ? 'text-text-tertiary border-border-light cursor-not-allowed'
               : 'text-text-secondary border-border hover:bg-bg-secondary hover:text-text-primary'
           )}

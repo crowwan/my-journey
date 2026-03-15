@@ -2,22 +2,19 @@
 
 import { useState } from 'react';
 import { Luggage, CheckCircle, Plus, Minus, Trash2 } from 'lucide-react';
-import type { PackingItem, PackingEntry, PreTodoItem } from '@/types/trip';
+import type { Trip, PackingEntry, PreTodoItem } from '@/types/trip';
 import { useTripStore } from '@/stores/useTripStore';
 import { useEditStore } from '@/stores/useEditStore';
 import { storage } from '@/lib/storage';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
-import { SectionTitle } from '../shared/SectionTitle';
+import { SectionEditHeader } from '../SectionEditHeader';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface ChecklistTabProps {
-  tripId: string;
-  packing: PackingItem[];
-  preTodos: PreTodoItem[];
-  isEditMode?: boolean;
+  trip: Trip;
 }
 
 // ============================================================
@@ -86,10 +83,16 @@ function AddItemInput({
   );
 }
 
-export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: ChecklistTabProps) {
+export function ChecklistTab({ trip }: ChecklistTabProps) {
+  const { packing, preTodos, id: tripId } = trip;
   const togglePackingItem = useTripStore((state) => state.togglePackingItem);
+  const editingSection = useEditStore((s) => s.editingSection);
   const updateEditingTrip = useEditStore((s) => s.updateEditingTrip);
   const checked = storage.getPackingChecked(tripId);
+
+  // 섹션별 편집 상태 확인
+  const isPackingEdit = editingSection === 'packing';
+  const isPreTodosEdit = editingSection === 'preTodos';
 
   // 전체 진행률 계산 (준비물 체크 항목)
   const packingTotal = (packing ?? []).reduce((sum, cat) => sum + cat.items.length, 0);
@@ -111,8 +114,8 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
 
   // 체크리스트 항목 이름 수정
   const handlePackingItemRename = (categoryIndex: number, itemIndex: number, newName: string) => {
-    updateEditingTrip((trip) => {
-      const newPacking = trip.packing.map((cat, ci) => {
+    updateEditingTrip((t) => {
+      const newPacking = t.packing.map((cat, ci) => {
         if (ci !== categoryIndex) return cat;
         return {
           ...cat,
@@ -121,33 +124,33 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
           ),
         };
       });
-      return { ...trip, packing: newPacking };
+      return { ...t, packing: newPacking };
     });
   };
 
   // 체크리스트 항목 추가
   const handlePackingItemAdd = (categoryIndex: number, name: string) => {
-    updateEditingTrip((trip) => {
-      const newPacking = trip.packing.map((cat, ci) => {
+    updateEditingTrip((t) => {
+      const newPacking = t.packing.map((cat, ci) => {
         if (ci !== categoryIndex) return cat;
         const newEntry: PackingEntry = { name, checked: false };
         return { ...cat, items: [...cat.items, newEntry] };
       });
-      return { ...trip, packing: newPacking };
+      return { ...t, packing: newPacking };
     });
   };
 
   // 체크리스트 항목 삭제
   const handlePackingItemDelete = (categoryIndex: number, itemIndex: number) => {
-    updateEditingTrip((trip) => {
-      const newPacking = trip.packing.map((cat, ci) => {
+    updateEditingTrip((t) => {
+      const newPacking = t.packing.map((cat, ci) => {
         if (ci !== categoryIndex) return cat;
         return {
           ...cat,
           items: cat.items.filter((_, ii) => ii !== itemIndex),
         };
       });
-      return { ...trip, packing: newPacking };
+      return { ...t, packing: newPacking };
     });
   };
 
@@ -157,42 +160,42 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
 
   // 사전 준비 항목 수정 (title 또는 description)
   const handlePreTodoUpdate = (index: number, field: 'title' | 'description', value: string) => {
-    updateEditingTrip((trip) => {
-      const newPreTodos = trip.preTodos.map((todo, i) =>
+    updateEditingTrip((t) => {
+      const newPreTodos = t.preTodos.map((todo, i) =>
         i === index ? { ...todo, [field]: value } : todo,
       );
-      return { ...trip, preTodos: newPreTodos };
+      return { ...t, preTodos: newPreTodos };
     });
   };
 
   // 사전 준비 항목 추가
   const handlePreTodoAdd = () => {
-    updateEditingTrip((trip) => {
-      const nextOrder = trip.preTodos.length > 0
-        ? Math.max(...trip.preTodos.map((t) => t.order)) + 1
+    updateEditingTrip((t) => {
+      const nextOrder = t.preTodos.length > 0
+        ? Math.max(...t.preTodos.map((td) => td.order)) + 1
         : 1;
       const newTodo: PreTodoItem = {
         order: nextOrder,
         title: '새 항목',
         description: '',
       };
-      return { ...trip, preTodos: [...trip.preTodos, newTodo] };
+      return { ...t, preTodos: [...t.preTodos, newTodo] };
     });
   };
 
   // 사전 준비 항목 삭제
   const handlePreTodoDelete = (index: number) => {
-    updateEditingTrip((trip) => {
-      const newPreTodos = trip.preTodos
+    updateEditingTrip((t) => {
+      const newPreTodos = t.preTodos
         .filter((_, i) => i !== index)
         // order 재정렬
         .map((todo, i) => ({ ...todo, order: i + 1 }));
-      return { ...trip, preTodos: newPreTodos };
+      return { ...t, preTodos: newPreTodos };
     });
   };
 
-  // 편집 모드에서도 빈 상태가 아니라면 UI를 보여줌
-  if (!hasPacking && !hasPreTodos && !isEditMode) {
+  // 아무 데이터도 없고 편집 모드도 아닌 경우 빈 상태
+  if (!hasPacking && !hasPreTodos && !isPackingEdit && !isPreTodosEdit) {
     return (
       <div className="animate-fade-up">
         <div className="text-center py-12 text-text-tertiary">
@@ -205,8 +208,8 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
 
   return (
     <div className="animate-fade-up">
-      {/* 전체 진행률 바 — 편집 모드에서는 숨김 */}
-      {!isEditMode && totalItems > 0 && (
+      {/* 전체 진행률 바 -- 편집 모드에서는 숨김 */}
+      {!isPackingEdit && totalItems > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-text-primary">준비 진행률</span>
@@ -222,16 +225,19 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
       )}
 
       {/* 준비물 섹션 */}
-      {(hasPacking || isEditMode) && (
+      {(hasPacking || isPackingEdit) && (
         <div className="mb-8">
-          <SectionTitle icon={<Luggage className="size-4" />}>
-            준비물
-            {!isEditMode && (
+          <SectionEditHeader
+            title="준비물"
+            icon={<Luggage className="size-4" />}
+            section="packing"
+            trip={trip}
+            suffix={
               <span className="text-sm font-normal text-text-secondary ml-2">
                 ({packingChecked}/{packingTotal})
               </span>
-            )}
-          </SectionTitle>
+            }
+          />
 
           {packing.map((category, categoryIndex) => {
             const checkedItems = checked[category.category] ?? [];
@@ -246,7 +252,7 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
                 <div className="flex items-center gap-2 mb-2 px-1">
                   <EmojiIcon emoji={category.categoryIcon} size={16} className="text-text-secondary" />
                   <span className="text-sm font-semibold text-text-primary">{category.category}</span>
-                  {!isEditMode && (
+                  {!isPackingEdit && (
                     <span className="text-xs text-text-tertiary">({catChecked}/{catTotal})</span>
                   )}
                 </div>
@@ -255,7 +261,7 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
                     const isChecked = checkedItems.includes(item.name);
 
                     // 편집 모드: 인라인 수정 + 삭제 버튼
-                    if (isEditMode) {
+                    if (isPackingEdit) {
                       return (
                         <div
                           key={`${category.category}-${itemIndex}`}
@@ -318,7 +324,7 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
                   })}
 
                   {/* 편집 모드: 항목 추가 input */}
-                  {isEditMode && (
+                  {isPackingEdit && (
                     <AddItemInput
                       onAdd={(name) => handlePackingItemAdd(categoryIndex, name)}
                       placeholder="항목 추가 (Enter로 확정)"
@@ -332,18 +338,21 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
       )}
 
       {/* 사전 할 일 섹션 */}
-      {(hasPreTodos || isEditMode) && (
+      {(hasPreTodos || isPreTodosEdit) && (
         <div>
-          <SectionTitle icon={<CheckCircle className="size-4" />}>
-            출발 전 할 일
-          </SectionTitle>
+          <SectionEditHeader
+            title="출발 전 할 일"
+            icon={<CheckCircle className="size-4" />}
+            section="preTodos"
+            trip={trip}
+          />
           <div className="space-y-3">
             {preTodos.map((todo, index) => (
               <Card
                 key={`pretodo-${index}`}
                 className={cn(
                   'rounded-xl py-0 gap-0 shadow-sm transition-shadow',
-                  isEditMode
+                  isPreTodosEdit
                     ? 'border-dashed border-border hover:border-primary/30'
                     : 'border-border-light hover:shadow-md'
                 )}
@@ -358,7 +367,7 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
                       {todo.order}
                     </Badge>
                     <div className="flex-1 min-w-0">
-                      {isEditMode ? (
+                      {isPreTodosEdit ? (
                         <>
                           <InlineInput
                             value={todo.title}
@@ -383,7 +392,7 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
                       )}
                     </div>
                     {/* 편집 모드: 삭제 버튼 */}
-                    {isEditMode && (
+                    {isPreTodosEdit && (
                       <button
                         onClick={() => handlePreTodoDelete(index)}
                         className="shrink-0 p-1 text-error hover:bg-error/10 rounded transition-colors"
@@ -398,7 +407,7 @@ export function ChecklistTab({ tripId, packing, preTodos, isEditMode = false }: 
             ))}
 
             {/* 편집 모드: 사전 준비 항목 추가 버튼 */}
-            {isEditMode && (
+            {isPreTodosEdit && (
               <button
                 onClick={handlePreTodoAdd}
                 className="w-full flex items-center justify-center gap-2 px-5 py-4 rounded-xl border border-dashed border-primary/30 bg-primary-50/30 text-sm text-primary hover:bg-primary-50 transition-colors"
