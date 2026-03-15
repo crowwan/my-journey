@@ -87,7 +87,7 @@ export default function Home() {
 
   return (
     <div>
-      <Header title="My Journey" />
+      <Header title="My Journey" showCalendar />
 
       {/* 시간대별 인사말 */}
       <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-6 pb-2">

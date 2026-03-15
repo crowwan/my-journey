@@ -1,14 +1,15 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, CalendarDays } from 'lucide-react';
 
 interface HeaderProps {
   title?: string;
   showBack?: boolean;
+  showCalendar?: boolean;
 }
 
-export function Header({ title = 'My Journey', showBack = false }: HeaderProps) {
+export function Header({ title = 'My Journey', showBack = false, showCalendar = false }: HeaderProps) {
   const router = useRouter();
 
   return (
@@ -25,6 +26,15 @@ export function Header({ title = 'My Journey', showBack = false }: HeaderProps) 
       <h1 className="font-display text-lg font-bold text-text-primary tracking-wide flex-1">
         {title}
       </h1>
+      {showCalendar && (
+        <button
+          onClick={() => router.push('/calendar')}
+          className="w-9 h-9 flex items-center justify-center rounded-full text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors"
+          aria-label="캘린더"
+        >
+          <CalendarDays className="size-5" />
+        </button>
+      )}
     </header>
   );
 }
