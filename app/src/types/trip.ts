@@ -46,6 +46,7 @@ export interface Accommodation {
   address: string;
   area: string;
   nearbyStations: string[];
+  mapUrl?: string;
 }
 
 export interface WeatherDay {

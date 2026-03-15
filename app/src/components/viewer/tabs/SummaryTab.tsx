@@ -216,6 +216,17 @@ function AccommodationEditCard({
         />
       </div>
 
+      {/* 지도 링크 */}
+      <div className="mb-4">
+        <label className="text-xs text-text-tertiary block mb-1">지도 링크 (선택)</label>
+        <InlineInput
+          value={accommodation.mapUrl ?? ''}
+          onChange={(v) => onUpdate('mapUrl', v)}
+          className="text-xs text-primary w-full"
+          placeholder="https://maps.google.com/... (비워두면 이름으로 검색)"
+        />
+      </div>
+
       {/* 근처 역 */}
       <div>
         <label className="text-xs text-text-tertiary block mb-2">근처 역</label>
@@ -421,9 +432,9 @@ export function SummaryTab({ trip }: SummaryTabProps) {
               <p className="text-sm">항공편 정보가 아직 없습니다</p>
             </div>
           )}
-          {flights.map((flight) => (
+          {flights.map((flight, index) => (
             <div
-              key={flight.direction}
+              key={`flight-${index}`}
               className="bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm"
             >
               <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-3">
@@ -481,7 +492,7 @@ export function SummaryTab({ trip }: SummaryTabProps) {
         <>
           {accommodation ? (
             <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(accommodation.name + (accommodation.address ? ' ' + accommodation.address : ''))}`}
+              href={accommodation.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(accommodation.name)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-surface border border-border-light rounded-xl p-5 mb-3 shadow-sm hover:border-primary/30 hover:shadow-md transition-all group"
