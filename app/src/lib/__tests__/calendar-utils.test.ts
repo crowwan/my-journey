@@ -61,7 +61,7 @@ describe('getCalendarBars', () => {
     days: color ? [{ dayNumber: 1, date: startDate, title: '', subtitle: '', color, items: [], mapSpots: [] }] : [],
     restaurants: [],
     transport: { homeToHotel: [], intercityRoutes: [], passes: [], passVerdict: '', tips: [] },
-    budget: { items: [], total: { min: '', max: '', minKRW: '', maxKRW: '' }, tips: [] },
+    budget: { items: [], currency: 'KRW', total: { amount: 0, currency: 'KRW' }, tips: [] },
     packing: [],
     preTodos: [],
     createdAt: '',

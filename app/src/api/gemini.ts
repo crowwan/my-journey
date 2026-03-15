@@ -6,6 +6,7 @@
 
 import { GoogleGenAI } from '@google/genai';
 import type { Trip, ChatMessage } from '@/types/trip';
+import { migrateBudget as migrateBudgetData } from '@/lib/budget-utils';
 
 // -- SDK 초기화 (lazy) --------------------------------------------
 // Vercel 빌드 시 환경변수 없이도 모듈 로드가 가능하도록 지연 초기화
@@ -91,9 +92,6 @@ Day 1: "#f97316", Day 2: "#6366f1", Day 3: "#10b981", Day 4: "#a78bfa", Day 5: "
 
 ## 이모지 사용 규칙 (반드시 아래 목록에서만 선택)
 
-### 날씨 (weather.icon)
-☀️ 맑음, 🌤️ 대체로 맑음, ⛅ 구름 조금, 🌥️ 대체로 흐림, ☁️ 흐림, 🌧️ 비, 🌦️ 소나기, ⛈️ 뇌우, ❄️ 눈, 🌨️ 눈비, 🌫️ 안개, 💨 바람
-
 ### 교통 (transport.homeToHotel.icon)
 ✈️ 비행기, 🚆 기차/KTX, 🚌 버스, 🚗 자동차/택시, 🚇 지하철, 🚊 트램, 🚶 도보, 🚢 배, 🛫 출발, 🛬 도착, 🏨 호텔, 🏠 집
 
@@ -113,6 +111,7 @@ Day 1: "#f97316", Day 2: "#6366f1", Day 3: "#10b981", Day 4: "#a78bfa", Day 5: "
 - 영업시간, 휴무일 반영
 - 이동 시간은 대중교통 기준
 - tips 배열 마지막에 "AI가 생성한 정보입니다. 실제와 다를 수 있습니다." 포함
+- **날씨(weather)는 실시간 API에서 제공하므로 생성하지 마세요. overview.weather는 빈 배열 []로 반환하세요.**
 
 ## 응답 JSON 스키마 (반드시 이 구조를 따르세요)
 추가 텍스트 없이 JSON만 반환합니다.
@@ -129,7 +128,7 @@ Day 1: "#f97316", Day 2: "#6366f1", Day 3: "#10b981", Day 4: "#a78bfa", Day 5: "
     "overview": {
       "flights": [{"direction": "outbound|inbound", "departure": "string", "arrival": "string", "departureTime": "HH:MM", "arrivalTime": "HH:MM", "date": "YYYY-MM-DD", "duration": "Xh Ym"}],
       "accommodation": {"name": "string", "address": "string", "area": "string", "nearbyStations": ["string"]},
-      "weather": [{"date": "YYYY-MM-DD", "dayOfWeek": "월|화|수|목|금|토|일", "icon": "emoji", "tempHigh": "number", "tempLow": "number", "tempAvg": "number"}],
+      "weather": [],
       "tips": ["string array"]
     },
     "days": [
@@ -158,8 +157,9 @@ Day 1: "#f97316", Day 2: "#6366f1", Day 3: "#10b981", Day 4: "#a78bfa", Day 5: "
       "tips": ["string"]
     },
     "budget": {
-      "items": [{"icon": "emoji", "label": "string", "detail": "string", "amount": "string", "percentage": "number", "color": "hex string"}],
-      "total": {"min": "string", "max": "string", "minKRW": "string", "maxKRW": "string"},
+      "currency": "string - 기본 통화 코드 (JPY, KRW, USD 등)",
+      "exchangeRate": "number - 1 외화 = ? KRW (예: JPY면 10, THB면 40). KRW일 때는 생략",
+      "items": [{"icon": "emoji", "label": "string", "detail": "string", "amount": "number - 숫자만 (통화 기호 없이)", "percentage": "number", "color": "hex string"}],
       "tips": ["string"]
     },
     "packing": [
@@ -196,7 +196,6 @@ ${tripJson}
 5. 구조, 포맷, 필드명은 기존 데이터와 동일하게 유지
 
 ## 이모지 사용 규칙 (반드시 아래 목록에서만 선택)
-- 날씨: ☀️ 🌤️ ⛅ 🌥️ ☁️ 🌧️ 🌦️ ⛈️ ❄️ 🌨️ 🌫️ 💨
 - 교통: ✈️ 🚆 🚌 🚗 🚇 🚊 🚶 🚢 🛫 🛬 🏨 🏠
 - 지도: 🏛️ ⛩️ 🏯 🗼 🍽️ ☕ 🛍️ 🎭 🎢 🏨
 - 예산: 🚆 🍽️ 🎫 ☕ 🛍️ 💰
@@ -208,6 +207,7 @@ ${tripJson}
 - 이모지도 위 허용 목록에서만 사용하세요
 - 전체 Trip JSON을 create와 동일한 형식으로 반환합니다
 - 추가 텍스트 없이 JSON만 반환합니다
+- **weather 배열은 수정하지 말고 그대로 유지하세요 (실시간 API에서 별도 제공)**
 
 ## 응답 JSON 스키마 (create와 동일)
 {
@@ -293,18 +293,7 @@ function normalizeTransport(raw: unknown): Trip['transport'] {
 }
 
 function normalizeBudget(raw: unknown): Trip['budget'] {
-  const b = (raw ?? {}) as Record<string, unknown>;
-  const total = (typeof b.total === 'object' && b.total !== null ? b.total : {}) as Record<string, unknown>;
-  return {
-    items: Array.isArray(b.items) ? b.items as Trip['budget']['items'] : [],
-    total: {
-      min: typeof total.min === 'string' ? total.min : '',
-      max: typeof total.max === 'string' ? total.max : '',
-      minKRW: typeof total.minKRW === 'string' ? total.minKRW : '',
-      maxKRW: typeof total.maxKRW === 'string' ? total.maxKRW : '',
-    },
-    tips: Array.isArray(b.tips) ? b.tips as string[] : [],
-  };
+  return migrateBudgetData((raw ?? {}) as Record<string, unknown>);
 }
 
 // -- 변환 함수 ---------------------------------------------------

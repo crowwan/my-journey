@@ -7,9 +7,11 @@ import { CustomSelect } from '@/components/ui/custom-select';
 import type { Trip, BudgetSection, BudgetItem } from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
+import { formatCurrency, convertToKRW, calculateBudgetTotal } from '@/lib/budget-utils';
 import { SectionEditHeader } from '../SectionEditHeader';
 import { SectionTitle } from '../shared/SectionTitle';
 import { TipsAccordion } from '../shared/TipsAccordion';
+import { DonutChart } from '../budget/DonutChart';
 import { cn } from '@/lib/utils';
 
 interface BudgetTabProps {
@@ -24,6 +26,18 @@ const BUDGET_EMOJI_OPTIONS = [
   { emoji: '☕', label: '간식/카페' },
   { emoji: '🛍️', label: '쇼핑' },
   { emoji: '💰', label: '예비비' },
+];
+
+// 통화 옵션 목록
+const CURRENCY_OPTIONS = [
+  { value: 'KRW', label: '₩ KRW (원)' },
+  { value: 'JPY', label: '¥ JPY (엔)' },
+  { value: 'USD', label: '$ USD (달러)' },
+  { value: 'EUR', label: '€ EUR (유로)' },
+  { value: 'THB', label: '฿ THB (바트)' },
+  { value: 'CNY', label: '¥ CNY (위안)' },
+  { value: 'TWD', label: 'NT$ TWD (대만달러)' },
+  { value: 'VND', label: '₫ VND (동)' },
 ];
 
 // 이모지 선택 드롭다운 — CustomSelect 기반, 이모지만 크게 표시
@@ -66,7 +80,7 @@ function InlineInput({
   placeholder,
   type = 'text',
 }: {
-  value: string;
+  value: string | number;
   onChange: (value: string) => void;
   className?: string;
   placeholder?: string;
@@ -91,10 +105,12 @@ function InlineInput({
 // ============================================================
 function BudgetEditCard({
   item,
+  currencySymbol,
   onUpdate,
   onDelete,
 }: {
   item: BudgetItem;
+  currencySymbol: string;
   onUpdate: (field: keyof BudgetItem, value: string | number) => void;
   onDelete: () => void;
 }) {
@@ -132,14 +148,15 @@ function BudgetEditCard({
         />
       </div>
 
-      {/* 금액 */}
+      {/* 금액 (숫자 입력) */}
       <div className="mb-3">
-        <label className="text-xs text-text-tertiary block mb-1">금액</label>
+        <label className="text-xs text-text-tertiary block mb-1">금액 ({currencySymbol})</label>
         <InlineInput
           value={item.amount}
-          onChange={(v) => onUpdate('amount', v)}
+          onChange={(v) => onUpdate('amount', Number(v) || 0)}
           className="text-sm text-primary font-bold w-full"
-          placeholder="¥3,000"
+          placeholder="3000"
+          type="number"
         />
         <span className="text-[10px] text-text-tertiary mt-0.5 block">비율 {item.percentage}% (자동 계산)</span>
       </div>
@@ -167,19 +184,58 @@ function BudgetEditSection({
   onItemUpdate,
   onItemDelete,
   onItemAdd,
-  onTotalUpdate,
+  onCurrencyChange,
+  onExchangeRateChange,
 }: {
   budget: BudgetSection;
   onItemUpdate: (index: number, field: keyof BudgetItem, value: string | number) => void;
   onItemDelete: (index: number) => void;
   onItemAdd: () => void;
-  onTotalUpdate: (field: string, value: string) => void;
+  onCurrencyChange: (currency: string) => void;
+  onExchangeRateChange: (rate: number) => void;
 }) {
   const items = budget?.items ?? [];
-  const total = budget?.total ?? { min: '', max: '', minKRW: '', maxKRW: '' };
+  const currency = budget?.currency ?? 'KRW';
+  const exchangeRate = budget?.exchangeRate;
+  const currencySymbol = CURRENCY_OPTIONS.find((o) => o.value === currency)?.label.split(' ')[0] ?? '';
+
+  // 실시간 합계 계산
+  const totalAmount = items.reduce((sum, item) => sum + item.amount, 0);
+  const totalKRW = exchangeRate ? totalAmount * exchangeRate : undefined;
 
   return (
     <div>
+      {/* 통화 + 환율 설정 */}
+      <SectionTitle icon={<Calculator className="size-4" />}>
+        통화 설정
+      </SectionTitle>
+      <div className="bg-surface border border-dashed border-border rounded-xl p-5 mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-text-tertiary block mb-1">기본 통화</label>
+            <CustomSelect
+              value={currency}
+              onChange={onCurrencyChange}
+              options={CURRENCY_OPTIONS}
+            />
+          </div>
+          {currency !== 'KRW' && (
+            <div>
+              <label className="text-xs text-text-tertiary block mb-1">
+                1 {currency} = ? KRW
+              </label>
+              <InlineInput
+                value={exchangeRate ?? ''}
+                onChange={(v) => onExchangeRateChange(Number(v) || 0)}
+                className="text-sm font-bold text-text-primary w-full"
+                placeholder="10"
+                type="number"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
       <SectionTitle icon={<Wallet className="size-4" />}>
         예산 항목
       </SectionTitle>
@@ -189,6 +245,7 @@ function BudgetEditSection({
         <BudgetEditCard
           key={`budget-edit-${idx}`}
           item={item}
+          currencySymbol={currencySymbol}
           onUpdate={(field, value) => onItemUpdate(idx, field, value)}
           onDelete={() => onItemDelete(idx)}
         />
@@ -201,50 +258,20 @@ function BudgetEditSection({
         항목 추가
       </button>
 
-      {/* 총합 편집 */}
+      {/* 실시간 합계 */}
       <SectionTitle icon={<Calculator className="size-4" />}>
-        예상 총 비용
+        예상 총 비용 (실시간)
       </SectionTitle>
-      <div className="bg-surface border border-dashed border-border rounded-xl p-5 mb-6">
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label className="text-xs text-text-tertiary block mb-1">최소 (외화)</label>
-            <InlineInput
-              value={total.min}
-              onChange={(v) => onTotalUpdate('min', v)}
-              className="text-sm font-bold text-text-primary w-full"
-              placeholder="¥50,000"
-            />
+      <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-5 mb-6 shadow-sm">
+        <div className="text-center">
+          <div className="text-2xl font-black text-text-primary mb-1">
+            {formatCurrency(totalAmount, currency)}
           </div>
-          <div>
-            <label className="text-xs text-text-tertiary block mb-1">최대 (외화)</label>
-            <InlineInput
-              value={total.max}
-              onChange={(v) => onTotalUpdate('max', v)}
-              className="text-sm font-bold text-text-primary w-full"
-              placeholder="¥80,000"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs text-text-tertiary block mb-1">최소 (원화)</label>
-            <InlineInput
-              value={total.minKRW}
-              onChange={(v) => onTotalUpdate('minKRW', v)}
-              className="text-sm font-semibold text-cat-sightseeing w-full"
-              placeholder="약 50만원"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-text-tertiary block mb-1">최대 (원화)</label>
-            <InlineInput
-              value={total.maxKRW}
-              onChange={(v) => onTotalUpdate('maxKRW', v)}
-              className="text-sm font-semibold text-cat-sightseeing w-full"
-              placeholder="약 80만원"
-            />
-          </div>
+          {totalKRW !== undefined && totalKRW > 0 && (
+            <div className="text-base text-cat-sightseeing font-semibold">
+              ({formatCurrency(totalKRW, 'KRW')})
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -257,9 +284,12 @@ function BudgetEditSection({
 function BudgetReadSection({ budget }: { budget: BudgetSection }) {
   const items = budget?.items ?? [];
   const tips = budget?.tips ?? [];
-  const total = budget?.total ?? { min: '', max: '', minKRW: '', maxKRW: '' };
+  const total = budget?.total;
+  const range = budget?.range;
+  const currency = budget?.currency ?? 'KRW';
+  const exchangeRate = budget?.exchangeRate;
 
-  if (items.length === 0 && !total.min && !total.max) {
+  if (items.length === 0 && !total?.amount && !range?.min) {
     return (
       <div className="text-center py-8 text-text-tertiary">
         <p className="text-sm">예산 정보가 아직 없습니다</p>
@@ -267,58 +297,110 @@ function BudgetReadSection({ budget }: { budget: BudgetSection }) {
     );
   }
 
+  // 합계 계산 (total이 없으면 items에서 계산)
+  const computedTotal = total?.amount
+    ? total
+    : calculateBudgetTotal(items, currency, exchangeRate);
+
   return (
     <div>
+      {/* 도넛 차트 + 합계 */}
+      {items.length > 0 && (
+        <div className="mb-8">
+          <DonutChart
+            items={items.map((item) => ({
+              label: item.label,
+              percentage: item.percentage,
+              color: item.color,
+              amount: item.amount,
+            }))}
+            totalAmount={computedTotal.amount}
+            totalAmountKRW={computedTotal.amountKRW}
+            currency={currency}
+          />
+        </div>
+      )}
+
       <SectionTitle icon={<Wallet className="size-4" />}>
         예산 항목
       </SectionTitle>
 
       {/* 예산 아이템 리스트 */}
       <div className="space-y-3 mb-8">
-        {items.map((item) => (
-          <div
-            key={item.label}
-            className="bg-surface border border-border-light rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <EmojiIcon emoji={item.icon} size={20} className="text-primary shrink-0" />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-text-primary">{item.label}</span>
-                  <span className="text-sm font-bold text-primary">{item.amount}</span>
+        {items.map((item) => {
+          const krwAmount = convertToKRW(item.amount, exchangeRate);
+          return (
+            <div
+              key={item.label}
+              className="bg-surface border border-border-light rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <EmojiIcon emoji={item.icon} size={20} className="text-primary shrink-0" />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-text-primary">{item.label}</span>
+                    <div className="text-right">
+                      <span className="text-sm font-bold text-primary">
+                        {formatCurrency(item.amount, currency)}
+                      </span>
+                      {krwAmount !== undefined && currency !== 'KRW' && (
+                        <span className="text-xs text-text-tertiary ml-1.5">
+                          ({formatCurrency(krwAmount, 'KRW')})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-xs text-text-secondary mt-0.5">{item.detail}</div>
                 </div>
-                <div className="text-xs text-text-secondary mt-0.5">{item.detail}</div>
               </div>
+              {/* 비율 바 -- 아이템별 색상 */}
+              <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${item.percentage}%`, backgroundColor: item.color || '#f97316' }}
+                />
+              </div>
+              <div className="text-right text-xs text-text-tertiary mt-1">{item.percentage}%</div>
             </div>
-            {/* 비율 바 — 아이템별 색상 */}
-            <div className="h-1.5 bg-bg-tertiary rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{ width: `${item.percentage}%`, backgroundColor: item.color || '#f97316' }}
-              />
-            </div>
-            <div className="text-right text-xs text-text-tertiary mt-1">{item.percentage}%</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* 총합 카드 */}
+      {/* 총합 카드 -- 구 데이터(range) 폴백 */}
       <SectionTitle icon={<Calculator className="size-4" />}>
         예상 총 비용
       </SectionTitle>
-      <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8 shadow-sm">
-        <div className="text-center">
-          <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
-            예상 범위
-          </div>
-          <div className="text-2xl font-black text-text-primary mb-1">
-            {total.min} ~ {total.max}
-          </div>
-          <div className="text-base text-cat-sightseeing font-semibold">
-            {total.minKRW} ~ {total.maxKRW}
+      {range && range.min ? (
+        <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8 shadow-sm">
+          <div className="text-center">
+            <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
+              예상 범위
+            </div>
+            <div className="text-2xl font-black text-text-primary mb-1">
+              {range.min} ~ {range.max}
+            </div>
+            <div className="text-base text-cat-sightseeing font-semibold">
+              {range.minKRW} ~ {range.maxKRW}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8 shadow-sm">
+          <div className="text-center">
+            <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
+              합계
+            </div>
+            <div className="text-2xl font-black text-text-primary mb-1">
+              {formatCurrency(computedTotal.amount, currency)}
+            </div>
+            {computedTotal.amountKRW !== undefined && computedTotal.amountKRW > 0 && (
+              <div className="text-base text-cat-sightseeing font-semibold">
+                ({formatCurrency(computedTotal.amountKRW, 'KRW')})
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 예산 팁 */}
       <TipsAccordion tips={tips} title="예산 팁" />
@@ -361,7 +443,8 @@ export function BudgetTab({ trip }: BudgetTabProps) {
         icon: '💰',
         label: '',
         detail: '',
-        amount: '',
+        amount: 0,
+        currency: t.budget?.currency ?? 'KRW',
         percentage: 0,
         color: '#f97316',
       };
@@ -369,31 +452,55 @@ export function BudgetTab({ trip }: BudgetTabProps) {
     });
   };
 
-  const handleBudgetTotalUpdate = (field: string, value: string) => {
+  const handleCurrencyChange = (currency: string) => {
     updateEditingTrip((t) => ({
       ...t,
-      budget: {
-        ...t.budget,
-        total: { ...(t.budget?.total ?? { min: '', max: '', minKRW: '', maxKRW: '' }), [field]: value },
-      },
+      budget: { ...t.budget, currency },
     }));
   };
 
+  const handleExchangeRateChange = (rate: number) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      budget: { ...t.budget, exchangeRate: rate || undefined },
+    }));
+  };
+
+  // 헤더에 표시할 서브텍스트
+  const headerSuffix = (() => {
+    if (!budgetTotal) return undefined;
+    // 구 데이터: range가 있으면 range 표시
+    const range = budget?.range;
+    if (range && range.minKRW) {
+      return (
+        <span className="text-sm font-normal text-text-secondary ml-2">
+          ({range.minKRW} ~ {range.maxKRW})
+        </span>
+      );
+    }
+    // 신 데이터: total 기반 표시
+    if (budgetTotal.amount > 0) {
+      const krwStr = budgetTotal.amountKRW
+        ? ` (${formatCurrency(budgetTotal.amountKRW, 'KRW')})`
+        : '';
+      return (
+        <span className="text-sm font-normal text-text-secondary ml-2">
+          {formatCurrency(budgetTotal.amount, budgetTotal.currency)}{krwStr}
+        </span>
+      );
+    }
+    return undefined;
+  })();
+
   return (
     <div className="animate-fade-up">
-      {/* 예산 섹션 — 편집 가능 */}
+      {/* 예산 섹션 -- 편집 가능 */}
       <SectionEditHeader
         title="예산"
         icon={<Wallet className="size-4" />}
         section="budget"
         trip={trip}
-        suffix={
-          budgetTotal && budgetTotal.minKRW ? (
-            <span className="text-sm font-normal text-text-secondary ml-2">
-              ({budgetTotal.minKRW} ~ {budgetTotal.maxKRW})
-            </span>
-          ) : undefined
-        }
+        suffix={headerSuffix}
       />
 
       {isBudgetEdit ? (
@@ -402,7 +509,8 @@ export function BudgetTab({ trip }: BudgetTabProps) {
           onItemUpdate={handleBudgetItemUpdate}
           onItemDelete={handleBudgetItemDelete}
           onItemAdd={handleBudgetItemAdd}
-          onTotalUpdate={handleBudgetTotalUpdate}
+          onCurrencyChange={handleCurrencyChange}
+          onExchangeRateChange={handleExchangeRateChange}
         />
       ) : (
         <BudgetReadSection budget={budget} />

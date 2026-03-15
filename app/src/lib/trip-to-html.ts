@@ -1135,16 +1135,20 @@ function generateTransportHtml(transport: TransportSection): string {
 function generateBudgetHtml(budget: BudgetSection): string {
   const items = budget.items ?? [];
   const total = budget.total;
+  const range = budget.range;
   const tips = budget.tips ?? [];
+  const currencySymbol = CURRENCY_CODE_TO_SYMBOL_HTML[budget.currency] ?? '';
 
   // 예산 항목
-  const itemsHtml = items.map((item) => `
+  const itemsHtml = items.map((item) => {
+    const amountStr = `${currencySymbol}${item.amount.toLocaleString('en-US')}`;
+    return `
     <div class="card" style="display:flex; align-items:center; gap:12px;">
       <div style="font-size:1.25rem;">${escapeHtml(item.icon)}</div>
       <div style="flex:1; min-width:0;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div style="font-size:0.875rem; font-weight:600;">${escapeHtml(item.label)}</div>
-          <div style="font-size:0.875rem; font-weight:700; color:var(--color-primary);">${escapeHtml(item.amount)}</div>
+          <div style="font-size:0.875rem; font-weight:700; color:var(--color-primary);">${amountStr}</div>
         </div>
         <div style="font-size:0.75rem; color:var(--color-text-secondary); margin-top:2px;">${escapeHtml(item.detail)}</div>
         <div class="budget-bar-bg">
@@ -1152,16 +1156,25 @@ function generateBudgetHtml(budget: BudgetSection): string {
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
-  // 총합
-  const totalHtml = total
-    ? `<div class="budget-total">
+  // 총합 — 자동 계산 기반, 구 데이터 range 폴백
+  let totalHtml = '';
+  if (range && range.min) {
+    totalHtml = `<div class="budget-total">
         <div class="budget-total-label">예상 총 비용</div>
-        <div class="budget-total-amount">${escapeHtml(total.min)} ~ ${escapeHtml(total.max)}</div>
-        ${total.minKRW ? `<div style="font-size:0.875rem; opacity:0.9; margin-top:4px;">(${escapeHtml(total.minKRW)} ~ ${escapeHtml(total.maxKRW)})</div>` : ''}
-      </div>`
-    : '';
+        <div class="budget-total-amount">${escapeHtml(range.min)} ~ ${escapeHtml(range.max)}</div>
+        ${range.minKRW ? `<div style="font-size:0.875rem; opacity:0.9; margin-top:4px;">(${escapeHtml(range.minKRW)} ~ ${escapeHtml(range.maxKRW)})</div>` : ''}
+      </div>`;
+  } else if (total) {
+    const totalAmountStr = `${currencySymbol}${total.amount.toLocaleString('en-US')}`;
+    const krwStr = total.amountKRW ? ` (₩${total.amountKRW.toLocaleString('en-US')})` : '';
+    totalHtml = `<div class="budget-total">
+        <div class="budget-total-label">예상 총 비용</div>
+        <div class="budget-total-amount">${totalAmountStr}${krwStr}</div>
+      </div>`;
+  }
 
   // 예산 팁
   const tipsHtml = tips.length > 0 ? generateTipsHtml(tips, '예산 팁') : '';
@@ -1173,6 +1186,11 @@ function generateBudgetHtml(budget: BudgetSection): string {
     ${tipsHtml}
   `;
 }
+
+// HTML 출력용 통화 기호 매핑
+const CURRENCY_CODE_TO_SYMBOL_HTML: Record<string, string> = {
+  JPY: '¥', USD: '$', EUR: '€', KRW: '₩', THB: '฿', VND: '₫', CNY: '¥', TWD: 'NT$',
+};
 
 // ============================================================
 // 체크리스트 섹션 HTML

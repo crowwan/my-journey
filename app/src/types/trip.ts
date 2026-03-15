@@ -26,7 +26,8 @@ export interface Trip {
 export interface TripOverview {
   flights: Flight[];
   accommodation: Accommodation;
-  weather: WeatherDay[];
+  // 레거시: AI 생성 데이터. 실시간 날씨는 /api/weather에서 조회
+  weather?: WeatherDay[];
   tips: string[];
 }
 
@@ -142,7 +143,10 @@ export interface TransportPass {
 // ============================================================
 export interface BudgetSection {
   items: BudgetItem[];
-  total: BudgetRange;
+  currency: string;        // 기본 통화 코드 (JPY, KRW, USD 등)
+  exchangeRate?: number;   // 1 외화 = ? KRW (예: JPY면 10)
+  total: BudgetTotal;      // 자동 계산 기반 합계
+  range?: BudgetRange;     // 구 데이터 호환용 (optional)
   tips: string[];
 }
 
@@ -150,11 +154,20 @@ export interface BudgetItem {
   icon: string;
   label: string;
   detail: string;
-  amount: string;
+  amount: number;          // 숫자 금액 (3000)
+  currency: string;        // 통화 코드 (JPY)
   percentage: number;
   color: string;
 }
 
+// 자동 계산 기반 합계
+export interface BudgetTotal {
+  amount: number;          // items 합계
+  currency: string;        // 기본 통화
+  amountKRW?: number;      // 환율 적용 원화
+}
+
+// 구 데이터 호환용 (하위 호환)
 export interface BudgetRange {
   min: string;
   max: string;

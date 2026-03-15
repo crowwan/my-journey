@@ -60,20 +60,24 @@ export const useEditStore = create<EditState>((set, get) => ({
         })),
         // 사전 준비: 빈 제목 제거
         preTodos: editingTrip.preTodos.filter((t) => t.title.trim() !== ''),
-        // 예산: 빈 라벨 제거 + 비율 자동 재계산
+        // 예산: 빈 라벨 제거 + 비율/합계 자동 재계산
         budget: (() => {
           const validItems = editingTrip.budget.items.filter((item) => item.label.trim() !== '');
-          // 금액에서 숫자 추출 (¥3,000 → 3000)
-          const amounts = validItems.map((item) => {
-            const num = parseFloat(item.amount.replace(/[^0-9.]/g, ''));
-            return isNaN(num) ? 0 : num;
-          });
-          const total = amounts.reduce((sum, n) => sum + n, 0);
-          const itemsWithPercentage = validItems.map((item, i) => ({
+          const totalAmount = validItems.reduce((sum, item) => sum + item.amount, 0);
+          const itemsWithPercentage = validItems.map((item) => ({
             ...item,
-            percentage: total > 0 ? Math.round((amounts[i] / total) * 100) : 0,
+            percentage: totalAmount > 0 ? Math.round((item.amount / totalAmount) * 100) : 0,
           }));
-          return { ...editingTrip.budget, items: itemsWithPercentage };
+          const exchangeRate = editingTrip.budget.exchangeRate;
+          return {
+            ...editingTrip.budget,
+            items: itemsWithPercentage,
+            total: {
+              amount: totalAmount,
+              currency: editingTrip.budget.currency,
+              amountKRW: exchangeRate ? totalAmount * exchangeRate : undefined,
+            },
+          };
         })(),
         // 교통: 빈 제목 단계 제거
         transport: {

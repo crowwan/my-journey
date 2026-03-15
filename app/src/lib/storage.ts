@@ -1,15 +1,22 @@
 import type { Trip, TripSummary } from '@/types/trip';
+import { migrateBudget } from '@/lib/budget-utils';
 
 const TRIP_PREFIX = 'trip:';
 const TRIP_LIST_KEY = 'trip:list';
 const PACKING_PREFIX = 'packing:checked:';
 
 export const storage = {
-  // Trip CRUD
+  // Trip CRUD (로드 시 구 데이터 자동 마이그레이션)
   getTrip(tripId: string): Trip | null {
     if (typeof window === 'undefined') return null;
     const raw = localStorage.getItem(`${TRIP_PREFIX}${tripId}`);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const trip = JSON.parse(raw) as Trip;
+    // 예산 구 데이터 마이그레이션 (amount가 string인 경우)
+    if (trip.budget) {
+      trip.budget = migrateBudget(trip.budget as unknown as Record<string, unknown>);
+    }
+    return trip;
   },
 
   saveTrip(trip: Trip): void {
