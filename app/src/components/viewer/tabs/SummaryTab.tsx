@@ -1,11 +1,13 @@
 'use client';
 
-import { Plane, Hotel, CloudSun, CalendarDays, ExternalLink, Plus, Trash2, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plane, Hotel, CloudSun, CalendarDays, ExternalLink, Plus, Trash2, X, Droplets, RefreshCw } from 'lucide-react';
 import { CustomSelect } from '@/components/ui/custom-select';
 import type { Trip, Flight, Accommodation } from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 
 import { EmojiIcon } from '@/lib/emoji-to-icon';
+import { useWeather } from '@/lib/useWeather';
 import { SectionEditHeader } from '../SectionEditHeader';
 import { SectionTitle } from '../shared/SectionTitle';
 import { TipsAccordion } from '../shared/TipsAccordion';
@@ -266,12 +268,43 @@ function AccommodationEditCard({
   );
 }
 
+// 마지막 업데이트 시각 표시 (순수 렌더 위반 방지를 위해 별도 컴포넌트)
+function WeatherUpdatedAt({ lastUpdated }: { lastUpdated: Date }) {
+  const [label, setLabel] = useState('방금 업데이트');
+
+  useEffect(() => {
+    function update() {
+      const diffMin = Math.round((Date.now() - lastUpdated.getTime()) / 60000);
+      setLabel(diffMin < 1 ? '방금 업데이트' : `${diffMin}분 전 업데이트`);
+    }
+    update();
+    const interval = setInterval(update, 60000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
+
+  return (
+    <div className="flex items-center gap-1.5 mb-2 text-xs text-text-tertiary">
+      <RefreshCw className="size-3" />
+      <span>{label}</span>
+    </div>
+  );
+}
+
 export function SummaryTab({ trip }: SummaryTabProps) {
   const flights = trip.overview?.flights ?? [];
   const accommodation = trip.overview?.accommodation;
-  const weather = trip.overview?.weather ?? [];
   const tips = trip.overview?.tips ?? [];
   const days = trip.days ?? [];
+
+  // 실시간 날씨 데이터 (mapSpots 좌표를 폴백으로 사용)
+  const firstSpot = days[0]?.mapSpots?.[0];
+  const fallbackCoords = firstSpot ? { lat: firstSpot.lat, lng: firstSpot.lng } : undefined;
+  const { data: weatherData, loading: weatherLoading, error: weatherError, lastUpdated } = useWeather(
+    trip.destination,
+    trip.startDate,
+    trip.endDate,
+    fallbackCoords,
+  );
 
   const editingSection = useEditStore((s) => s.editingSection);
   const updateEditingTrip = useEditStore((s) => s.updateEditingTrip);
@@ -531,25 +564,87 @@ export function SummaryTab({ trip }: SummaryTabProps) {
         </>
       )}
 
-      {/* 날씨 */}
+      {/* 실시간 날씨 */}
       <SectionTitle icon={<CloudSun className="size-4" />}>
         날씨 예보
       </SectionTitle>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {weather.map((w) => (
-          <div
-            key={w.date}
-            className="bg-surface border border-border-light rounded-xl p-4 min-w-[120px] text-center shrink-0 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="text-xs text-text-tertiary font-semibold">{w.dayOfWeek}</div>
-            <div className="text-2xl my-1.5"><EmojiIcon emoji={w.icon} size={24} className="inline-block" /></div>
-            <div className="text-base font-bold text-text-primary">{w.tempAvg}°</div>
-            <div className="text-xs text-text-secondary">
-              {w.tempLow}° ~ {w.tempHigh}°
+
+      {/* 마지막 업데이트 시각 */}
+      {lastUpdated && (
+        <WeatherUpdatedAt lastUpdated={lastUpdated} />
+      )}
+
+      {/* 로딩 스켈레톤 */}
+      {weatherLoading && (
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={`skeleton-${i}`}
+              className="bg-surface border border-border-light rounded-xl p-4 min-w-[120px] text-center shrink-0 shadow-sm"
+            >
+              <div className="h-3 w-8 mx-auto bg-bg-tertiary rounded animate-shimmer mb-2" />
+              <div className="h-7 w-7 mx-auto bg-bg-tertiary rounded-full animate-shimmer my-1.5" />
+              <div className="h-5 w-10 mx-auto bg-bg-tertiary rounded animate-shimmer mb-1" />
+              <div className="h-3 w-16 mx-auto bg-bg-tertiary rounded animate-shimmer" />
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* 에러 메시지 */}
+      {!weatherLoading && weatherError && (
+        <div className="text-center py-6 text-text-tertiary mb-3">
+          <CloudSun className="size-8 mx-auto mb-2 opacity-40" />
+          <p className="text-sm">{weatherError}</p>
+        </div>
+      )}
+
+      {/* 날씨 데이터 없음 (에러도 아님) */}
+      {!weatherLoading && !weatherError && (!weatherData || weatherData.length === 0) && (
+        <div className="text-center py-6 text-text-tertiary mb-3">
+          <CloudSun className="size-8 mx-auto mb-2 opacity-40" />
+          <p className="text-sm">예보 범위 밖이거나 날씨 데이터가 없습니다</p>
+        </div>
+      )}
+
+      {/* 실시간 날씨 카드 */}
+      {!weatherLoading && !weatherError && weatherData && weatherData.length > 0 && (
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {weatherData.map((w) => {
+            const isToday = w.date === todayStr;
+            return (
+              <div
+                key={w.date}
+                className={cn(
+                  'bg-surface border rounded-xl p-4 min-w-[120px] text-center shrink-0 shadow-sm hover:shadow-md transition-shadow',
+                  isToday ? 'border-primary/40 ring-1 ring-primary/20' : 'border-border-light',
+                )}
+              >
+                <div className="text-xs text-text-tertiary font-semibold">
+                  {w.dayOfWeek}
+                  {isToday && (
+                    <span className="ml-1 text-[10px] text-primary font-bold">TODAY</span>
+                  )}
+                </div>
+                <div className="text-2xl my-1.5">
+                  <EmojiIcon emoji={w.icon} size={24} className="inline-block" />
+                </div>
+                <div className="text-base font-bold text-text-primary">{w.tempAvg}°</div>
+                <div className="text-xs text-text-secondary">
+                  {w.tempLow}° ~ {w.tempHigh}°
+                </div>
+                {/* 강수 확률 */}
+                {w.precipitationProbability > 0 && (
+                  <div className="flex items-center justify-center gap-0.5 mt-1.5 text-xs text-info">
+                    <Droplets className="size-3" />
+                    <span>{w.precipitationProbability}%</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* 일별 요약 */}
       <SectionTitle icon={<CalendarDays className="size-4" />}>
