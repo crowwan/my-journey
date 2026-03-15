@@ -6,6 +6,7 @@ import { getCalendarDays, getCalendarBars } from '@/lib/calendar-utils';
 import { Header } from '@/components/layout/Header';
 import { CalendarHeader } from '@/components/calendar/CalendarHeader';
 import { CalendarGrid } from '@/components/calendar/CalendarGrid';
+import { MonthTripList } from '@/components/calendar/MonthTripList';
 
 export default function CalendarPage() {
   const { isLoaded, loadTrips, trips } = useTripStore();
@@ -63,6 +64,11 @@ export default function CalendarPage() {
           onToday={goToToday}
         />
         <CalendarGrid days={calendarDays} bars={calendarBars} />
+
+        {/* 해당 월 여행 요약 리스트 */}
+        <div className="mt-6 pb-8">
+          <MonthTripList trips={tripsArray} year={year} month={month} />
+        </div>
       </main>
     </div>
   );

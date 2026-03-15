@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { CalendarDay, CalendarBar } from '@/lib/calendar-utils';
 import { TripBar } from './TripBar';
 
@@ -11,16 +12,17 @@ interface CalendarGridProps {
 // 요일 헤더 라벨
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
-// 같은 주, 3개 초과 바가 있을 때 "+N개" 표시를 위한 계산
-function getOverflowCount(bars: CalendarBar[], weekIndex: number): number {
+// 해당 주의 최대 row 수 계산 (셀 높이 동적 결정용)
+function getMaxRows(bars: CalendarBar[], weekIndex: number): number {
   const weekBars = bars.filter((b) => b.weekIndex === weekIndex);
-  const maxRow = Math.max(...weekBars.map((b) => b.row), -1);
-  return maxRow >= 3 ? maxRow - 2 : 0;
+  if (weekBars.length === 0) return 0;
+  return Math.max(...weekBars.map((b) => b.row)) + 1;
 }
 
 // 월간 캘린더 7열 그리드
 export function CalendarGrid({ days, bars }: CalendarGridProps) {
   const weeks = Math.ceil(days.length / 7);
+  const [hoveredTripId, setHoveredTripId] = useState<string | null>(null);
 
   return (
     <div className="border border-border-light rounded-xl overflow-hidden">
@@ -41,10 +43,10 @@ export function CalendarGrid({ days, bars }: CalendarGridProps) {
       {/* 주별 행 */}
       {Array.from({ length: weeks }, (_, weekIdx) => {
         const weekDays = days.slice(weekIdx * 7, weekIdx * 7 + 7);
-        const weekBars = bars.filter(
-          (b) => b.weekIndex === weekIdx && b.row < 3
-        );
-        const overflow = getOverflowCount(bars, weekIdx);
+        const weekBars = bars.filter((b) => b.weekIndex === weekIdx);
+        const maxRows = getMaxRows(bars, weekIdx);
+        // 날짜 헤더 28px + 바 영역 (각 22px) + 여백 8px
+        const minHeight = Math.max(80, 28 + maxRows * 22 + 8);
 
         return (
           <div key={weekIdx} className="relative">
@@ -53,7 +55,8 @@ export function CalendarGrid({ days, bars }: CalendarGridProps) {
               {weekDays.map((d) => (
                 <div
                   key={d.date}
-                  className={`min-h-[80px] sm:min-h-[100px] p-1 border-r border-border-light last:border-r-0 ${
+                  style={{ minHeight }}
+                  className={`p-1 border-r border-border-light last:border-r-0 ${
                     d.isWeekend ? 'bg-bg-secondary' : 'bg-bg'
                   }`}
                 >
@@ -85,27 +88,18 @@ export function CalendarGrid({ days, bars }: CalendarGridProps) {
                     style={{
                       gridColumn: `${bar.startCol} / ${bar.endCol + 1}`,
                       position: 'absolute',
-                      top: `${24 + bar.row * 22}px`,
+                      top: `${28 + bar.row * 22}px`,
                       left: bar.startCol === 1 ? '2px' : '1px',
                       right: bar.endCol === 7 ? '2px' : '1px',
                     }}
                   >
-                    <TripBar bar={bar} />
+                    <TripBar
+                      bar={bar}
+                      isHovered={hoveredTripId === bar.tripId}
+                      onHover={setHoveredTripId}
+                    />
                   </div>
                 ))}
-
-                {/* 초과 바 표시 */}
-                {overflow > 0 && (
-                  <div
-                    className="absolute text-[10px] text-text-tertiary font-medium pointer-events-auto"
-                    style={{
-                      top: `${24 + 3 * 22}px`,
-                      left: '4px',
-                    }}
-                  >
-                    +{overflow}개
-                  </div>
-                )}
               </div>
             </div>
           </div>

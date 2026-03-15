@@ -1,8 +1,8 @@
 'use client';
 
-import { Plane, Hotel, CloudSun, CalendarDays, CalendarPlus, ExternalLink } from 'lucide-react';
+import { Plane, Hotel, CloudSun, CalendarDays, ExternalLink } from 'lucide-react';
 import type { Trip } from '@/types/trip';
-import { downloadIcsFile } from '@/lib/ics-utils';
+
 import { EmojiIcon } from '@/lib/emoji-to-icon';
 import { SectionTitle } from '../shared/SectionTitle';
 import { TipsAccordion } from '../shared/TipsAccordion';
@@ -136,15 +136,6 @@ export function SummaryTab({ trip }: SummaryTabProps) {
       <SectionTitle icon={<CalendarDays className="size-4" />}>
         일정 요약
       </SectionTitle>
-      {days.length > 0 && (
-        <button
-          onClick={() => downloadIcsFile(trip)}
-          className="flex items-center gap-1.5 text-xs text-primary border border-primary/20 bg-primary-50 rounded-full px-4 py-2 hover:bg-primary-100 transition-colors mb-4"
-        >
-          <CalendarPlus className="size-3.5" />
-          캘린더에 추가
-        </button>
-      )}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
         {days.map((day, index) => {
           const isToday = day.date === todayStr;
