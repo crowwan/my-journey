@@ -1,126 +1,122 @@
 # AI 기능 고도화 — 컨텍스트
 
-**최종 갱신**: 2026-03-15
+**최종 갱신**: 2026-03-15 (세션 종료 시점)
 
 ---
 
-## 주요 파일 맵
+## 현재 구현 상태
 
-### AI 드로어 / 채팅 UI
+### ✅ 완료된 Phase
 
-| 파일 | 역할 | Phase |
-|------|------|-------|
-| `src/components/ai/AIDrawerProvider.tsx` | FAB + 드로어 마운트, 토글 로직 | 1, 2 |
-| `src/components/ai/AIDrawer.tsx` | 슬라이드 패널, 닫기/ESC/오버레이/body 스크롤 제어 | 1, 2 |
-| `src/components/ai/AIFloatingButton.tsx` | FAB (토글 + 배지 표시 예정) | 2 |
-| `src/components/chat/ChatContainer.tsx` | 채팅 메인 영역, 빈 상태, 예시 칩, 생성 버튼 | 1, 3 |
-| `src/components/chat/ChatInput.tsx` | 텍스트 입력 + 전송 | - |
-| `src/components/chat/ChatMessage.tsx` | 메시지 버블 + tripPreview 렌더링 | 3 |
-| `src/components/chat/TripPreviewCard.tsx` | 생성 결과 카드 + 저장 버튼 | 3, 4 |
-| `src/components/chat/TypingIndicator.tsx` | 로딩 애니메이션 | - |
+| Phase | 내용 | 상태 |
+|-------|------|------|
+| Phase 1 | Quick Setup 폼 + 세션 영속화 | ✅ 완료 |
+| Phase 3 | 생성 결과 대화 내 수정 (replace_trip) | ✅ 완료 |
+| Phase 2 | Split View + 기존 여행 수정 | ✅ 구현 완료 (E2E 테스트 미완) |
 
-### 신규 생성 예정
-
-| 파일 | 역할 | Phase |
-|------|------|-------|
-| `src/components/chat/QuickSetupForm.tsx` | 목적지/날짜/인원 입력 폼 (create 모드 초기 화면) | 1 ✅ |
-| `src/components/ai/AISplitView.tsx` | Split View (좌 TripViewer + 우 ChatContainer) | 2 |
-
-### 상태 관리
-
-| 파일 | 역할 | Phase |
-|------|------|-------|
-| `src/stores/useChatStore.ts` | 메시지/로딩/에러/생성Trip 관리 | 1, 3 |
-| `src/stores/useUIStore.ts` | 드로어 열림/닫힘/모드/tripId | 1, 2 |
-| `src/stores/useTripStore.ts` | 여행 CRUD (localStorage 영속) | 4 |
-
-### API / 서버
-
-| 파일 | 역할 | Phase |
-|------|------|-------|
-| `src/api/gemini.ts` | Gemini SDK 래퍼, 시스템 프롬프트, DTO 변환 | 3, 4 |
-| `src/app/api/chat/route.ts` | Next.js API Route (stateless 핸들러) | 3, 4 |
-
-### 타입
-
-| 파일 | 역할 | Phase |
-|------|------|-------|
-| `src/types/trip.ts` | Trip, ChatMessage, TripAction 타입 정의 | 3, 4 |
-
-### 여행 상세 (edit 진입점)
-
-| 파일 | 역할 | Phase |
-|------|------|-------|
-| `src/components/viewer/HeroSection.tsx` | 여행 상세 히어로 (수정 버튼 추가 예정) | 4 |
-| `src/app/trips/[tripId]/page.tsx` | 여행 상세 페이지 | 4 |
+### 미완료 항목
+- 1.9: 드로어 닫았다 열었을 때 대화 복원 수동 테스트
+- 3.7: 생성 → 수정 → 재수정 → 저장 E2E 수동 테스트
+- 2.15: Split View E2E 수동 테스트
+- CLAUDE.md 업데이트
+- 메모리 업데이트
+- Vercel 배포 QA
 
 ---
 
-## 핵심 결정사항
+## 이번 세션에서 수정된 파일 (2026-03-15)
 
-### D1: 세션 저장소 선택 — sessionStorage
+### 신규 생성
+| 파일 | 역할 |
+|------|------|
+| `src/components/chat/QuickSetupForm.tsx` | 목적지/출발일/귀국일/인원 입력 폼 → 프롬프트 조립 → 바로 create |
+| `src/components/ai/AISplitView.tsx` | Split View (좌 TripViewer + 우 ChatContainer), 저장/닫기 헤더 |
 
-- **이유**: 탭 단위 세션 → 탭 닫으면 자연스럽게 초기화. localStorage는 영구 보존되어 불필요한 데이터 누적.
-- **대안 검토**: localStorage (과도), IndexedDB (오버엔지니어링), zustand in-memory (현재, 부족)
+### 주요 수정
+| 파일 | 변경 내용 |
+|------|----------|
+| `src/stores/useChatStore.ts` | zustand persist + sessionStorage, skipHydration:true, quickSetupSkipped 상태, action 필드 제거 |
+| `src/stores/useUIStore.ts` | aiViewMode('drawer'\|'split'), setAIViewMode, openAISplitView 추가 |
+| `src/components/ai/AIDrawerProvider.tsx` | useSyncExternalStore 데스크탑 감지, generatedTrip 시 자동 Split View 전환, clearMessages 제거 |
+| `src/components/ai/AIDrawer.tsx` | handleClose에서 clearMessages() 제거 |
+| `src/components/chat/ChatContainer.tsx` | Quick Setup/자유채팅/edit 3분기 빈 상태, 새 대화 버튼(Split View시 숨김), rehydrate() 호출 |
+| `src/components/chat/ChatMessage.tsx` | isLatestPreview prop, Split View시 TripPreviewCard 숨김 |
+| `src/components/chat/TripPreviewCard.tsx` | isLatest prop, "초안 보기" 풀스크린 모달 (모바일용) |
+| `src/components/chat/ChatInput.tsx` | CSS 기반 높이 자동 조절 (invisible div 방식), scrollbar-hide |
+| `src/components/viewer/TripViewer.tsx` | scrollContainerRef optional prop (Split View 내부 스크롤 대응) |
+| `src/components/viewer/HeroSection.tsx` | "AI로 수정" 버튼 추가 → openAISplitView('edit', tripId) |
+| `src/api/gemini.ts` | EDIT_TRIP_PROMPT → getEditTripPrompt() 함수, replace_trip 방식, editTrip 반환타입 변경 |
+| `src/app/page.tsx` | useState lazy initializer → useEffect 복원 (하이드레이션 수정), eslint block disable |
+| `src/app/trips/[tripId]/page.tsx` | useState+useEffect → useMemo 변환 |
 
-### D2: edit 모드 전략 — replace_trip (전체 재생성)
+### 삭제
+| 파일 | 이유 |
+|------|------|
+| `src/components/shared/HorizontalScroll.tsx` | 미사용 컴포넌트 |
 
-- **이유**: 부분 merge (TripAction 적용)는 action 타입별 로직이 복잡하고, Gemini 응답의 일관성도 보장 어려움. 전체 Trip JSON 재생성이 단순하고 안정적.
-- **트레이드오프**: 토큰 사용량 증가 → 프로토타입 단계에서 허용 가능
+---
+
+## 주요 결정사항
+
+### D1: 세션 저장소 — sessionStorage
+- 탭 닫으면 자연 초기화, localStorage는 과도
+
+### D2: edit 모드 — replace_trip (전체 재생성)
+- 부분 merge 복잡도 회피, create와 동일한 스키마 재활용
+- gemini.ts의 editTrip이 trip 필드 반환 (기존 action 대신)
+- 기존 Trip ID + createdAt 유지
 
 ### D3: Split View (드로어 최소화 대체)
+- 데스크탑: 좌 TripViewer + 우 ChatContainer (fixed flex)
+- 모바일: 기존 드로어 유지 + TripPreviewCard에 "초안 보기" 풀스크린 모달
+- AIDrawerProvider에서 useSyncExternalStore로 데스크탑 감지 (640px 기준)
 
-- **이유**: 드로어 최소화보다 Split View가 더 자연스러운 UX. 여행 전체를 보면서 수정 대화 가능.
-- **대안 검토**: 드로어 3-상태(open/minimized/closed) → 최소화해도 뷰어를 볼 수 없음, Split View가 우월
-- **모바일**: 화면 작아서 split 불가 → 기존 드로어 유지
+### D4: Quick Setup → 바로 create
+- 폼에서 기본 정보 수집 → 프롬프트 조립 → sendMessage(text, 'create')
+- 날짜: date input 2개 (출발일 + 귀국일), 기간 자동 계산
+- "건너뛰기" → 자유 채팅 모드
 
-### D4: TripAction 타입 유지
+### D5: ChatInput 높이 조절 — CSS invisible div 방식
+- JS adjustHeight 대신 invisible div가 콘텐츠 높이 결정
+- textarea는 absolute로 div 위에 배치
+- min-h-[40px], max-h-[120px], scrollbar-hide
 
-- **이유**: replace_trip 방식을 주력으로 쓰되, TripAction 타입은 향후 부분 업데이트 최적화 시 재활용 가능. 현재 삭제하지 않음.
+### D6: SSR 하이드레이션 안전
+- useChatStore: skipHydration:true + ChatContainer에서 수동 rehydrate()
+- page.tsx showSplash: useEffect에서 sessionStorage 확인 (eslint block disable)
 
 ---
 
-## 의존성
+## 해결한 버그
 
-### 라이브러리
+1. **하이드레이션 에러**: useState lazy initializer의 `typeof window` 분기 → 서버/클라이언트 불일치 → useEffect 복원
+2. **ChatInput 스크롤 노출**: textarea py 패딩 + border-radius → overflow-hidden + invisible div 방식으로 해결
+3. **Split View 헤더 높이 불일치**: ChatContainer "새 대화" 바가 추가 높이 → Split View시 숨김 + 양쪽 h-[49px] 고정
 
-| 패키지 | 용도 | 상태 |
-|--------|------|------|
-| `zustand` | 상태 관리 | 이미 사용 중 |
-| `zustand/middleware` (persist) | sessionStorage 영속화 | zustand 내장, 추가 설치 불필요 |
-| `@google/genai` | Gemini API | 이미 사용 중 |
+---
 
-### 환경
+## 커밋 히스토리 (이번 세션)
 
-| 항목 | 상태 |
+| 커밋 | 내용 |
 |------|------|
-| `GEMINI_API_KEY` | 설정 완료 |
-| Vercel 배포 | 설정 완료 |
-| Next.js App Router | 사용 중 |
+| `12003fd` | 미사용 컴포넌트 삭제 + ESLint 수정 |
+| `774c203` | Quick Setup 폼 + 세션 영속화 (Phase 1) |
+| `2bb750b` | SSR 하이드레이션 에러 수정 |
+| `a7d11e6` | 생성 결과 대화 내 수정 (Phase 3) |
+| `077ee23` | Split View 구현 (Phase 2) |
+| `531616d` | ChatInput 높이 자동 조절 개선 |
+| `df9b19c` | 모바일 초안 보기 + ChatInput 스크롤바 숨김 |
+| `4c8174b` | Split View 헤더 높이 통일 + 새 대화 버튼 통합 |
 
 ---
 
-## 현재 코드 핵심 포인트
+## 다음 작업 (우선순위순)
 
-### clearMessages() 호출 지점 (Phase 1에서 제거 대상)
-
-1. `AIDrawer.tsx:22` — `handleClose` 콜백 내
-2. `AIDrawerProvider.tsx:21` — `handleToggle` 함수 내 (드로어 열려있을 때 닫기)
-
-### body.overflow 제어 (Phase 2에서 조건부 변경)
-
-1. `AIDrawer.tsx:39-47` — `useEffect`에서 isOpen 기반 제어
-
-### edit 모드 미완성 부분
-
-1. `gemini.ts:159-186` — EDIT_TRIP_PROMPT 존재, 프롬프트 수정 필요
-2. `gemini.ts:366-387` — editTrip API 존재, replace_trip 방식으로 변경 필요
-3. `trip.ts:211-231` — TripAction/TripActionType 타입 존재
-4. `ChatMessage.tsx:73` — tripAction 필드 destructure하지만 렌더링 안 함
-5. `ChatContainer.tsx:54-59` — edit 모드 핸들러 존재, 동작은 함
-
-### openAIDrawer('edit') 호출 지점 — 현재 없음
-
-- `page.tsx` (홈): openAIDrawer('create') 만 사용
-- `NewTripButton`: openAIDrawer('create')
-- `AIDrawerProvider`: openAIDrawer() (기본값 create)
+1. **E2E 수동 테스트** — Vercel 배포 후 전체 흐름 확인
+   - Quick Setup → 생성 → Split View → 수정 → 저장
+   - 기존 여행 → AI 수정 → Split View → 수정 → 저장
+   - 모바일: 드로어 → 생성 → 초안 보기 → 저장
+   - 세션 영속화: 드로어 닫기 → 열기 → 대화 복원
+2. **국내 여행 대응** — Gemini 프롬프트에 국내 여행 가이드 추가, 항공편 없을 때 "정보 없음" 대신 섹션 숨김
+3. **Phase 2 (드로어 최소화)** — 필요 시 추후 구현 (현재 Split View로 대체)
+4. **CLAUDE.md 업데이트** — AI 기능 설명 추가
