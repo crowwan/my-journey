@@ -5,7 +5,9 @@ import type { Trip } from '@/types/trip';
 import type { TabId } from '@/lib/constants';
 import { storage } from '@/lib/storage';
 import { getPackingProgress } from '@/lib/trip-utils';
+import { useEditStore } from '@/stores/useEditStore';
 import { HeroSection } from './HeroSection';
+import { EditBar } from './EditBar';
 import { TabBar } from './TabBar';
 import { SummaryTab } from './tabs/SummaryTab';
 import { ScheduleTab } from './tabs/ScheduleTab';
@@ -21,8 +23,14 @@ interface TripViewerProps {
 
 export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('summary');
-  const checkedMap = storage.getPackingChecked(trip.id);
-  const packingProgress = getPackingProgress(trip.packing, checkedMap);
+  const isEditMode = useEditStore((s) => s.isEditMode);
+  const editingTrip = useEditStore((s) => s.editingTrip);
+
+  // 편집 모드일 때는 editingTrip 사용, 아닐 때는 원본 trip 사용
+  const displayTrip = isEditMode && editingTrip ? editingTrip : trip;
+
+  const checkedMap = storage.getPackingChecked(displayTrip.id);
+  const packingProgress = getPackingProgress(displayTrip.packing, checkedMap);
 
   // 탭 변경 시 스크롤 처리: scrollContainerRef가 있으면 내부 스크롤, 없으면 window
   const scrollToTop = () => {
@@ -35,16 +43,18 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
 
   return (
     <div>
-      <HeroSection trip={trip} packingProgress={packingProgress} />
+      {/* 편집 모드 시 상단 저장/취소 바 */}
+      {isEditMode && <EditBar />}
+      <HeroSection trip={displayTrip} packingProgress={packingProgress} />
       <TabBar activeTab={activeTab} onChange={(tab) => {
         setActiveTab(tab);
         scrollToTop();
       }} />
       <div className="max-w-[1100px] mx-auto px-5 py-8">
-        {activeTab === 'summary' && <SummaryTab trip={trip} />}
-        {activeTab === 'schedule' && <ScheduleTab days={trip.days} />}
-        {activeTab === 'guide' && <GuideTab restaurants={trip.restaurants} transport={trip.transport} budget={trip.budget} />}
-        {activeTab === 'checklist' && <ChecklistTab tripId={trip.id} packing={trip.packing} preTodos={trip.preTodos} />}
+        {activeTab === 'summary' && <SummaryTab trip={displayTrip} />}
+        {activeTab === 'schedule' && <ScheduleTab days={displayTrip.days} />}
+        {activeTab === 'guide' && <GuideTab restaurants={displayTrip.restaurants} transport={displayTrip.transport} budget={displayTrip.budget} />}
+        {activeTab === 'checklist' && <ChecklistTab tripId={displayTrip.id} packing={displayTrip.packing} preTodos={displayTrip.preTodos} isEditMode={isEditMode} />}
       </div>
     </div>
   );

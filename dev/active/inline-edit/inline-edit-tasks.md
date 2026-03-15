@@ -6,15 +6,15 @@
 
 ## Phase 1: 편집 모드 기반 + 체크리스트/사전준비
 
-- [ ] 1.1 useEditStore 생성 (isEditMode, editingTrip, enter/exit/save/cancel)
-- [ ] 1.2 HeroSection에 "편집" 토글 버튼 추가 (Pencil 아이콘 옆 또는 대체)
-- [ ] 1.3 편집 모드 시 상단 저장/취소 바 표시
-- [ ] 1.4 체크리스트 항목 추가 (+ 버튼 → 인라인 input)
-- [ ] 1.5 체크리스트 항목 삭제 (- 버튼)
-- [ ] 1.6 체크리스트 항목 이름 수정 (탭 → input)
-- [ ] 1.7 사전 준비 항목 추가/삭제/수정
-- [ ] 1.8 저장/취소 동작 검증
-- [ ] 1.9 빌드 + 린트 확인
+- [x] 1.1 useEditStore 생성 (isEditMode, editingTrip, enter/exit/save/cancel) [2026-03-15]
+- [x] 1.2 HeroSection에 "편집" 토글 버튼 추가 (PenLine 아이콘, 편집 중 비활성) [2026-03-15]
+- [x] 1.3 편집 모드 시 상단 저장/취소 바 표시 (EditBar 컴포넌트) [2026-03-15]
+- [x] 1.4 체크리스트 항목 추가 (+ 버튼 → 인라인 input, Enter로 확정) [2026-03-15]
+- [x] 1.5 체크리스트 항목 삭제 (- 버튼, Minus 아이콘) [2026-03-15]
+- [x] 1.6 체크리스트 항목 이름 수정 (인라인 input, border-dashed) [2026-03-15]
+- [x] 1.7 사전 준비 항목 추가/삭제/수정 (title, description 인라인 편집) [2026-03-15]
+- [x] 1.8 저장/취소 동작 검증 (saveEdit → useTripStore.saveTrip + updatedAt 갱신) [2026-03-15]
+- [x] 1.9 빌드 + 린트 확인 (0 errors, 빌드 성공) [2026-03-15]
 
 ---
 
