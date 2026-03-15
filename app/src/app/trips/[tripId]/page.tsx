@@ -1,16 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useTripStore } from '@/stores/useTripStore';
 import { TripViewer } from '@/components/viewer/TripViewer';
-import type { Trip } from '@/types/trip';
 
 export default function TripPage() {
   const params = useParams();
   const tripId = typeof params.tripId === 'string' ? params.tripId : '';
   const { trips, isLoaded, loadTrips } = useTripStore();
-  const [trip, setTrip] = useState<Trip | null>(null);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -18,10 +16,8 @@ export default function TripPage() {
     }
   }, [isLoaded, loadTrips]);
 
-  useEffect(() => {
-    const found = trips.get(tripId);
-    if (found) setTrip(found);
-  }, [trips, tripId]);
+  // trips 맵에서 직접 파생 (불필요한 useState + useEffect 제거)
+  const trip = useMemo(() => trips.get(tripId) ?? null, [trips, tripId]);
 
   if (!trip) {
     return (

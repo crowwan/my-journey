@@ -26,13 +26,13 @@ export default function Home() {
   const { isLoaded, loadTrips, getTripSummaries, deleteTrip } = useTripStore();
   const openAIDrawer = useUIStore((s) => s.openAIDrawer);
   const trips = useTripStore((s) => s.trips);
-  const [showSplash, setShowSplash] = useState(true);
-
-  useEffect(() => {
-    if (sessionStorage.getItem('splashShown')) {
-      setShowSplash(false);
+  // 세션 내 첫 방문 여부를 초기값에서 판단 (불필요한 useEffect 제거)
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !sessionStorage.getItem('splashShown');
     }
-  }, []);
+    return true;
+  });
 
   useEffect(() => {
     if (!isLoaded) {
