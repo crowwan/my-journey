@@ -1,100 +1,78 @@
 # 환율 계산기 + 실시간 날씨 - 컨텍스트 & 결정사항
 
 ## 상태
-- 단계: 계획 수립 완료, 구현 미착수
-- 진행률: 0 / 17 작업 완료
+- 단계: **날씨 구현 완료, 환율 미착수**
+- 진행률: 날씨 7/7 완료, 환율 0/5 미착수
 - 최종 수정: 2026-03-15
 
-## 주요 파일
+## 이번 세션 구현 완료 (날씨)
 
-### 수정 대상
+### 생성된 파일
+| 파일 | 용도 | 상태 |
+|------|------|------|
+| `app/src/lib/api-cache.ts` | 인메모리 TTL 캐시 유틸 | ✅ 완료 |
+| `app/src/lib/geocoding.ts` | 도시명 → 위경도 (한글→영문 매핑 80+개) | ✅ 완료 |
+| `app/src/lib/weather-utils.ts` | WMO 코드 → 이모지/설명 매핑 | ✅ 완료 |
+| `app/src/app/api/weather/route.ts` | Open-Meteo 날씨 API Route (1시간 캐시) | ✅ 완료 |
+| `app/src/lib/useWeather.ts` | `useWeather()` 커스텀 훅 | ✅ 완료 |
 
-| 파일 | 용도 | 변경 내용 |
-|------|------|----------|
-| `app/src/components/viewer/tabs/SummaryTab.tsx` | 요약탭 날씨 섹션 | 실시간 날씨 위젯으로 교체 |
-| `app/src/components/viewer/tabs/GuideTab.tsx` | 가이드탭 예산 섹션 | 환율 계산기 위젯 통합 |
-| `app/src/api/gemini.ts` | Gemini 프롬프트 | 날씨 생성 제거, 스키마 수정 |
-| `app/src/types/trip.ts` | Trip 타입 정의 | `weather` 필드 optional 변경 + 주석 |
+### 수정된 파일
+| 파일 | 변경 내용 | 상태 |
+|------|----------|------|
+| `app/src/components/viewer/tabs/SummaryTab.tsx` | 실시간 날씨 위젯 (스켈레톤, 에러, TODAY 뱃지, 강수확률) | ✅ 완료 |
+| `app/src/types/trip.ts` | `weather` optional 변경 + 레거시 주석 | ✅ 완료 |
+| `app/src/api/gemini.ts` | create/edit 프롬프트에서 날씨 생성 제거 | ✅ 완료 |
 
-### 신규 생성
-
-| 파일 | 용도 |
-|------|------|
-| `app/src/app/api/weather/route.ts` | Open-Meteo 날씨 API Route |
-| `app/src/app/api/currency/route.ts` | ExchangeRate-API 환율 API Route |
-| `app/src/lib/api-cache.ts` | 서버 인메모리 캐시 유틸 |
-| `app/src/lib/geocoding.ts` | 도시명 -> 위경도 변환 유틸 |
-| `app/src/lib/weather-utils.ts` | WMO 코드 -> 이모지 매핑 |
-| `app/src/lib/currency-utils.ts` | 목적지 -> 통화 코드 매핑 |
-| `app/src/lib/useWeather.ts` | 날씨 데이터 fetch 커스텀 훅 |
-| `app/src/lib/useCurrency.ts` | 환율 데이터 fetch 커스텀 훅 |
-| `app/src/components/viewer/CurrencyConverter.tsx` | 환율 변환 위젯 컴포넌트 |
-
-### 참조 (읽기 전용)
-
-| 파일 | 참조 이유 |
-|------|----------|
-| `app/src/components/viewer/TripViewer.tsx` | 뷰어 구조 파악, 탭 배치 |
-| `app/src/components/viewer/HeroSection.tsx` | 여행 메타 정보 참조 |
-| `app/src/app/api/chat/route.ts` | 기존 API Route 패턴 참조 |
-| `app/src/stores/useTripStore.ts` | Trip 데이터 접근 패턴 |
-| `app/src/lib/constants.ts` | 탭 구성, Day 색상 |
-| `docs/design-system.md` | UI 컴포넌트 스타일 가이드 |
+### 미구현 (환율)
+| 파일 | 용도 | 상태 |
+|------|------|------|
+| `app/src/app/api/currency/route.ts` | ExchangeRate-API 환율 API Route | ❌ 미착수 |
+| `app/src/lib/currency-utils.ts` | 목적지 → 통화 코드 매핑 | ❌ 미착수 |
+| `app/src/lib/useCurrency.ts` | 환율 데이터 fetch 훅 | ❌ 미착수 |
+| `app/src/components/viewer/CurrencyConverter.tsx` | 환율 변환 위젯 | ❌ 미착수 |
 
 ---
 
 ## 주요 결정
 
-### 1. 날씨 API 선택: Open-Meteo (2026-03-15)
-- **근거**: API 키 불필요, 무제한 호출(비상업), 16일 예보 제공
-- **대안**: OpenWeatherMap (5일 예보 제한), WeatherAPI (3일 예보 제한)
-- **트레이드오프**: WMO 날씨 코드를 이모지로 변환하는 매핑 테이블 직접 구현 필요. 대신 API 키 관리 부담 제로
+### 1. 날씨 API: Open-Meteo (2026-03-15)
+- API 키 불필요, 무제한 호출(비상업), 16일 예보
 
-### 2. 환율 API 선택: ExchangeRate-API v6 (2026-03-15)
-- **근거**: KRW 직접 지원, 안정적, 월 1,500회로 개인 프로젝트에 충분
-- **대안**: frankfurter.app (API 키 불필요, 무제한 -- 하지만 ECB 기준이라 KRW/JPY 등 아시아 통화 지원 불확실)
-- **트레이드오프**: API 키 관리 필요 + 월간 호출 제한. 캐싱으로 완화
-- **폴백 전략**: API 키 미설정 시 환율 섹션을 gracefully 숨김 (앱 기능에 영향 없음)
+### 2. Geocoding: 한글→영문 매핑 테이블 방식 (2026-03-15)
+- **이슈**: Open-Meteo Geocoding이 한글 검색을 지원하지 않음 ("제주도", "오사카" → 결과 없음)
+- **해결**: `CITY_NAME_MAP` 테이블로 한글→영문 변환 (80+개 도시)
+- **추가 이슈**: "Jeju" 검색 시 에티오피아가 1순위로 반환됨
+- **해결**: `count: 5`로 복수 결과 조회 + 주요 국가 코드(KR, JP 등) 우선 선택
+- **폴백**: 매핑 테이블에 없는 도시 → 영문 그대로 검색 → 실패 시 mapSpots 좌표 폴백
 
-### 3. API 호출 위치: 서버 사이드 (Next.js API Route) (2026-03-15)
-- **근거**: API 키 보호, CORS 무관, 서버 캐싱 일원화
-- **대안**: 클라이언트 직접 호출 (Open-Meteo는 키 불필요라 가능)
-- **트레이드오프**: 서버리스 cold start 시 캐시 초기화. 하지만 Vercel의 edge 캐싱/ISR로 보완 가능
+### 3. 날씨 실패 시 AI 폴백 없음 (2026-03-15)
+- **사용자 결정**: AI 생성 날씨는 부정확해서 차라리 안 보여주는 게 나음
+- **구현**: 에러 시 "날씨 데이터를 가져올 수 없습니다" 메시지만 표시
+- **16일 초과**: "예보 범위 밖이거나 날씨 데이터가 없습니다" 표시
 
-### 4. Trip 타입 변경 전략: 최소 변경 + 하위호환 (2026-03-15)
-- **근거**: `WeatherDay` 타입 삭제 시 기존 localStorage 데이터 깨짐
-- **결정**: `overview.weather`를 optional로만 변경, 타입 자체는 유지
-- **대안**: 별도 `LiveWeather` 타입 생성 -- 불필요한 복잡도 증가
-- **트레이드오프**: 사용되지 않는 타입이 남지만, 코드베이스 안정성 우선
+### 4. 환율 API: ExchangeRate-API v6 (2026-03-15)
+- KRW 직접 지원, 월 1,500회 (캐싱 6시간이면 충분)
+- **차단 요인**: API 키 발급 필요 (https://www.exchangerate-api.com/)
 
-### 5. UI 배치: 환율 계산기를 가이드탭 예산 섹션 내부에 (2026-03-15)
-- **근거**: 환율과 예산은 자연스럽게 연관. 별도 탭이나 모달은 과도
-- **대안 A**: 5번째 탭 추가 -- 기존 4탭 구조 깨짐, 디자인 시스템 변경 필요
-- **대안 B**: 모달/드로어 -- 접근성 낮음, 빈번한 사용 불편
-- **트레이드오프**: 가이드탭이 살짝 길어지지만, Accordion 내부라 접힘/펼침 가능
+### 5. 공유 기능: Supabase 도입 시 함께 (2026-03-15)
+- **사용자 결정**: 공유 기능은 보류, Supabase 전체 데이터 레이어 전환 시 도입
+- trip-sharing 계획서는 `dev/active/trip-sharing/`에 유지
 
-### 6. 캐싱 전략 (2026-03-15)
-- **날씨**: 서버 인메모리 1시간 TTL. 날씨 데이터는 자주 변하므로 짧게
-- **환율**: 서버 인메모리 6시간 TTL. 일일 업데이트라 긴 캐시 가능
-- **Geocoding**: 서버 인메모리 24시간 TTL. 도시 좌표는 변하지 않음
+### 6. iOS 앱 폐기 (2026-03-15)
+- Capacitor 기반 iOS 앱 계획 폐기, 웹 서빙 방식으로 전환
+- 계획서 아카이빙: `dev/archive/ios-app-roadmap/`
 
 ---
 
 ## 알려진 이슈
 
-### 차단 요인
-- ExchangeRate-API 무료 회원가입 필요 (https://www.exchangerate-api.com/) -- 구현 시작 전 API 키 발급 필요
+### 해결됨
+- ✅ Open-Meteo 한글 검색 미지원 → 영문 매핑 테이블로 해결
+- ✅ "Jeju" 에티오피아 우선 반환 → country_code 필터링으로 해결
 
-### 임시 해결책 (예정)
-- 환율 API 키 미설정 시: 환율 계산기 섹션 자체를 숨김
-- Open-Meteo geocoding 실패 시: Trip.days[0].mapSpots[0] 좌표 폴백
-
-### 향후 개선사항
-- 환율 히스토리 차트 (7일/30일 추이)
-- 날씨 알림 (출발 전 악천후 경고)
-- 다중 통화 지원 (경유지 통화)
-- 시간대별 날씨 (시간별 예보)
-- PWA 오프라인 캐시 (ServiceWorker)
+### 미해결
+- ExchangeRate-API 키 미발급 → 환율 구현 시작 전 필요
+- ShareModal.tsx ESLint 경고 (useEffect 내 setState) — 기존 이슈
 
 ---
 
@@ -103,48 +81,20 @@
 ### Open-Meteo Forecast API
 ```
 GET https://api.open-meteo.com/v1/forecast
-  ?latitude=34.6937
-  &longitude=135.5023
+  ?latitude=34.6937&longitude=135.5023
   &daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,
          precipitation_probability_max,weathercode
-  &timezone=auto
-  &forecast_days=16
-```
-
-응답 예시:
-```json
-{
-  "daily": {
-    "time": ["2026-03-15", "2026-03-16"],
-    "temperature_2m_max": [18.5, 20.1],
-    "temperature_2m_min": [8.2, 9.0],
-    "temperature_2m_mean": [13.4, 14.6],
-    "precipitation_probability_max": [10, 45],
-    "weathercode": [0, 61]
-  }
-}
+  &timezone=auto&forecast_days=16
 ```
 
 ### Open-Meteo Geocoding API
 ```
 GET https://geocoding-api.open-meteo.com/v1/search
-  ?name=osaka
-  &count=1
-  &language=en
+  ?name=Osaka&count=5&language=en
 ```
+주의: 한글 검색 미지원. CITY_NAME_MAP으로 영문 변환 필요.
 
-### ExchangeRate-API v6
+### ExchangeRate-API v6 (미구현)
 ```
 GET https://v6.exchangerate-api.com/v6/{API_KEY}/pair/KRW/JPY/10000
-```
-
-응답 예시:
-```json
-{
-  "result": "success",
-  "base_code": "KRW",
-  "target_code": "JPY",
-  "conversion_rate": 0.1098,
-  "conversion_result": 1098.0
-}
 ```
