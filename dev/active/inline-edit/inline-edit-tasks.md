@@ -49,9 +49,20 @@
 
 ## Phase 4: 예산 + 교통
 
-- [ ] 4.1 예산 항목 편집 + 추가/삭제
-- [ ] 4.2 교통 homeToHotel 편집
-- [ ] 4.3 빌드 + 린트 확인
+- [x] 4.1 예산 항목 편집 + 추가/삭제 [2026-03-15]
+  - ✅ BudgetEditCard: icon, label, detail, amount, percentage, color 인라인 편집
+  - ✅ 예산 항목 추가/삭제
+  - ✅ total (min, max, minKRW, maxKRW) 편집
+  - ✅ 예산 팁 수정/삭제/추가
+- [x] 4.2 교통 편집 (homeToHotel + intercityRoutes + passes + ICOCA + tips) [2026-03-15]
+  - ✅ TransportStepEditCard: homeToHotel 단계 icon/title/subtitle 편집 + 추가/삭제
+  - ✅ RouteEditCard: 도시간 노선 편집 + 추가/삭제
+  - ✅ PassEditCard: 패스 비교 편집 + 추가/삭제 (추천도 select)
+  - ✅ passVerdict 편집
+  - ✅ ICOCA 가이드 수정/삭제/추가
+  - ✅ 교통 팁 수정/삭제/추가
+- [x] 4.3 빌드 + 린트 확인 (0 errors, 빌드 성공) [2026-03-15]
+  - 📝 Accordion → SectionEditHeader 방식으로 전환 (교통/예산 모두)
 
 ---
 

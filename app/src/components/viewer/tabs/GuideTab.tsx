@@ -4,7 +4,10 @@ import {
   UtensilsCrossed, Train, Wallet, Plane as PlaneIcon,
   CreditCard, Calculator, ExternalLink, Plus, Trash2
 } from 'lucide-react';
-import type { Trip, Restaurant, TransportSection, TransportPass, BudgetSection } from '@/types/trip';
+import type {
+  Trip, Restaurant, TransportSection, TransportPass, TransportStep,
+  TransportRoute, BudgetSection, BudgetItem
+} from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
 import { SectionEditHeader } from '../SectionEditHeader';
@@ -12,12 +15,6 @@ import { SectionTitle } from '../shared/SectionTitle';
 import { Tip } from '../shared/Tip';
 import { TipsAccordion } from '../shared/TipsAccordion';
 import { cn } from '@/lib/utils';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 
 interface GuideTabProps {
   trip: Trip;
@@ -163,6 +160,356 @@ function RestaurantEditCard({
   );
 }
 
+// ============================================================
+// 예산 항목 편집 카드
+// ============================================================
+function BudgetEditCard({
+  item,
+  onUpdate,
+  onDelete,
+}: {
+  item: BudgetItem;
+  onUpdate: (field: keyof BudgetItem, value: string | number) => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="bg-surface border border-dashed border-border rounded-xl p-5 mb-3 hover:border-primary/30 transition-all">
+      {/* 아이콘 + 라벨 */}
+      <div className="grid grid-cols-[60px_1fr] gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">아이콘</label>
+          <InlineInput
+            value={item.icon}
+            onChange={(v) => onUpdate('icon', v)}
+            className="text-sm text-text-primary w-full text-center"
+            placeholder="🚆"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">항목명</label>
+          <InlineInput
+            value={item.label}
+            onChange={(v) => onUpdate('label', v)}
+            className="text-sm font-bold text-text-primary w-full"
+            placeholder="교통비"
+          />
+        </div>
+      </div>
+
+      {/* 상세 설명 */}
+      <div className="mb-3">
+        <label className="text-xs text-text-tertiary block mb-1">상세</label>
+        <InlineInput
+          value={item.detail}
+          onChange={(v) => onUpdate('detail', v)}
+          className="text-sm text-text-secondary w-full"
+          placeholder="세부 내역"
+        />
+      </div>
+
+      {/* 금액 + 비율 + 색상 */}
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">금액</label>
+          <InlineInput
+            value={item.amount}
+            onChange={(v) => onUpdate('amount', v)}
+            className="text-sm text-primary font-bold w-full"
+            placeholder="¥3,000"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">비율 (%)</label>
+          <InlineInput
+            value={String(item.percentage)}
+            onChange={(v) => {
+              const num = parseFloat(v);
+              if (!isNaN(num) && num >= 0 && num <= 100) {
+                onUpdate('percentage', num);
+              } else if (v === '') {
+                onUpdate('percentage', 0);
+              }
+            }}
+            type="number"
+            className="text-sm text-text-primary w-full"
+            placeholder="30"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">색상</label>
+          <input
+            type="color"
+            value={item.color || '#f97316'}
+            onChange={(e) => onUpdate('color', e.target.value)}
+            className="w-full h-8 rounded-md border border-border cursor-pointer bg-transparent"
+          />
+        </div>
+      </div>
+
+      {/* 삭제 버튼 */}
+      <div className="flex justify-end">
+        <button
+          onClick={onDelete}
+          className="flex items-center gap-1 text-xs text-error hover:bg-error/10 rounded-md px-2 py-1 transition-colors"
+          aria-label="예산 항목 삭제"
+        >
+          <Trash2 className="size-3.5" />
+          삭제
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 교통 단계(homeToHotel) 편집 카드
+// ============================================================
+function TransportStepEditCard({
+  step,
+  onUpdate,
+  onDelete,
+}: {
+  step: TransportStep;
+  onUpdate: (field: keyof TransportStep, value: string) => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="bg-surface border border-dashed border-border rounded-xl p-4 mb-3 hover:border-primary/30 transition-all">
+      <div className="grid grid-cols-[60px_1fr] gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">아이콘</label>
+          <InlineInput
+            value={step.icon}
+            onChange={(v) => onUpdate('icon', v)}
+            className="text-sm text-text-primary w-full text-center"
+            placeholder="🚃"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">제목</label>
+          <InlineInput
+            value={step.title}
+            onChange={(v) => onUpdate('title', v)}
+            className="text-sm font-bold text-text-primary w-full"
+            placeholder="난바역"
+          />
+        </div>
+      </div>
+      <div className="mb-3">
+        <label className="text-xs text-text-tertiary block mb-1">부제목</label>
+        <InlineInput
+          value={step.subtitle}
+          onChange={(v) => onUpdate('subtitle', v)}
+          className="text-sm text-text-secondary w-full"
+          placeholder="난카이선 40분"
+        />
+      </div>
+      {/* 삭제 버튼 */}
+      <div className="flex justify-end">
+        <button
+          onClick={onDelete}
+          className="flex items-center gap-1 text-xs text-error hover:bg-error/10 rounded-md px-2 py-1 transition-colors"
+          aria-label="교통 단계 삭제"
+        >
+          <Trash2 className="size-3.5" />
+          삭제
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 도시간 노선 편집 카드
+// ============================================================
+function RouteEditCard({
+  route,
+  onUpdate,
+  onDelete,
+}: {
+  route: TransportRoute;
+  onUpdate: (field: keyof TransportRoute, value: string) => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="bg-surface border border-dashed border-border rounded-xl p-4 mb-3 hover:border-primary/30 transition-all">
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">출발</label>
+          <InlineInput
+            value={route.from}
+            onChange={(v) => onUpdate('from', v)}
+            className="text-sm text-text-primary w-full"
+            placeholder="오사카"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">도착</label>
+          <InlineInput
+            value={route.to}
+            onChange={(v) => onUpdate('to', v)}
+            className="text-sm text-text-primary w-full"
+            placeholder="교토"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">교통편</label>
+          <InlineInput
+            value={route.method}
+            onChange={(v) => onUpdate('method', v)}
+            className="text-sm text-cat-transport w-full"
+            placeholder="JR 신쾌속"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">소요</label>
+          <InlineInput
+            value={route.duration}
+            onChange={(v) => onUpdate('duration', v)}
+            className="text-sm text-text-secondary w-full"
+            placeholder="30분"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">요금</label>
+          <InlineInput
+            value={route.cost}
+            onChange={(v) => onUpdate('cost', v)}
+            className="text-sm text-primary font-semibold w-full"
+            placeholder="¥570"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <button
+          onClick={onDelete}
+          className="flex items-center gap-1 text-xs text-error hover:bg-error/10 rounded-md px-2 py-1 transition-colors"
+          aria-label="노선 삭제"
+        >
+          <Trash2 className="size-3.5" />
+          삭제
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 패스 편집 카드
+// ============================================================
+function PassEditCard({
+  pass,
+  onUpdate,
+  onDelete,
+}: {
+  pass: TransportPass;
+  onUpdate: (field: keyof TransportPass, value: string) => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="bg-surface border border-dashed border-border rounded-xl p-4 mb-3 hover:border-primary/30 transition-all">
+      <div className="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">이름</label>
+          <InlineInput
+            value={pass.name}
+            onChange={(v) => onUpdate('name', v)}
+            className="text-sm font-bold text-text-primary w-full"
+            placeholder="간사이 패스"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-text-tertiary block mb-1">가격</label>
+          <InlineInput
+            value={pass.price}
+            onChange={(v) => onUpdate('price', v)}
+            className="text-sm text-text-primary w-full"
+            placeholder="¥2,800"
+          />
+        </div>
+      </div>
+      <div className="mb-3">
+        <label className="text-xs text-text-tertiary block mb-1">추천도</label>
+        <select
+          value={pass.recommendation}
+          onChange={(e) => onUpdate('recommendation', e.target.value)}
+          className="text-sm bg-bg-secondary border border-border rounded-md px-2 py-1 text-text-primary outline-none focus:border-primary w-full"
+        >
+          <option value="recommended">추천</option>
+          <option value="neutral">보통</option>
+          <option value="not-recommended">비추천</option>
+        </select>
+      </div>
+      <div className="mb-3">
+        <label className="text-xs text-text-tertiary block mb-1">이유</label>
+        <InlineInput
+          value={pass.reason}
+          onChange={(v) => onUpdate('reason', v)}
+          className="text-sm text-text-secondary w-full"
+          placeholder="추천 이유"
+        />
+      </div>
+      <div className="flex justify-end">
+        <button
+          onClick={onDelete}
+          className="flex items-center gap-1 text-xs text-error hover:bg-error/10 rounded-md px-2 py-1 transition-colors"
+          aria-label="패스 삭제"
+        >
+          <Trash2 className="size-3.5" />
+          삭제
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// 팁 편집 리스트 (공용: 예산/교통 팁)
+// ============================================================
+function TipsEditList({
+  tips,
+  onUpdate,
+  onDelete,
+  onAdd,
+}: {
+  tips: string[];
+  onUpdate: (index: number, value: string) => void;
+  onDelete: (index: number) => void;
+  onAdd: () => void;
+}) {
+  return (
+    <div className="mb-3">
+      {tips.map((tip, idx) => (
+        <div key={idx} className="flex items-center gap-2 mb-2">
+          <span className="text-xs text-text-tertiary shrink-0 w-5 text-center">{idx + 1}</span>
+          <InlineInput
+            value={tip}
+            onChange={(v) => onUpdate(idx, v)}
+            className="text-sm text-text-secondary flex-1"
+            placeholder="팁 내용"
+          />
+          <button
+            onClick={() => onDelete(idx)}
+            className="text-error hover:bg-error/10 rounded-md p-1 transition-colors shrink-0"
+            aria-label="팁 삭제"
+          >
+            <Trash2 className="size-3.5" />
+          </button>
+        </div>
+      ))}
+      <button
+        onClick={onAdd}
+        className="flex items-center gap-1 text-xs text-primary hover:bg-primary-50 rounded-md px-2 py-1 transition-colors"
+      >
+        <Plus className="size-3.5" />
+        팁 추가
+      </button>
+    </div>
+  );
+}
+
 // 패스 추천 상태별 색상 매핑
 function getPassColor(recommendation: TransportPass['recommendation']) {
   switch (recommendation) {
@@ -188,7 +535,193 @@ export function GuideTab({ trip }: GuideTabProps) {
   const routeCount = (transport?.intercityRoutes?.length ?? 0) + (transport?.homeToHotel?.length ?? 0);
 
   const isRestaurantsEdit = editingSection === 'restaurants';
+  const isBudgetEdit = editingSection === 'budget';
+  const isTransportEdit = editingSection === 'transport';
   const dayCount = trip.days?.length ?? 1;
+
+  // ---- 예산 핸들러 ----
+  const handleBudgetItemUpdate = (index: number, field: keyof BudgetItem, value: string | number) => {
+    updateEditingTrip((t) => {
+      const newItems = (t.budget?.items ?? []).map((item, i) =>
+        i === index ? { ...item, [field]: value } : item,
+      );
+      return { ...t, budget: { ...t.budget, items: newItems } };
+    });
+  };
+
+  const handleBudgetItemDelete = (index: number) => {
+    updateEditingTrip((t) => {
+      const newItems = (t.budget?.items ?? []).filter((_, i) => i !== index);
+      return { ...t, budget: { ...t.budget, items: newItems } };
+    });
+  };
+
+  const handleBudgetItemAdd = () => {
+    updateEditingTrip((t) => {
+      const newItem: BudgetItem = {
+        icon: '💰',
+        label: '',
+        detail: '',
+        amount: '',
+        percentage: 0,
+        color: '#f97316',
+      };
+      return { ...t, budget: { ...t.budget, items: [...(t.budget?.items ?? []), newItem] } };
+    });
+  };
+
+  const handleBudgetTotalUpdate = (field: string, value: string) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      budget: {
+        ...t.budget,
+        total: { ...(t.budget?.total ?? { min: '', max: '', minKRW: '', maxKRW: '' }), [field]: value },
+      },
+    }));
+  };
+
+  const handleBudgetTipUpdate = (index: number, value: string) => {
+    updateEditingTrip((t) => {
+      const newTips = [...(t.budget?.tips ?? [])];
+      newTips[index] = value;
+      return { ...t, budget: { ...t.budget, tips: newTips } };
+    });
+  };
+
+  const handleBudgetTipDelete = (index: number) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      budget: { ...t.budget, tips: (t.budget?.tips ?? []).filter((_, i) => i !== index) },
+    }));
+  };
+
+  const handleBudgetTipAdd = () => {
+    updateEditingTrip((t) => ({
+      ...t,
+      budget: { ...t.budget, tips: [...(t.budget?.tips ?? []), ''] },
+    }));
+  };
+
+  // ---- 교통 핸들러 ----
+  const handleStepUpdate = (index: number, field: keyof TransportStep, value: string) => {
+    updateEditingTrip((t) => {
+      const newSteps = (t.transport?.homeToHotel ?? []).map((s, i) =>
+        i === index ? { ...s, [field]: value } : s,
+      );
+      return { ...t, transport: { ...t.transport, homeToHotel: newSteps } };
+    });
+  };
+
+  const handleStepDelete = (index: number) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, homeToHotel: (t.transport?.homeToHotel ?? []).filter((_, i) => i !== index) },
+    }));
+  };
+
+  const handleStepAdd = () => {
+    updateEditingTrip((t) => {
+      const newStep: TransportStep = { icon: '🚃', title: '', subtitle: '' };
+      return { ...t, transport: { ...t.transport, homeToHotel: [...(t.transport?.homeToHotel ?? []), newStep] } };
+    });
+  };
+
+  const handleRouteUpdate = (index: number, field: keyof TransportRoute, value: string) => {
+    updateEditingTrip((t) => {
+      const newRoutes = (t.transport?.intercityRoutes ?? []).map((r, i) =>
+        i === index ? { ...r, [field]: value } : r,
+      );
+      return { ...t, transport: { ...t.transport, intercityRoutes: newRoutes } };
+    });
+  };
+
+  const handleRouteDelete = (index: number) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, intercityRoutes: (t.transport?.intercityRoutes ?? []).filter((_, i) => i !== index) },
+    }));
+  };
+
+  const handleRouteAdd = () => {
+    updateEditingTrip((t) => {
+      const newRoute: TransportRoute = { from: '', to: '', method: '', duration: '', cost: '' };
+      return { ...t, transport: { ...t.transport, intercityRoutes: [...(t.transport?.intercityRoutes ?? []), newRoute] } };
+    });
+  };
+
+  const handlePassUpdate = (index: number, field: keyof TransportPass, value: string) => {
+    updateEditingTrip((t) => {
+      const newPasses = (t.transport?.passes ?? []).map((p, i) =>
+        i === index ? { ...p, [field]: value } : p,
+      );
+      return { ...t, transport: { ...t.transport, passes: newPasses } };
+    });
+  };
+
+  const handlePassDelete = (index: number) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, passes: (t.transport?.passes ?? []).filter((_, i) => i !== index) },
+    }));
+  };
+
+  const handlePassAdd = () => {
+    updateEditingTrip((t) => {
+      const newPass: TransportPass = { name: '', price: '', recommendation: 'neutral', reason: '' };
+      return { ...t, transport: { ...t.transport, passes: [...(t.transport?.passes ?? []), newPass] } };
+    });
+  };
+
+  const handleTransportTipUpdate = (index: number, value: string) => {
+    updateEditingTrip((t) => {
+      const newTips = [...(t.transport?.tips ?? [])];
+      newTips[index] = value;
+      return { ...t, transport: { ...t.transport, tips: newTips } };
+    });
+  };
+
+  const handleTransportTipDelete = (index: number) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, tips: (t.transport?.tips ?? []).filter((_, i) => i !== index) },
+    }));
+  };
+
+  const handleTransportTipAdd = () => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, tips: [...(t.transport?.tips ?? []), ''] },
+    }));
+  };
+
+  const handlePassVerdictUpdate = (value: string) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, passVerdict: value },
+    }));
+  };
+
+  const handleIcocaGuideUpdate = (index: number, value: string) => {
+    updateEditingTrip((t) => {
+      const newGuide = [...(t.transport?.icocaGuide ?? [])];
+      newGuide[index] = value;
+      return { ...t, transport: { ...t.transport, icocaGuide: newGuide } };
+    });
+  };
+
+  const handleIcocaGuideDelete = (index: number) => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, icocaGuide: (t.transport?.icocaGuide ?? []).filter((_, i) => i !== index) },
+    }));
+  };
+
+  const handleIcocaGuideAdd = () => {
+    updateEditingTrip((t) => ({
+      ...t,
+      transport: { ...t.transport, icocaGuide: [...(t.transport?.icocaGuide ?? []), ''] },
+    }));
+  };
 
   // 맛집 필드 업데이트
   const handleRestaurantUpdate = (index: number, field: keyof Restaurant, value: string | number) => {
@@ -266,43 +799,74 @@ export function GuideTab({ trip }: GuideTabProps) {
         <RestaurantSection restaurants={restaurants} />
       )}
 
-      {/* 교통 섹션 — 읽기 전용 (Phase 4에서 편집 추가) */}
-      <Accordion type="multiple" defaultValue={['transport', 'budget']}>
-        <AccordionItem value="transport" className="border-b-0 mb-2">
-          <AccordionTrigger className="hover:no-underline px-1 py-3">
-            <div className="flex items-center gap-2.5">
-              <Train className="size-4 text-text-secondary" />
-              <span className="text-lg font-semibold text-text-primary">교통</span>
-              {routeCount > 0 && (
-                <span className="text-sm text-text-tertiary font-normal">
-                  ({routeCount}개 노선)
-                </span>
-              )}
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4">
-            <TransportSection_ transport={transport} />
-          </AccordionContent>
-        </AccordionItem>
+      {/* 교통 섹션 — 편집 가능 */}
+      <SectionEditHeader
+        title="교통"
+        icon={<Train className="size-4" />}
+        section="transport"
+        trip={trip}
+        suffix={
+          routeCount > 0 ? (
+            <span className="text-sm font-normal text-text-secondary ml-2">
+              ({routeCount}개 노선)
+            </span>
+          ) : undefined
+        }
+      />
 
-        {/* 예산 섹션 */}
-        <AccordionItem value="budget" className="border-b-0 mb-2">
-          <AccordionTrigger className="hover:no-underline px-1 py-3">
-            <div className="flex items-center gap-2.5">
-              <Wallet className="size-4 text-text-secondary" />
-              <span className="text-lg font-semibold text-text-primary">예산</span>
-              {budgetTotal && budgetTotal.minKRW && (
-                <span className="text-sm text-text-tertiary font-normal">
-                  ({budgetTotal.minKRW} ~ {budgetTotal.maxKRW})
-                </span>
-              )}
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-4">
-            <BudgetSection_ budget={budget} />
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      {isTransportEdit ? (
+        <TransportEditSection
+          transport={transport}
+          onStepUpdate={handleStepUpdate}
+          onStepDelete={handleStepDelete}
+          onStepAdd={handleStepAdd}
+          onRouteUpdate={handleRouteUpdate}
+          onRouteDelete={handleRouteDelete}
+          onRouteAdd={handleRouteAdd}
+          onPassUpdate={handlePassUpdate}
+          onPassDelete={handlePassDelete}
+          onPassAdd={handlePassAdd}
+          onPassVerdictUpdate={handlePassVerdictUpdate}
+          onIcocaUpdate={handleIcocaGuideUpdate}
+          onIcocaDelete={handleIcocaGuideDelete}
+          onIcocaAdd={handleIcocaGuideAdd}
+          onTipUpdate={handleTransportTipUpdate}
+          onTipDelete={handleTransportTipDelete}
+          onTipAdd={handleTransportTipAdd}
+        />
+      ) : (
+        <TransportSection_ transport={transport} />
+      )}
+
+      {/* 예산 섹션 — 편집 가능 */}
+      <SectionEditHeader
+        title="예산"
+        icon={<Wallet className="size-4" />}
+        section="budget"
+        trip={trip}
+        suffix={
+          budgetTotal && budgetTotal.minKRW ? (
+            <span className="text-sm font-normal text-text-secondary ml-2">
+              ({budgetTotal.minKRW} ~ {budgetTotal.maxKRW})
+            </span>
+          ) : undefined
+        }
+      />
+
+      {isBudgetEdit ? (
+        <BudgetEditSection
+          budget={budget}
+          onItemUpdate={handleBudgetItemUpdate}
+          onItemDelete={handleBudgetItemDelete}
+          onItemAdd={handleBudgetItemAdd}
+          onTotalUpdate={handleBudgetTotalUpdate}
+          onTipUpdate={handleBudgetTipUpdate}
+          onTipDelete={handleBudgetTipDelete}
+          onTipAdd={handleBudgetTipAdd}
+        />
+      ) : (
+        <BudgetSection_ budget={budget} />
+      )}
     </div>
   );
 }
@@ -518,6 +1082,256 @@ function TransportSection_({ transport }: { transport: TransportSection }) {
 
       {/* 교통 팁 */}
       <TipsAccordion tips={tips} title="교통 팁" />
+    </div>
+  );
+}
+
+// --- 교통 편집 섹션 ---
+function TransportEditSection({
+  transport,
+  onStepUpdate,
+  onStepDelete,
+  onStepAdd,
+  onRouteUpdate,
+  onRouteDelete,
+  onRouteAdd,
+  onPassUpdate,
+  onPassDelete,
+  onPassAdd,
+  onPassVerdictUpdate,
+  onIcocaUpdate,
+  onIcocaDelete,
+  onIcocaAdd,
+  onTipUpdate,
+  onTipDelete,
+  onTipAdd,
+}: {
+  transport: TransportSection;
+  onStepUpdate: (index: number, field: keyof TransportStep, value: string) => void;
+  onStepDelete: (index: number) => void;
+  onStepAdd: () => void;
+  onRouteUpdate: (index: number, field: keyof TransportRoute, value: string) => void;
+  onRouteDelete: (index: number) => void;
+  onRouteAdd: () => void;
+  onPassUpdate: (index: number, field: keyof TransportPass, value: string) => void;
+  onPassDelete: (index: number) => void;
+  onPassAdd: () => void;
+  onPassVerdictUpdate: (value: string) => void;
+  onIcocaUpdate: (index: number, value: string) => void;
+  onIcocaDelete: (index: number) => void;
+  onIcocaAdd: () => void;
+  onTipUpdate: (index: number, value: string) => void;
+  onTipDelete: (index: number) => void;
+  onTipAdd: () => void;
+}) {
+  const homeToHotel = transport?.homeToHotel ?? [];
+  const intercityRoutes = transport?.intercityRoutes ?? [];
+  const passes = transport?.passes ?? [];
+  const icocaGuide = transport?.icocaGuide ?? [];
+  const tips = transport?.tips ?? [];
+
+  return (
+    <div>
+      {/* 집 → 호텔 경로 편집 */}
+      <SectionTitle icon={<PlaneIcon className="size-4" />}>
+        집 → 호텔 경로
+      </SectionTitle>
+      {homeToHotel.map((step, idx) => (
+        <TransportStepEditCard
+          key={`step-edit-${idx}`}
+          step={step}
+          onUpdate={(field, value) => onStepUpdate(idx, field, value)}
+          onDelete={() => onStepDelete(idx)}
+        />
+      ))}
+      <button
+        onClick={onStepAdd}
+        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-dashed border-primary/30 bg-primary-50/30 text-sm text-primary hover:bg-primary-50 transition-colors mb-4"
+      >
+        <Plus className="size-4" />
+        단계 추가
+      </button>
+
+      {/* 도시간 노선 편집 */}
+      <SectionTitle icon={<Train className="size-4" />}>
+        도시간 노선
+      </SectionTitle>
+      {intercityRoutes.map((route, idx) => (
+        <RouteEditCard
+          key={`route-edit-${idx}`}
+          route={route}
+          onUpdate={(field, value) => onRouteUpdate(idx, field, value)}
+          onDelete={() => onRouteDelete(idx)}
+        />
+      ))}
+      <button
+        onClick={onRouteAdd}
+        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-dashed border-primary/30 bg-primary-50/30 text-sm text-primary hover:bg-primary-50 transition-colors mb-4"
+      >
+        <Plus className="size-4" />
+        노선 추가
+      </button>
+
+      {/* 패스 비교 편집 */}
+      <SectionTitle icon={<CreditCard className="size-4" />}>
+        패스 비교
+      </SectionTitle>
+      {passes.map((pass, idx) => (
+        <PassEditCard
+          key={`pass-edit-${idx}`}
+          pass={pass}
+          onUpdate={(field, value) => onPassUpdate(idx, field, value)}
+          onDelete={() => onPassDelete(idx)}
+        />
+      ))}
+      <button
+        onClick={onPassAdd}
+        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-dashed border-primary/30 bg-primary-50/30 text-sm text-primary hover:bg-primary-50 transition-colors mb-4"
+      >
+        <Plus className="size-4" />
+        패스 추가
+      </button>
+
+      {/* 패스 결론 */}
+      <div className="mb-4">
+        <label className="text-xs text-text-tertiary block mb-1">패스 결론</label>
+        <InlineInput
+          value={transport?.passVerdict ?? ''}
+          onChange={onPassVerdictUpdate}
+          className="text-sm text-text-secondary w-full"
+          placeholder="패스 종합 의견"
+        />
+      </div>
+
+      {/* ICOCA 가이드 편집 */}
+      <SectionTitle icon={<CreditCard className="size-4" />}>
+        ICOCA 가이드
+      </SectionTitle>
+      <TipsEditList
+        tips={icocaGuide}
+        onUpdate={onIcocaUpdate}
+        onDelete={onIcocaDelete}
+        onAdd={onIcocaAdd}
+      />
+
+      {/* 교통 팁 편집 */}
+      <SectionTitle icon={<Train className="size-4" />}>
+        교통 팁
+      </SectionTitle>
+      <TipsEditList
+        tips={tips}
+        onUpdate={onTipUpdate}
+        onDelete={onTipDelete}
+        onAdd={onTipAdd}
+      />
+    </div>
+  );
+}
+
+// --- 예산 편집 섹션 ---
+function BudgetEditSection({
+  budget,
+  onItemUpdate,
+  onItemDelete,
+  onItemAdd,
+  onTotalUpdate,
+  onTipUpdate,
+  onTipDelete,
+  onTipAdd,
+}: {
+  budget: BudgetSection;
+  onItemUpdate: (index: number, field: keyof BudgetItem, value: string | number) => void;
+  onItemDelete: (index: number) => void;
+  onItemAdd: () => void;
+  onTotalUpdate: (field: string, value: string) => void;
+  onTipUpdate: (index: number, value: string) => void;
+  onTipDelete: (index: number) => void;
+  onTipAdd: () => void;
+}) {
+  const items = budget?.items ?? [];
+  const total = budget?.total ?? { min: '', max: '', minKRW: '', maxKRW: '' };
+  const tips = budget?.tips ?? [];
+
+  return (
+    <div>
+      <SectionTitle icon={<Wallet className="size-4" />}>
+        예산 항목
+      </SectionTitle>
+
+      {/* 예산 아이템 편집 */}
+      {items.map((item, idx) => (
+        <BudgetEditCard
+          key={`budget-edit-${idx}`}
+          item={item}
+          onUpdate={(field, value) => onItemUpdate(idx, field, value)}
+          onDelete={() => onItemDelete(idx)}
+        />
+      ))}
+      <button
+        onClick={onItemAdd}
+        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-dashed border-primary/30 bg-primary-50/30 text-sm text-primary hover:bg-primary-50 transition-colors mb-6"
+      >
+        <Plus className="size-4" />
+        항목 추가
+      </button>
+
+      {/* 총합 편집 */}
+      <SectionTitle icon={<Calculator className="size-4" />}>
+        예상 총 비용
+      </SectionTitle>
+      <div className="bg-surface border border-dashed border-border rounded-xl p-5 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="text-xs text-text-tertiary block mb-1">최소 (외화)</label>
+            <InlineInput
+              value={total.min}
+              onChange={(v) => onTotalUpdate('min', v)}
+              className="text-sm font-bold text-text-primary w-full"
+              placeholder="¥50,000"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-text-tertiary block mb-1">최대 (외화)</label>
+            <InlineInput
+              value={total.max}
+              onChange={(v) => onTotalUpdate('max', v)}
+              className="text-sm font-bold text-text-primary w-full"
+              placeholder="¥80,000"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-text-tertiary block mb-1">최소 (원화)</label>
+            <InlineInput
+              value={total.minKRW}
+              onChange={(v) => onTotalUpdate('minKRW', v)}
+              className="text-sm font-semibold text-cat-sightseeing w-full"
+              placeholder="약 50만원"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-text-tertiary block mb-1">최대 (원화)</label>
+            <InlineInput
+              value={total.maxKRW}
+              onChange={(v) => onTotalUpdate('maxKRW', v)}
+              className="text-sm font-semibold text-cat-sightseeing w-full"
+              placeholder="약 80만원"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 예산 팁 편집 */}
+      <SectionTitle icon={<Wallet className="size-4" />}>
+        예산 팁
+      </SectionTitle>
+      <TipsEditList
+        tips={tips}
+        onUpdate={onTipUpdate}
+        onDelete={onTipDelete}
+        onAdd={onTipAdd}
+      />
     </div>
   );
 }
