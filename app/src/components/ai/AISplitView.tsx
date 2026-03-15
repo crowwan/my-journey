@@ -4,6 +4,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, Save } from 'lucide-react';
 import type { Trip } from '@/types/trip';
+import { RotateCcw } from 'lucide-react';
 import { useChatStore } from '@/stores/useChatStore';
 import { useTripStore } from '@/stores/useTripStore';
 import { useUIStore } from '@/stores/useUIStore';
@@ -20,6 +21,8 @@ export function AISplitView({ mode, tripId }: AISplitViewProps) {
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const generatedTrip = useChatStore((s) => s.generatedTrip);
+  const messages = useChatStore((s) => s.messages);
+  const clearMessages = useChatStore((s) => s.clearMessages);
   const saveTrip = useTripStore((s) => s.saveTrip);
   const closeAIDrawer = useUIStore((s) => s.closeAIDrawer);
   const trips = useTripStore((s) => s.trips);
@@ -66,7 +69,7 @@ export function AISplitView({ mode, tripId }: AISplitViewProps) {
       {/* 좌측: 여행 뷰어 */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* 헤더: 닫기 + 저장 */}
-        <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border-light bg-surface">
+        <div className="shrink-0 flex items-center justify-between px-4 h-[49px] border-b border-border-light bg-surface">
           <button
             onClick={handleClose}
             className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
@@ -101,11 +104,20 @@ export function AISplitView({ mode, tripId }: AISplitViewProps) {
 
       {/* 우측: 채팅 */}
       <div className="w-[400px] border-l border-border-light flex flex-col bg-bg shrink-0">
-        {/* 채팅 헤더 */}
-        <div className="shrink-0 flex items-center px-4 py-3 border-b border-border-light">
+        {/* 채팅 헤더 — 좌측과 동일 높이 */}
+        <div className="shrink-0 flex items-center justify-between px-4 h-[49px] border-b border-border-light">
           <h2 className="text-base font-bold text-text-primary">
             {mode === 'edit' ? '여행 수정하기' : 'AI Travel Planner'}
           </h2>
+          {messages.length > 0 && (
+            <button
+              onClick={clearMessages}
+              className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors px-2.5 py-1.5 rounded-md hover:bg-bg-tertiary"
+            >
+              <RotateCcw size={14} />
+              새 대화
+            </button>
+          )}
         </div>
 
         {/* 채팅 컨테이너 */}

@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react';
 import { useChatStore } from '@/stores/useChatStore';
 import { useTripStore } from '@/stores/useTripStore';
+import { useUIStore } from '@/stores/useUIStore';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
@@ -37,6 +38,7 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
   const clearMessages = useChatStore((s) => s.clearMessages);
   const setQuickSetupSkipped = useChatStore((s) => s.setQuickSetupSkipped);
   const { trips, isLoaded, loadTrips } = useTripStore();
+  const aiViewMode = useUIStore((s) => s.aiViewMode);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // sessionStorage에서 채팅 세션 복원 (SSR 하이드레이션 이후)
@@ -117,8 +119,8 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* 새 대화 버튼 — 메시지가 있을 때만 표시 */}
-      {hasMessages && (
+      {/* 새 대화 버튼 — 메시지가 있고 드로어 모드일 때만 표시 (Split View에서는 헤더에 통합) */}
+      {hasMessages && aiViewMode !== 'split' && (
         <div className="shrink-0 flex justify-end px-4 py-2 border-b border-border-light">
           <button
             onClick={handleNewChat}
