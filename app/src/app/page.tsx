@@ -26,13 +26,16 @@ export default function Home() {
   const { isLoaded, loadTrips, getTripSummaries, deleteTrip } = useTripStore();
   const openAIDrawer = useUIStore((s) => s.openAIDrawer);
   const trips = useTripStore((s) => s.trips);
-  // 세션 내 첫 방문 여부를 초기값에서 판단 (불필요한 useEffect 제거)
-  const [showSplash, setShowSplash] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return !sessionStorage.getItem('splashShown');
+  const [showSplash, setShowSplash] = useState(true);
+
+  // 서버/클라이언트 일치를 위해 useEffect에서 sessionStorage 확인 (hydration 안전)
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (sessionStorage.getItem('splashShown')) {
+      setShowSplash(false);
     }
-    return true;
-  });
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!isLoaded) {

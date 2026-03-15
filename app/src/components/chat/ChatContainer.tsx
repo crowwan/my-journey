@@ -39,6 +39,11 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
   const { trips, isLoaded, loadTrips } = useTripStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // sessionStorage에서 채팅 세션 복원 (SSR 하이드레이션 이후)
+  useEffect(() => {
+    useChatStore.persist.rehydrate();
+  }, []);
+
   // 편집 모드일 때 trip 데이터 로드
   useEffect(() => {
     if (!isLoaded) loadTrips();

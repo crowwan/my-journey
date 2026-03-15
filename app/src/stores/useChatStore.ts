@@ -139,7 +139,8 @@ export const useChatStore = create<ChatState>()(
     {
       name: 'chat-session',
       storage: createJSONStorage(() => sessionStorage),
-      // isLoading, error는 영속화 제외
+      // SSR 하이드레이션 불일치 방지: 클라이언트 마운트 후 수동 rehydrate
+      skipHydration: true,
       partialize: (state) => ({
         messages: state.messages,
         generatedTrip: state.generatedTrip,
