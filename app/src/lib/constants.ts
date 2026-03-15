@@ -1,8 +1,9 @@
-// 여행 페이지 4탭 구성
+// 여행 페이지 5탭 구성
 export const TAB_CONFIG = [
   { id: 'summary', label: '요약', icon: 'Plane' },
   { id: 'schedule', label: '일정', icon: 'Calendar' },
   { id: 'guide', label: '가이드', icon: 'Compass' },
+  { id: 'budget', label: '예산', icon: 'Wallet' },
   { id: 'checklist', label: '체크리스트', icon: 'CheckSquare' },
 ] as const;
 

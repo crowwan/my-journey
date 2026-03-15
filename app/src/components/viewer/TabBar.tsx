@@ -1,6 +1,6 @@
 'use client';
 
-import { Plane, Calendar, Compass, CheckSquare } from 'lucide-react';
+import { Plane, Calendar, Compass, Wallet, CheckSquare } from 'lucide-react';
 import { TAB_CONFIG, type TabId } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
@@ -9,6 +9,7 @@ const TAB_ICONS = {
   Plane,
   Calendar,
   Compass,
+  Wallet,
   CheckSquare,
 } as const;
 

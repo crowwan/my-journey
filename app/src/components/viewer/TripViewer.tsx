@@ -11,6 +11,7 @@ import { TabBar } from './TabBar';
 import { SummaryTab } from './tabs/SummaryTab';
 import { ScheduleTab } from './tabs/ScheduleTab';
 import { GuideTab } from './tabs/GuideTab';
+import { BudgetTab } from './tabs/BudgetTab';
 import { ChecklistTab } from './tabs/ChecklistTab';
 
 interface TripViewerProps {
@@ -53,6 +54,7 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
         {activeTab === 'summary' && <SummaryTab trip={displayTrip} />}
         {activeTab === 'schedule' && <ScheduleTab trip={displayTrip} />}
         {activeTab === 'guide' && <GuideTab trip={displayTrip} />}
+        {activeTab === 'budget' && <BudgetTab trip={displayTrip} />}
         {activeTab === 'checklist' && <ChecklistTab trip={displayTrip} />}
       </div>
     </div>
