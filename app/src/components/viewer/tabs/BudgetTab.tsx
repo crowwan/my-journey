@@ -199,10 +199,6 @@ function BudgetEditSection({
   const exchangeRate = budget?.exchangeRate;
   const currencySymbol = CURRENCY_OPTIONS.find((o) => o.value === currency)?.label.split(' ')[0] ?? '';
 
-  // 실시간 합계 계산
-  const totalAmount = items.reduce((sum, item) => sum + item.amount, 0);
-  const totalKRW = exchangeRate ? totalAmount * exchangeRate : undefined;
-
   return (
     <div>
       {/* 통화 + 환율 설정 */}
@@ -258,22 +254,6 @@ function BudgetEditSection({
         항목 추가
       </button>
 
-      {/* 실시간 합계 */}
-      <SectionTitle icon={<Calculator className="size-4" />}>
-        예상 총 비용 (실시간)
-      </SectionTitle>
-      <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-5 mb-6 shadow-sm">
-        <div className="text-center">
-          <div className="text-2xl font-black text-text-primary mb-1">
-            {formatCurrency(totalAmount, currency)}
-          </div>
-          {totalKRW !== undefined && totalKRW > 0 && (
-            <div className="text-base text-cat-sightseeing font-semibold">
-              ({formatCurrency(totalKRW, 'KRW')})
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
@@ -285,11 +265,10 @@ function BudgetReadSection({ budget }: { budget: BudgetSection }) {
   const items = budget?.items ?? [];
   const tips = budget?.tips ?? [];
   const total = budget?.total;
-  const range = budget?.range;
   const currency = budget?.currency ?? 'KRW';
   const exchangeRate = budget?.exchangeRate;
 
-  if (items.length === 0 && !total?.amount && !range?.min) {
+  if (items.length === 0 && !total?.amount) {
     return (
       <div className="text-center py-8 text-text-tertiary">
         <p className="text-sm">예산 정보가 아직 없습니다</p>
@@ -366,42 +345,6 @@ function BudgetReadSection({ budget }: { budget: BudgetSection }) {
         })}
       </div>
 
-      {/* 총합 카드 -- 구 데이터(range) 폴백 */}
-      <SectionTitle icon={<Calculator className="size-4" />}>
-        예상 총 비용
-      </SectionTitle>
-      {range && range.min ? (
-        <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8 shadow-sm">
-          <div className="text-center">
-            <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
-              예상 범위
-            </div>
-            <div className="text-2xl font-black text-text-primary mb-1">
-              {range.min} ~ {range.max}
-            </div>
-            <div className="text-base text-cat-sightseeing font-semibold">
-              {range.minKRW} ~ {range.maxKRW}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-surface border border-cat-sightseeing/30 rounded-xl p-7 mb-8 shadow-sm">
-          <div className="text-center">
-            <div className="text-xs text-text-tertiary uppercase tracking-wider font-semibold mb-2">
-              합계
-            </div>
-            <div className="text-2xl font-black text-text-primary mb-1">
-              {formatCurrency(computedTotal.amount, currency)}
-            </div>
-            {computedTotal.amountKRW !== undefined && computedTotal.amountKRW > 0 && (
-              <div className="text-base text-cat-sightseeing font-semibold">
-                ({formatCurrency(computedTotal.amountKRW, 'KRW')})
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* 예산 팁 */}
       <TipsAccordion tips={tips} title="예산 팁" />
     </div>
@@ -468,24 +411,14 @@ export function BudgetTab({ trip }: BudgetTabProps) {
 
   // 헤더에 표시할 서브텍스트
   const headerSuffix = (() => {
-    if (!budgetTotal) return undefined;
-    // 구 데이터: range가 있으면 range 표시
-    const range = budget?.range;
-    if (range && range.minKRW) {
-      return (
-        <span className="text-sm font-normal text-text-secondary ml-2">
-          ({range.minKRW} ~ {range.maxKRW})
-        </span>
-      );
-    }
-    // 신 데이터: total 기반 표시
-    if (budgetTotal.amount > 0) {
-      const krwStr = budgetTotal.amountKRW
-        ? ` (${formatCurrency(budgetTotal.amountKRW, 'KRW')})`
+    // 신 데이터: total 기반 표시 (우선)
+    if (budgetTotal && budgetTotal.amount > 0) {
+      const krwStr = budgetTotal.amountKRW && budgetTotal.currency !== 'KRW'
+        ? ` ≈ ${formatCurrency(budgetTotal.amountKRW, 'KRW')}`
         : '';
       return (
         <span className="text-sm font-normal text-text-secondary ml-2">
-          {formatCurrency(budgetTotal.amount, budgetTotal.currency)}{krwStr}
+          ({formatCurrency(budgetTotal.amount, budgetTotal.currency)}{krwStr})
         </span>
       );
     }
