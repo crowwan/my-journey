@@ -295,3 +295,74 @@ export async function setPackingCheck(
 
   if (error) throw new Error(`패킹 체크 저장 실패: ${error.message}`);
 }
+
+// ============================================================
+// 공유 기능
+// ============================================================
+
+/**
+ * 공유 링크 생성 — share_token을 발급하고 trip_shares에 저장
+ * 이미 공유 중이면 기존 token 반환
+ */
+export async function createShareLink(tripId: string): Promise<string> {
+  const supabase = createClient();
+
+  // 기존 공유 토큰 확인
+  const existing = await supabase
+    .from('trip_shares')
+    .select('share_token')
+    .eq('trip_id', tripId)
+    .not('share_token', 'is', null)
+    .limit(1)
+    .maybeSingle();
+
+  if (existing.data?.share_token) {
+    return existing.data.share_token as string;
+  }
+
+  // 새 토큰 생성 (crypto.randomUUID 앞 12자)
+  const token = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+
+  const { error } = await supabase.from('trip_shares').insert({
+    trip_id: tripId,
+    share_token: token,
+    permission: 'view',
+  } as Record<string, unknown>);
+
+  if (error) throw new Error(`공유 링크 생성 실패: ${error.message}`);
+
+  return token;
+}
+
+/**
+ * 현재 공유 토큰 조회
+ */
+export async function getShareToken(tripId: string): Promise<string | null> {
+  const supabase = createClient();
+
+  const result = await supabase
+    .from('trip_shares')
+    .select('share_token')
+    .eq('trip_id', tripId)
+    .not('share_token', 'is', null)
+    .limit(1)
+    .maybeSingle();
+
+  if (result.error) return null;
+
+  return (result.data?.share_token as string) ?? null;
+}
+
+/**
+ * 공유 해제 — 해당 trip의 공유 레코드 삭제
+ */
+export async function deleteShareLink(tripId: string): Promise<void> {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from('trip_shares')
+    .delete()
+    .eq('trip_id', tripId);
+
+  if (error) throw new Error(`공유 해제 실패: ${error.message}`);
+}

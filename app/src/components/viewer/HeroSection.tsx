@@ -16,9 +16,11 @@ import { cn } from '@/lib/utils';
 interface HeroSectionProps {
   trip: Trip;
   packingProgress?: { checked: number; total: number; percentage: number };
+  // 읽기 전용 모드 — AI 수정, 공유 버튼 숨김
+  readOnly?: boolean;
 }
 
-export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
+export function HeroSection({ trip, packingProgress, readOnly = false }: HeroSectionProps) {
   const router = useRouter();
   const openAISplitView = useUIStore((s) => s.openAISplitView);
   const clearMessages = useChatStore((s) => s.clearMessages);
@@ -72,29 +74,31 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
             {dday}
           </Badge>
         </div>
-        {/* 액션 버튼 -- 데스크탑에서만 */}
-        <div className="hidden sm:flex items-center gap-1">
-          <button
-            onClick={handleAIEdit}
-            disabled={isSectionEditing}
-            className={cn(
-              'flex items-center justify-center size-9 rounded-md transition-colors shrink-0',
-              isSectionEditing
-                ? 'text-text-tertiary cursor-not-allowed'
-                : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
-            )}
-            aria-label="AI로 수정"
-          >
-            <Pencil className="size-4" />
-          </button>
-          <button
-            onClick={handleShare}
-            className="flex items-center justify-center size-9 rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors shrink-0"
-            aria-label="공유하기"
-          >
-            <Share2 className="size-4" />
-          </button>
-        </div>
+        {/* 액션 버튼 -- 데스크탑에서만 (readOnly에서는 숨김) */}
+        {!readOnly && (
+          <div className="hidden sm:flex items-center gap-1">
+            <button
+              onClick={handleAIEdit}
+              disabled={isSectionEditing}
+              className={cn(
+                'flex items-center justify-center size-9 rounded-md transition-colors shrink-0',
+                isSectionEditing
+                  ? 'text-text-tertiary cursor-not-allowed'
+                  : 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+              )}
+              aria-label="AI로 수정"
+            >
+              <Pencil className="size-4" />
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex items-center justify-center size-9 rounded-md text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors shrink-0"
+              aria-label="공유하기"
+            >
+              <Share2 className="size-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 2행: 날짜 + 인원 + 태그 */}
@@ -124,36 +128,40 @@ export function HeroSection({ trip, packingProgress }: HeroSectionProps) {
         </div>
       )}
 
-      {/* 액션 버튼 -- 모바일에서만 텍스트 버튼 */}
-      <div className="sm:hidden flex items-center gap-2 mt-3">
-        <button
-          onClick={handleAIEdit}
-          disabled={isSectionEditing}
-          className={cn(
-            'flex items-center gap-1.5 text-xs border rounded-full px-4 py-2 transition-colors',
-            isSectionEditing
-              ? 'text-text-tertiary border-border-light cursor-not-allowed'
-              : 'text-text-secondary border-border hover:bg-bg-secondary hover:text-text-primary'
-          )}
-        >
-          <Pencil className="size-3.5" />
-          AI로 수정
-        </button>
-        <button
-          onClick={handleShare}
-          className="flex items-center gap-1.5 text-xs text-text-secondary border border-border rounded-full px-4 py-2 hover:bg-bg-secondary hover:text-text-primary transition-colors"
-        >
-          <Share2 className="size-3.5" />
-          공유하기
-        </button>
-      </div>
+      {/* 액션 버튼 -- 모바일에서만 텍스트 버튼 (readOnly에서는 숨김) */}
+      {!readOnly && (
+        <div className="sm:hidden flex items-center gap-2 mt-3">
+          <button
+            onClick={handleAIEdit}
+            disabled={isSectionEditing}
+            className={cn(
+              'flex items-center gap-1.5 text-xs border rounded-full px-4 py-2 transition-colors',
+              isSectionEditing
+                ? 'text-text-tertiary border-border-light cursor-not-allowed'
+                : 'text-text-secondary border-border hover:bg-bg-secondary hover:text-text-primary'
+            )}
+          >
+            <Pencil className="size-3.5" />
+            AI로 수정
+          </button>
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-1.5 text-xs text-text-secondary border border-border rounded-full px-4 py-2 hover:bg-bg-secondary hover:text-text-primary transition-colors"
+          >
+            <Share2 className="size-3.5" />
+            공유하기
+          </button>
+        </div>
+      )}
 
-      {/* 공유 모달 */}
-      <ShareModal
-        trip={trip}
-        open={shareModalOpen}
-        onClose={() => setShareModalOpen(false)}
-      />
+      {/* 공유 모달 (readOnly에서는 불필요) */}
+      {!readOnly && (
+        <ShareModal
+          trip={trip}
+          open={shareModalOpen}
+          onClose={() => setShareModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

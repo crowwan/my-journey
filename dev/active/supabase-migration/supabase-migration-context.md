@@ -1,7 +1,7 @@
 # Supabase 마이그레이션 — 컨텍스트
 
-**최종 갱신**: 2026-03-17 (Phase 3 데이터 접근 레이어 구현 완료)
-**상태**: Phase 3 완료 → Phase 4 대기 (localStorage 마이그레이션)
+**최종 갱신**: 2026-03-17 (Phase 5 공유 기능 구현 완료)
+**상태**: Phase 3, 5 완료 → Phase 4 대기 (localStorage 마이그레이션)
 
 ---
 
@@ -146,6 +146,31 @@
 - Supabase SDK에 Database 제네릭 미적용: 부분 select 시 타입 추론 이슈로 unwrap 헬퍼 패턴 사용
 - storage.ts 삭제하지 않음: Guest Mode에서 계속 사용
 - togglePackingItem: 동기(localStorage) + 비동기(Supabase) 이중 저장으로 UX 유지
+
+---
+
+## Phase 5 구현 완료 (2026-03-17)
+
+### 생성된 파일
+| 파일 | 역할 |
+|------|------|
+| `src/app/api/shared/[token]/route.ts` | 공유 토큰으로 Trip 조회 API (service_role RLS 우회) |
+| `src/app/shared/[token]/page.tsx` | 공유 뷰어 페이지 (비로그인 읽기 전용) |
+| `src/components/viewer/ViewerContext.tsx` | readOnly 상태 Context (하위 전체 전달) |
+
+### 수정된 파일
+| 파일 | 변경 내용 |
+|------|----------|
+| `src/lib/supabase/trip-api.ts` | createShareLink, getShareToken, deleteShareLink 함수 추가 |
+| `src/components/viewer/ShareModal.tsx` | 링크 공유 옵션 추가 (생성/복사/해제) |
+| `src/components/viewer/TripViewer.tsx` | readOnly prop + ViewerProvider 래퍼 |
+| `src/components/viewer/HeroSection.tsx` | readOnly prop — AI 수정/공유 버튼 조건부 숨김 |
+| `src/components/viewer/SectionEditHeader.tsx` | ViewerContext 연동 — readOnly시 편집 버튼 숨김 |
+
+### 설계 결정
+- ViewerContext 패턴: 5개 탭 컴포넌트에 개별 readOnly prop 전달 대신, Context로 일괄 전달
+- share_token 생성: crypto.randomUUID().replace(/-/g,'').slice(0,12) — nanoid 패키지 미설치
+- 공유 뷰어: 클라이언트 컴포넌트 (fetch → TripViewer) — SSR 불필요 (비로그인 동적 데이터)
 
 ---
 

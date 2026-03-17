@@ -13,15 +13,18 @@ import { ScheduleTab } from './tabs/ScheduleTab';
 import { GuideTab } from './tabs/GuideTab';
 import { BudgetTab } from './tabs/BudgetTab';
 import { ChecklistTab } from './tabs/ChecklistTab';
+import { ViewerProvider } from './ViewerContext';
 
 interface TripViewerProps {
   trip: Trip;
   // Split View에서 내부 스크롤 컨테이너를 사용하기 위한 ref
   // 없으면 window.scrollTo 사용 (기존 동작 호환)
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  // 공유 뷰어 등 읽기 전용 모드 — 편집/AI/공유 버튼 숨김
+  readOnly?: boolean;
 }
 
-export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
+export function TripViewer({ trip, scrollContainerRef, readOnly = false }: TripViewerProps) {
   const [activeTab, setActiveTab] = useState<TabId>('summary');
   const editingSection = useEditStore((s) => s.editingSection);
   const editingTrip = useEditStore((s) => s.editingTrip);
@@ -43,20 +46,22 @@ export function TripViewer({ trip, scrollContainerRef }: TripViewerProps) {
   };
 
   return (
-    <div>
-      <HeroSection trip={displayTrip} packingProgress={packingProgress} />
-      <TabBar activeTab={activeTab} onChange={(tab) => {
-        if (editingSection) cancelSectionEdit();
-        setActiveTab(tab);
-        scrollToTop();
-      }} />
-      <div className="max-w-[1100px] mx-auto px-5 py-8">
-        {activeTab === 'summary' && <SummaryTab trip={displayTrip} />}
-        {activeTab === 'schedule' && <ScheduleTab trip={displayTrip} />}
-        {activeTab === 'guide' && <GuideTab trip={displayTrip} />}
-        {activeTab === 'budget' && <BudgetTab trip={displayTrip} />}
-        {activeTab === 'checklist' && <ChecklistTab trip={displayTrip} />}
+    <ViewerProvider readOnly={readOnly}>
+      <div>
+        <HeroSection trip={displayTrip} packingProgress={packingProgress} readOnly={readOnly} />
+        <TabBar activeTab={activeTab} onChange={(tab) => {
+          if (editingSection) cancelSectionEdit();
+          setActiveTab(tab);
+          scrollToTop();
+        }} />
+        <div className="max-w-[1100px] mx-auto px-5 py-8">
+          {activeTab === 'summary' && <SummaryTab trip={displayTrip} />}
+          {activeTab === 'schedule' && <ScheduleTab trip={displayTrip} />}
+          {activeTab === 'guide' && <GuideTab trip={displayTrip} />}
+          {activeTab === 'budget' && <BudgetTab trip={displayTrip} />}
+          {activeTab === 'checklist' && <ChecklistTab trip={displayTrip} />}
+        </div>
       </div>
-    </div>
+    </ViewerProvider>
   );
 }

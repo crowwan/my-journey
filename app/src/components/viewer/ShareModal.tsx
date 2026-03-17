@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
-import { X, Download, Share2, Link, Loader2, Check } from 'lucide-react';
+import { X, Download, Share2, Link, LinkIcon, Loader2, Check, Unlink } from 'lucide-react';
 import type { Trip } from '@/types/trip';
 import { downloadTripHtml, shareTripHtml, copyShareUrl, canShareFiles } from '@/lib/share-utils';
+import { createShareLink, getShareToken, deleteShareLink } from '@/lib/supabase/trip-api';
 
 // File 공유 지원 여부를 SSR 안전하게 확인하는 훅
 function useCanShareFiles(): boolean {
@@ -22,8 +23,34 @@ interface ShareModalProps {
 
 export function ShareModal({ trip, open, onClose }: ShareModalProps) {
   const [loading, setLoading] = useState(false);
+  const [linkLoading, setLinkLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [tokenChecked, setTokenChecked] = useState(false);
   const supportsFileShare = useCanShareFiles();
+
+  // 모달 열릴 때 기존 공유 토큰 조회
+  useEffect(() => {
+    if (!open) {
+      setTokenChecked(false);
+      return;
+    }
+
+    let cancelled = false;
+    async function checkToken() {
+      try {
+        const token = await getShareToken(trip.id);
+        if (!cancelled) {
+          setShareToken(token);
+          setTokenChecked(true);
+        }
+      } catch {
+        if (!cancelled) setTokenChecked(true);
+      }
+    }
+    checkToken();
+    return () => { cancelled = true; };
+  }, [open, trip.id]);
 
   // ESC 키로 닫기
   useEffect(() => {
@@ -42,10 +69,51 @@ export function ShareModal({ trip, open, onClose }: ShareModalProps) {
     return () => clearTimeout(timer);
   }, [toast]);
 
+  // 공유 링크 생성 + 클립보드 복사
+  const handleCreateShareLink = useCallback(async () => {
+    setLinkLoading(true);
+    try {
+      const token = await createShareLink(trip.id);
+      setShareToken(token);
+      const shareUrl = `${window.location.origin}/shared/${token}`;
+      await navigator.clipboard.writeText(shareUrl);
+      setToast('공유 링크가 복사되었습니다');
+    } catch {
+      setToast('공유 링크 생성에 실패했습니다');
+    } finally {
+      setLinkLoading(false);
+    }
+  }, [trip.id]);
+
+  // 기존 공유 링크 복사
+  const handleCopyShareLink = useCallback(async () => {
+    if (!shareToken) return;
+    const shareUrl = `${window.location.origin}/shared/${shareToken}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setToast('공유 링크가 복사되었습니다');
+    } catch {
+      setToast('복사에 실패했습니다');
+    }
+  }, [shareToken]);
+
+  // 공유 해제
+  const handleDeleteShareLink = useCallback(async () => {
+    setLinkLoading(true);
+    try {
+      await deleteShareLink(trip.id);
+      setShareToken(null);
+      setToast('공유가 해제되었습니다');
+    } catch {
+      setToast('공유 해제에 실패했습니다');
+    } finally {
+      setLinkLoading(false);
+    }
+  }, [trip.id]);
+
   // HTML 파일 다운로드
   const handleDownload = useCallback(() => {
     setLoading(true);
-    // setTimeout으로 UI 스레드 양보 (HTML 생성이 약간 걸릴 수 있으므로)
     setTimeout(() => {
       const result = downloadTripHtml(trip);
       setLoading(false);
@@ -111,6 +179,59 @@ export function ShareModal({ trip, open, onClose }: ShareModalProps) {
 
           {/* 옵션 목록 */}
           <div className="px-6 pb-6 space-y-2">
+            {/* 링크 공유 — 최상단 */}
+            {tokenChecked && (
+              shareToken ? (
+                // 이미 공유 중 — 링크 복사 + 공유 해제
+                <div className="space-y-2">
+                  <button
+                    onClick={handleCopyShareLink}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-colors hover:bg-bg-secondary border border-primary-200 bg-primary-50"
+                  >
+                    <LinkIcon className="size-5 text-primary-500 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-text-primary">공유 링크 복사</div>
+                      <div className="text-xs text-text-tertiary mt-0.5">누구나 이 링크로 여행을 볼 수 있어요</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={handleDeleteShareLink}
+                    disabled={linkLoading}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-colors hover:bg-bg-secondary border border-border-light disabled:opacity-50"
+                  >
+                    {linkLoading ? (
+                      <Loader2 className="size-4 text-error animate-spin shrink-0" />
+                    ) : (
+                      <Unlink className="size-4 text-error shrink-0" />
+                    )}
+                    <span className="text-xs font-medium text-error">공유 해제</span>
+                  </button>
+                </div>
+              ) : (
+                // 공유 안 됨 — 링크 생성 버튼
+                <button
+                  onClick={handleCreateShareLink}
+                  disabled={linkLoading}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-colors hover:bg-bg-secondary border border-border-light disabled:opacity-50"
+                >
+                  {linkLoading ? (
+                    <Loader2 className="size-5 text-primary-500 animate-spin shrink-0" />
+                  ) : (
+                    <LinkIcon className="size-5 text-primary-500 shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-text-primary">링크 공유</div>
+                    <div className="text-xs text-text-tertiary mt-0.5">공유 링크를 만들어 누구에게나 보여줄 수 있어요</div>
+                  </div>
+                </button>
+              )
+            )}
+
+            {/* 구분선 */}
+            {tokenChecked && (
+              <div className="h-px bg-border-light" />
+            )}
+
             {/* HTML 파일 다운로드 -- 항상 표시 */}
             <button
               onClick={handleDownload}
@@ -150,8 +271,8 @@ export function ShareModal({ trip, open, onClose }: ShareModalProps) {
             >
               <Link className="size-5 text-text-secondary shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-text-primary">링크 복사</div>
-                <div className="text-xs text-text-tertiary mt-0.5">앱 링크를 클립보드에 복사</div>
+                <div className="text-sm font-medium text-text-primary">앱 링크 복사</div>
+                <div className="text-xs text-text-tertiary mt-0.5">앱 페이지 링크를 클립보드에 복사</div>
               </div>
             </button>
           </div>

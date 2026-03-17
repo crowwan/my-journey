@@ -155,6 +155,44 @@
 
 ---
 
+## Phase 5: URL 기반 여행 공유 기능 [M] ✅ 완료
+
+### 5-1. 공유 API 함수 ✅
+- [x] `createShareLink(tripId)` — token 생성 + trip_shares insert (기존 있으면 재사용)
+- [x] `getShareToken(tripId)` — 현재 공유 토큰 조회
+- [x] `deleteShareLink(tripId)` — 공유 해제
+- 파일: `src/lib/supabase/trip-api.ts`에 추가
+
+### 5-2. 공유 Trip 조회 API Route ✅
+- [x] `src/app/api/shared/[token]/route.ts` 생성
+- [x] service_role 키로 RLS 우회 (비로그인 접근)
+- [x] share_token → trip_id → 6개 테이블 병렬 쿼리 → dbToTrip 조립 → JSON 응답
+
+### 5-3. 공유 뷰어 페이지 ✅
+- [x] `src/app/shared/[token]/page.tsx` 생성
+- [x] API Route 호출 → Trip fetch → TripViewer readOnly 렌더링
+- [x] 로딩/에러 상태 UI
+- [x] 하단 "My Journey에서 만들었어요" 워터마크
+
+### 5-4. ShareModal 업데이트 ✅
+- [x] "링크 공유" 옵션 최상단 추가 (createShareLink → 클립보드 복사)
+- [x] 이미 공유 중이면 "공유 링크 복사" + "공유 해제" 표시
+- [x] 모달 열릴 때 getShareToken 자동 조회
+- [x] 기존 HTML 다운로드 + Web Share + 앱 링크 복사 옵션 유지
+
+### 5-5. TripViewer 읽기 전용 모드 ✅
+- [x] TripViewer에 `readOnly` prop 추가
+- [x] ViewerContext 생성 (하위 컴포넌트에 readOnly 자동 전달)
+- [x] HeroSection — readOnly시 AI 수정, 공유 버튼 숨김
+- [x] SectionEditHeader — ViewerContext에서 readOnly 감지, 편집 버튼 숨김
+
+### 5-6. 검증 ✅
+- [x] `vitest run` 47개 테스트 통과
+- [x] `next build` 성공
+- [ ] E2E: 공유 링크 생성 → 시크릿 모드 접근 (SQL 실행 후)
+
+---
+
 ## 진행 상태 요약
 
 | Phase | 규모 | 상태 | 의존성 |
@@ -164,7 +202,7 @@
 | Phase 2: DB + Auth | L | ✅ 완료 (SQL 실행 대기) | Phase 1 ✅ |
 | Phase 3: 데이터 레이어 교체 | XL | ✅ 완료 | Phase 2 ✅ |
 | Phase 4: 마이그레이션 | M | ⬜ 미시작 | Phase 3 |
-| Phase 5: 공유 기능 | M | ⬜ 미시작 | Phase 3 |
+| Phase 5: 공유 기능 | M | ✅ 완료 | Phase 3 ✅ |
 | Phase 6: 비로그인/오프라인 | M | ⬜ 미시작 | Phase 4 |
 
 **MVP 1**: Phase 0 완료 ✅ → React Query 기반 (localStorage, 기존 기능 유지)
