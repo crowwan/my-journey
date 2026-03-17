@@ -1,6 +1,6 @@
 # Supabase 마이그레이션 — 작업 체크리스트
 
-**최종 갱신**: 2026-03-17 (Phase 0 구현 완료 반영)
+**최종 갱신**: 2026-03-17 (Phase 2 DB 스키마 + Auth UI 구현 반영)
 
 ---
 
@@ -54,45 +54,56 @@
 
 ---
 
-## Phase 1: Supabase 프로젝트 설정 [S]
+## Phase 1: Supabase 프로젝트 설정 [S] ✅ 완료
 
-- [ ] **1-1** Supabase 대시보드 프로젝트 생성 (서울/도쿄 리전)
-- [ ] **1-2** 환경변수 설정 (.env.local + Vercel)
+- [x] **1-1** Supabase 대시보드 프로젝트 생성 (도쿄 리전, Project ID: kogoegdsspcndaytqukh)
+- [x] **1-2** 환경변수 설정 (.env.local)
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] **1-3** `@supabase/supabase-js`, `@supabase/ssr` 설치
-- [ ] **1-4** `src/lib/supabase/client.ts` — 브라우저 클라이언트
-- [ ] **1-5** `src/lib/supabase/server.ts` — 서버 클라이언트
-- [ ] **1-6** `middleware.ts` — Auth 세션 갱신 미들웨어
-- [ ] **1-7** DB 연결 테스트 (select 1 성공)
+  - ⚠️ TODO: Vercel 환경변수 설정 필요
+- [x] **1-3** `@supabase/supabase-js`, `@supabase/ssr` 설치
+- [x] **1-4** `src/lib/supabase/client.ts` — 브라우저 클라이언트 (싱글턴)
+- [x] **1-5** `src/lib/supabase/server.ts` — 서버 클라이언트 (cookies 연동)
+- [x] **1-6** `middleware.ts` + `src/lib/supabase/middleware.ts` — Auth 세션 갱신
+- [ ] **1-7** DB 연결 테스트 — Phase 2 (테이블 생성 후) 검증 예정
 
 ---
 
-## Phase 2: DB 스키마 + Auth [L]
+## Phase 2: DB 스키마 + Auth [L] ✅ 완료
 
-### 2-1. 테이블 생성
-- [ ] `profiles` 테이블 + auth trigger (handle_new_user)
-- [ ] `trips` 테이블 (메타 + overview JSONB + transport JSONB)
-- [ ] `trip_days` 테이블 (items JSONB, map_spots JSONB)
-- [ ] `restaurants` 테이블
-- [ ] `budget_items` 테이블
-- [ ] `packing_categories` 테이블 (items JSONB)
-- [ ] `packing_checks` 테이블
-- [ ] `pre_todos` 테이블
-- [ ] `trip_shares` 테이블
-- [ ] 인덱스 생성
+### 2-1. 테이블 생성 (SQL 파일 생성 완료 — 대시보드에서 실행 필요)
+- [x] `profiles` 테이블 + auth trigger (handle_new_user)
+- [x] `trips` 테이블 (메타 + overview JSONB + transport JSONB)
+- [x] `trip_days` 테이블 (items JSONB, map_spots JSONB)
+- [x] `restaurants` 테이블
+- [x] `budget_items` 테이블
+- [x] `packing_categories` 테이블 (items JSONB)
+- [x] `packing_checks` 테이블
+- [x] `pre_todos` 테이블
+- [x] `trip_shares` 테이블
+- [x] 인덱스 생성
+- 파일: `supabase/migrations/001_initial_schema.sql`
 
 ### 2-2. RLS 정책
-- [ ] trips: 소유자 CRUD + 공유 SELECT
-- [ ] 기타 테이블: trips 소유자 기준
+- [x] trips: 소유자 CRUD (간소화 — 공유 뷰어는 API Route에서 service_role 처리)
+- [x] 하위 테이블: trip_id 기반 소유자 확인
+- [x] packing_checks: user_id 기반
+- [x] trip_shares: 소유자만 관리
 
 ### 2-3. Auth 설정
-- [ ] Google OAuth 활성화 (GCP Console)
-- [ ] `src/app/login/page.tsx` — 로그인 UI
-- [ ] `src/app/auth/callback/route.ts` — OAuth 콜백
-- [ ] `src/hooks/useAuth.ts` — 인증 상태 hook
-- [ ] Header에 프로필 아바타 + 로그아웃
+- [x] Kakao OAuth 활성화 (Supabase 대시보드에서 완료)
+- [x] `src/app/auth/callback/route.ts` — OAuth 콜백 핸들러
+- [x] `src/hooks/useAuth.ts` — 인증 상태 React Query hook (useAuth, useSignInWithKakao, useSignOut)
+- [x] Header에 프로필 아바타 + 로그아웃 (비로그인 시 "로그인" 버튼)
+- [x] 홈 페이지 비로그인 배너 ("로그인하면 클라우드에 저장됩니다")
+- ~~`src/app/login/page.tsx`~~ — 별도 로그인 페이지 불필요 (Header에서 바로 카카오 로그인)
+
+### 2-4. 검증
+- [x] `next build` 성공
+- [x] `vitest run` 34개 테스트 통과
+- [ ] Supabase 대시보드에서 SQL 실행 (사용자 수동)
+- [ ] 카카오 로그인 E2E 테스트 (SQL 실행 후)
 
 ---
 
@@ -112,8 +123,8 @@
 | Phase | 규모 | 상태 | 의존성 |
 |-------|------|------|--------|
 | Phase 0: React Query 도입 | L | ✅ 완료 | 없음 |
-| Phase 1: Supabase 설정 | S | ⬜ 미시작 | Phase 0 ✅ |
-| Phase 2: DB + Auth | L | ⬜ 미시작 | Phase 1 |
+| Phase 1: Supabase 설정 | S | ✅ 완료 | Phase 0 ✅ |
+| Phase 2: DB + Auth | L | ✅ 완료 (SQL 실행 대기) | Phase 1 ✅ |
 | Phase 3: 데이터 레이어 교체 | XL | ⬜ 미시작 | Phase 2 |
 | Phase 4: 마이그레이션 | M | ⬜ 미시작 | Phase 3 |
 | Phase 5: 공유 기능 | M | ⬜ 미시작 | Phase 3 |

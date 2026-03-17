@@ -1,7 +1,7 @@
 # Supabase 마이그레이션 — 컨텍스트
 
-**최종 갱신**: 2026-03-17 (Phase 0 구현 완료 반영)
-**상태**: Phase 0 완료 → Phase 1 대기 (사용자 결정 필요)
+**최종 갱신**: 2026-03-17 (Phase 2 DB 스키마 + Auth UI 구현 완료)
+**상태**: Phase 2 완료 (SQL 대시보드 실행 대기) → Phase 3 대기 (데이터 접근 레이어)
 
 ---
 
@@ -82,22 +82,42 @@
 
 ---
 
-## Phase 1~3: Supabase 전환 (미착수)
+## Phase 1 구현 완료 (2026-03-17)
 
-계획은 기존과 동일. 아래 파일은 Phase 1~3에서 생성 예정:
+### 생성된 파일
+| 파일 | 역할 |
+|------|------|
+| `src/lib/supabase/client.ts` | 브라우저 Supabase 클라이언트 (싱글턴, createBrowserClient) |
+| `src/lib/supabase/server.ts` | 서버 Supabase 클라이언트 (createServerClient + cookies) |
+| `src/lib/supabase/middleware.ts` | Auth 세션 갱신 헬퍼 (updateSession) |
+| `middleware.ts` | Next.js 미들웨어 (정적 파일 제외 matcher) |
 
+## Phase 2 구현 완료 (2026-03-17)
+
+### 생성된 파일
+| 파일 | 역할 |
+|------|------|
+| `supabase/migrations/001_initial_schema.sql` | 전체 DB 스키마 (9 테이블 + RLS + 인덱스 + 트리거) |
+| `src/app/auth/callback/route.ts` | OAuth 콜백 핸들러 (code exchange → 세션 → 홈 리다이렉트) |
+| `src/hooks/useAuth.ts` | 인증 React Query hooks (useAuth, useSignInWithKakao, useSignOut) |
+
+### 수정된 파일
+| 파일 | 변경 내용 |
+|------|----------|
+| `src/components/layout/Header.tsx` | 로그인/로그아웃 UI 추가 (아바타 + 로그아웃 / 로그인 버튼) |
+| `src/app/page.tsx` | useAuth 연동 + 비로그인 시 클라우드 저장 안내 배너 |
+
+### 설계 결정
+- 별도 로그인 페이지 불필요 — Header에서 바로 카카오 로그인 실행 (간소화)
+- RLS 간소화 — 공유 뷰어는 비로그인 읽기 전용이므로 API Route에서 service_role로 처리
+- profiles RLS — 본인 SELECT/UPDATE만 (INSERT는 트리거가 SECURITY DEFINER로 처리)
+
+### Phase 3에서 생성 예정
 | 파일 | 역할 | Phase |
 |------|------|-------|
-| `src/lib/supabase/client.ts` | 브라우저 Supabase 클라이언트 | 1 |
-| `src/lib/supabase/server.ts` | 서버 Supabase 클라이언트 | 1 |
-| `src/lib/supabase/middleware.ts` | Auth 세션 갱신 | 1 |
 | `src/types/supabase.ts` | DB 타입 정의 | 3 |
 | `src/lib/supabase/trip-api.ts` | Trip 데이터 접근 함수 | 3 |
 | `src/lib/supabase/trip-mapper.ts` | Trip ↔ DB 변환 함수 | 3 |
-| `src/hooks/useAuth.ts` | 인증 상태 hook | 2 |
-| `src/app/login/page.tsx` | 로그인 페이지 | 2 |
-| `src/app/auth/callback/route.ts` | OAuth 콜백 | 2 |
-| `middleware.ts` | Supabase 미들웨어 | 1 |
 
 ### Phase 3 핵심 변경 (계획 유지)
 | 파일 | 변경 내용 |
@@ -143,8 +163,8 @@
 |--------|-------|------|
 | `@tanstack/react-query` | 0 | ✅ 설치됨 |
 | `@tanstack/react-query-devtools` | 0 | ✅ 설치됨 (dev) |
-| `@supabase/supabase-js` | 1 | 미설치 |
-| `@supabase/ssr` | 1 | 미설치 |
+| `@supabase/supabase-js` | 1 | ✅ 설치됨 |
+| `@supabase/ssr` | 1 | ✅ 설치됨 |
 
 ---
 

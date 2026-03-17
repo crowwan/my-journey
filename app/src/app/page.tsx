@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useTrips, useAllTrips, useDeleteTrip } from '@/queries/useTrips';
+import { useAuth } from '@/hooks/useAuth';
 import { useUIStore } from '@/stores/useUIStore';
 import { groupTrips } from '@/domain/trip';
 import { Header } from '@/components/layout/Header';
@@ -10,7 +11,7 @@ import { TripCard } from '@/components/home/TripCard';
 import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Sun, CloudSun, Moon, MoonStar, Plane, Plus } from 'lucide-react';
+import { Sun, CloudSun, Moon, MoonStar, Plane, Plus, Cloud } from 'lucide-react';
 
 // 시간대별 인사말 텍스트와 아이콘을 반환
 function getGreeting(): { text: string; icon: React.ReactNode } {
@@ -23,6 +24,7 @@ function getGreeting(): { text: string; icon: React.ReactNode } {
 }
 
 export default function Home() {
+  const { data: user, isLoading: isAuthLoading } = useAuth();
   const { data: summaries = [] } = useTrips();
   const { data: allTrips = [] } = useAllTrips();
   const deleteTripMutation = useDeleteTrip();
@@ -162,6 +164,18 @@ export default function Home() {
             {pastFiltered.map((trip, index) => (
               <TripCard key={trip.id} trip={trip} index={index} onDelete={(id: string) => deleteTripMutation.mutate(id)} />
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* 비로그인 시 클라우드 저장 안내 배너 */}
+      {!isAuthLoading && !user && summaries.length > 0 && (
+        <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-6">
+          <div className="flex items-center gap-3 rounded-xl bg-secondary-50 border border-secondary-200 p-4">
+            <Cloud className="size-5 text-secondary-500 flex-shrink-0" />
+            <p className="text-sm text-text-secondary">
+              로그인하면 여행 데이터가 클라우드에 저장되어 어디서든 접근할 수 있어요.
+            </p>
           </div>
         </section>
       )}
