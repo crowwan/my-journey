@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseAmountString, migrateBudgetItem, migrateBudget, calculateBudgetTotal, formatCurrency, convertToKRW } from '../budget-utils';
+import { parseAmountString, migrateBudgetItem, migrateBudget, calculateBudgetTotal, formatCurrency, convertToKRW } from '@/domain/budget';
 
 // ============================================================
 // parseAmountString 테스트

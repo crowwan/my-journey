@@ -6,7 +6,7 @@
 
 import { GoogleGenAI } from '@google/genai';
 import type { Trip, ChatMessage } from '@/types/trip';
-import { migrateBudget as migrateBudgetData } from '@/lib/budget-utils';
+import { migrateBudget as migrateBudgetData } from '@/domain/budget';
 
 // -- SDK 초기화 (lazy) --------------------------------------------
 // Vercel 빌드 시 환경변수 없이도 모듈 로드가 가능하도록 지연 초기화

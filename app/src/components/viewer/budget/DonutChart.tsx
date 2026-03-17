@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { formatCurrency } from '@/lib/budget-utils';
+import { formatCurrency } from '@/domain/budget';
 
 interface DonutChartItem {
   label: string;

@@ -10,18 +10,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TripViewer } from '@/components/viewer/TripViewer';
+import { formatDateRange } from '@/lib/date-utils';
 
 interface TripPreviewCardProps {
   trip: Trip;
   isLatest?: boolean;
-}
-
-function formatDateRange(startDate: string, endDate: string): string {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const fmt = (d: Date) =>
-    d.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-  return `${fmt(start)} ~ ${fmt(end)}`;
 }
 
 export function TripPreviewCard({ trip, isLatest = true }: TripPreviewCardProps) {

@@ -3,17 +3,12 @@
 import type { ChatMessage as ChatMessageType } from '@/types/trip';
 import { useUIStore } from '@/stores/useUIStore';
 import { TripPreviewCard } from './TripPreviewCard';
+import { formatTime } from '@/lib/date-utils';
 
 interface ChatMessageProps {
   message: ChatMessageType;
   // tripPreview가 있는 메시지 중 마지막(최신)인지 여부
   isLatestPreview?: boolean;
-}
-
-// 타임스탬프를 HH:MM 형식으로 변환
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 // 인라인 마크다운 파싱: **bold**, *italic*

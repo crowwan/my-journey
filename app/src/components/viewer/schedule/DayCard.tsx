@@ -5,6 +5,7 @@ import { Map } from 'lucide-react';
 import type { Day } from '@/types/trip';
 import { TimelineItemComponent } from './TimelineItem';
 import { openInMapsApp } from '@/lib/map-utils';
+import { isToday } from '@/lib/date-utils';
 import {
   Accordion,
   AccordionItem,
@@ -21,15 +22,13 @@ interface DayCardProps {
 
 export function DayCard({ day, defaultOpen = false }: DayCardProps) {
   // 오늘 날짜와 day.date를 로컬 시간 기준으로 비교
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  const isToday = day.date === todayStr;
+  const isTodayDate = isToday(day.date);
 
   return (
     <Accordion
       type="single"
       collapsible
-      defaultValue={defaultOpen || isToday ? `day-${day.dayNumber}` : undefined}
+      defaultValue={defaultOpen || isTodayDate ? `day-${day.dayNumber}` : undefined}
     >
       <AccordionItem
         value={`day-${day.dayNumber}`}
@@ -43,7 +42,7 @@ export function DayCard({ day, defaultOpen = false }: DayCardProps) {
             <div className="text-left flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-text-primary">{day.title}</h3>
-                {isToday && (
+                {isTodayDate && (
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-white px-2 py-0.5 rounded-full">
                     Today
                   </span>

@@ -4,7 +4,7 @@ import { useState, type RefObject } from 'react';
 import type { Trip } from '@/types/trip';
 import type { TabId } from '@/lib/constants';
 import { storage } from '@/lib/storage';
-import { getPackingProgress } from '@/lib/trip-utils';
+import { getPackingProgress } from '@/domain/trip';
 import { useEditStore } from '@/stores/useEditStore';
 import { HeroSection } from './HeroSection';
 import { TabBar } from './TabBar';

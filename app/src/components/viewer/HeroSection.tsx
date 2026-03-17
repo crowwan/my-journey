@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Share2, ChevronLeft, Pencil } from 'lucide-react';
 import type { Trip } from '@/types/trip';
-import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/lib/trip-utils';
+import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/domain/trip';
 import { useUIStore } from '@/stores/useUIStore';
 import { useChatStore } from '@/stores/useChatStore';
 import { useEditStore } from '@/stores/useEditStore';

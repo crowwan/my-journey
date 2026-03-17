@@ -1,4 +1,10 @@
-import type { PackingItem, TripSummary } from '@/types/trip';
+// ============================================================
+// 여행 도메인 함수
+// 여행 상태 판별, 그룹핑, D-Day 계산, 체크리스트 진행률
+// ============================================================
+
+import type { PackingItem, TripSummary, Restaurant } from '@/types/trip';
+import { getTodayISO } from '@/lib/date-utils';
 
 // 여행 상태 타입
 export type TripStatus = 'upcoming' | 'ongoing' | 'completed';
@@ -12,10 +18,7 @@ export type TripGroup = {
 
 // 여행 목록을 시간 기준으로 그룹핑
 export function groupTrips(summaries: TripSummary[]): TripGroup {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  // 로컬 시간 기준 YYYY-MM-DD (toISOString()은 UTC 기준이라 KST에서 하루 전 날짜가 됨)
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayStr = getTodayISO();
 
   const group: TripGroup = { upcoming: [], ongoing: [], past: [] };
 
@@ -104,4 +107,45 @@ export function getDDayBadgeStyle(status: TripStatus): string {
     case 'completed':
       return 'bg-gray-100 text-gray-500 border border-gray-200';
   }
+}
+
+/**
+ * 맛집 목록을 dayNumber별로 그룹핑하여 정렬된 배열로 반환한다
+ */
+export function groupRestaurantsByDay(
+  restaurants: Restaurant[]
+): Array<[number, Restaurant[]]> {
+  const grouped = new Map<number, Restaurant[]>();
+  restaurants.forEach((r) => {
+    const list = grouped.get(r.dayNumber) ?? [];
+    list.push(r);
+    grouped.set(r.dayNumber, list);
+  });
+
+  return Array.from(grouped.entries()).sort(([a], [b]) => a - b);
+}
+
+/**
+ * 체크리스트 전체 진행률을 계산한다
+ * (카테고리별 체크 상태를 기반으로 전체 아이템 수 대비 체크된 수 집계)
+ */
+export function calculatePackingProgress(
+  categories: PackingItem[] | undefined,
+  checkedMap: Record<string, string[]>
+): { total: number; checked: number; percentage: number } {
+  if (!categories || categories.length === 0) {
+    return { total: 0, checked: 0, percentage: 0 };
+  }
+
+  const total = categories.reduce((sum, cat) => sum + cat.items.length, 0);
+  const checked = categories.reduce((sum, cat) => {
+    const categoryChecked = checkedMap[cat.category] ?? [];
+    return sum + cat.items.filter((item) => categoryChecked.includes(item.name)).length;
+  }, 0);
+
+  return {
+    total,
+    checked,
+    percentage: total > 0 ? Math.round((checked / total) * 100) : 0,
+  };
 }

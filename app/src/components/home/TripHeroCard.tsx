@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import type { TripSummary } from '@/types/trip';
-import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/lib/trip-utils';
+import { getDDay, getTripStatus, getDDayBadgeStyle } from '@/domain/trip';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';

@@ -11,6 +11,7 @@ import type {
 } from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
+import { groupRestaurantsByDay } from '@/domain/trip';
 import { SectionEditHeader } from '../SectionEditHeader';
 import { SectionTitle } from '../shared/SectionTitle';
 import { Tip } from '../shared/Tip';
@@ -632,14 +633,7 @@ function RestaurantSection({ restaurants }: { restaurants: Restaurant[] }) {
   }
 
   // dayNumber별 그룹핑
-  const grouped = new Map<number, Restaurant[]>();
-  restaurants.forEach((r) => {
-    const list = grouped.get(r.dayNumber) ?? [];
-    list.push(r);
-    grouped.set(r.dayNumber, list);
-  });
-
-  const sortedDays = Array.from(grouped.entries()).sort(([a], [b]) => a - b);
+  const sortedDays = groupRestaurantsByDay(restaurants);
 
   return (
     <div className="space-y-6">

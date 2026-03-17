@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTripStore } from '@/stores/useTripStore';
 import { useUIStore } from '@/stores/useUIStore';
-import { groupTrips } from '@/lib/trip-utils';
+import { groupTrips } from '@/domain/trip';
 import { Header } from '@/components/layout/Header';
 import { SplashScreen } from '@/components/layout/SplashScreen';
 import { TripCard } from '@/components/home/TripCard';

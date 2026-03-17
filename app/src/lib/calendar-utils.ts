@@ -1,4 +1,5 @@
 import type { Trip } from '@/types/trip';
+import { getTodayISO } from '@/lib/date-utils';
 
 // 캘린더 그리드의 날짜 셀 정보
 export interface CalendarDay {
@@ -27,10 +28,9 @@ function toDateStr(year: number, month: number, day: number): string {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-// 오늘 날짜 문자열 (로컬 기준)
+// 오늘 날짜 문자열 (로컬 기준) — date-utils의 getTodayISO 래핑
 function getTodayStr(): string {
-  const now = new Date();
-  return toDateStr(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  return getTodayISO();
 }
 
 // 해당 월의 캘린더 그리드 날짜 배열 반환

@@ -3,31 +3,14 @@
 import { useState } from 'react';
 import { Plane, Sparkles, ArrowRight } from 'lucide-react';
 import { CustomSelect } from '@/components/ui/custom-select';
+import { getTodayISO, diffDays, formatDateKR } from '@/lib/date-utils';
+import { buildQuickSetupPrompt } from '@/lib/prompt-builder';
 
 // -- 인원 옵션 (1명 ~ 10명) ------------------------------------------------
 const TRAVELER_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
   count: i + 1,
   label: `${i + 1}명`,
 }));
-
-// 오늘 날짜를 YYYY-MM-DD 형식으로 반환
-function getTodayISO(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-// 날짜 차이 계산 (일 수)
-function diffDays(start: string, end: string): number {
-  const s = new Date(start);
-  const e = new Date(end);
-  return Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-// 날짜를 읽기 좋은 형식으로 (3월 15일)
-function formatDateKR(dateStr: string): string {
-  const d = new Date(dateStr);
-  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
-}
 
 interface QuickSetupFormProps {
   onSubmit: (prompt: string) => void;
@@ -59,11 +42,7 @@ export function QuickSetupForm({ onSubmit, onSkip, disabled = false }: QuickSetu
     const trimmed = destination.trim();
     if (!trimmed || !startDate || !endDate) return;
 
-    const days = diffDays(startDate, endDate) + 1;
-    const nights = days - 1;
-    const durationStr = nights > 0 ? `${nights}박 ${days}일` : '당일치기';
-
-    const prompt = `목적지: ${trimmed}, 기간: ${startDate} ~ ${endDate} (${durationStr}), 인원: ${travelers}명. 여행 계획을 생성해주세요.`;
+    const prompt = buildQuickSetupPrompt({ destination: trimmed, startDate, endDate, travelers });
     onSubmit(prompt);
   };
 

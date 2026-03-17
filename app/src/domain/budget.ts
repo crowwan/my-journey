@@ -1,12 +1,12 @@
 // ============================================================
-// 예산 유틸리티 함수
-// 구 데이터(문자열 금액) → 신 데이터(숫자 금액) 마이그레이션
+// 예산 도메인 함수
+// 구 데이터(문자열 금액) -> 신 데이터(숫자 금액) 마이그레이션
 // 통화 포맷, 환율 계산, 합계 계산
 // ============================================================
 
 import type { BudgetItem, BudgetTotal, BudgetSection, BudgetRange } from '@/types/trip';
 
-// 통화 기호 → ISO 통화 코드 매핑
+// 통화 기호 -> ISO 통화 코드 매핑
 const CURRENCY_SYMBOLS: Record<string, string> = {
   '¥': 'JPY',
   '$': 'USD',
@@ -16,7 +16,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   '₫': 'VND',
 };
 
-// ISO 통화 코드 → 통화 기호 매핑
+// ISO 통화 코드 -> 통화 기호 매핑
 const CURRENCY_CODE_TO_SYMBOL: Record<string, string> = {
   JPY: '¥',
   USD: '$',
@@ -30,7 +30,7 @@ const CURRENCY_CODE_TO_SYMBOL: Record<string, string> = {
 
 /**
  * 통화 기호가 포함된 금액 문자열을 숫자와 통화 코드로 분리한다
- * 예: "¥3,000" → { amount: 3000, currency: "JPY" }
+ * 예: "¥3,000" -> { amount: 3000, currency: "JPY" }
  */
 export function parseAmountString(amountStr: string): { amount: number; currency: string } {
   if (!amountStr || amountStr.trim() === '') {
@@ -63,7 +63,7 @@ export function parseAmountString(amountStr: string): { amount: number; currency
 
 /**
  * 구/신 데이터 호환 BudgetItem 마이그레이션
- * 문자열 amount → 숫자 amount + currency 분리
+ * 문자열 amount -> 숫자 amount + currency 분리
  */
 export function migrateBudgetItem(
   item: Record<string, unknown>,
@@ -184,7 +184,7 @@ export function migrateBudget(
 
 /**
  * 숫자 금액을 통화 기호 + 천 단위 쉼표로 포맷한다
- * 예: (3000, "JPY") → "¥3,000"
+ * 예: (3000, "JPY") -> "¥3,000"
  */
 export function formatCurrency(amount: number, currency: string): string {
   const symbol = CURRENCY_CODE_TO_SYMBOL[currency] ?? '';
@@ -200,4 +200,43 @@ export function convertToKRW(amount: number, exchangeRate?: number): number | un
     return undefined;
   }
   return amount * exchangeRate;
+}
+
+/**
+ * 숫자를 천 단위 쉼표로 포맷한다 (소수점 2자리까지)
+ */
+export function formatNumber(value: number): string {
+  if (value === 0) return '0';
+  const rounded = Math.round(value * 100) / 100;
+  return rounded.toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+/**
+ * 경과 시간을 한글 텍스트로 변환한다
+ * 예: 5분 전, 2시간 전, 3일 전
+ */
+export function getTimeAgo(date: Date): string {
+  const diff = Date.now() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+
+  if (minutes < 1) return '방금 전';
+  if (minutes < 60) return `${minutes}분 전`;
+  if (hours < 24) return `${hours}시간 전`;
+  return `${Math.floor(hours / 24)}일 전`;
+}
+
+/**
+ * 예산 헤더에 표시할 서브텍스트를 계산한다
+ * total 기반: "¥8,000 ≈ ₩80,000" 형태
+ */
+export function getBudgetSuffix(budgetTotal: BudgetTotal | undefined): string | null {
+  if (!budgetTotal || budgetTotal.amount <= 0) return null;
+
+  const main = formatCurrency(budgetTotal.amount, budgetTotal.currency);
+  const krwStr = budgetTotal.amountKRW && budgetTotal.currency !== 'KRW'
+    ? ` ≈ ${formatCurrency(budgetTotal.amountKRW, 'KRW')}`
+    : '';
+
+  return `${main}${krwStr}`;
 }

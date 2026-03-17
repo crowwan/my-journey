@@ -8,6 +8,7 @@ import { useEditStore } from '@/stores/useEditStore';
 
 import { EmojiIcon } from '@/lib/emoji-to-icon';
 import { useWeather } from '@/lib/useWeather';
+import { getTodayISO } from '@/lib/date-utils';
 import { SectionEditHeader } from '../SectionEditHeader';
 import { SectionTitle } from '../shared/SectionTitle';
 import { TipsAccordion } from '../shared/TipsAccordion';
@@ -314,10 +315,7 @@ export function SummaryTab({ trip }: SummaryTabProps) {
   const isAccommodationEdit = editingSection === 'accommodation';
 
   // 오늘 날짜 문자열 (로컬 시간 기준)
-  const todayStr = (() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  })();
+  const todayStr = getTodayISO();
 
   // ============================================================
   // 항공편 편집 헬퍼

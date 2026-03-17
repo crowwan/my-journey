@@ -1,5 +1,5 @@
 import type { Trip, TripSummary } from '@/types/trip';
-import { migrateBudget } from '@/lib/budget-utils';
+import { migrateBudget } from '@/domain/budget';
 
 const TRIP_PREFIX = 'trip:';
 const TRIP_LIST_KEY = 'trip:list';

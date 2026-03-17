@@ -7,6 +7,7 @@ import { useTripStore } from '@/stores/useTripStore';
 import { useEditStore } from '@/stores/useEditStore';
 import { storage } from '@/lib/storage';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
+import { calculatePackingProgress } from '@/domain/trip';
 import { SectionEditHeader } from '../SectionEditHeader';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
@@ -95,15 +96,7 @@ export function ChecklistTab({ trip }: ChecklistTabProps) {
   const isPreTodosEdit = editingSection === 'preTodos';
 
   // 전체 진행률 계산 (준비물 체크 항목)
-  const packingTotal = (packing ?? []).reduce((sum, cat) => sum + cat.items.length, 0);
-  const packingChecked = (packing ?? []).reduce((sum, cat) => {
-    const categoryChecked = checked[cat.category] ?? [];
-    return sum + cat.items.filter((item) => categoryChecked.includes(item.name)).length;
-  }, 0);
-
-  const totalItems = packingTotal;
-  const totalChecked = packingChecked;
-  const percentage = totalItems > 0 ? Math.round((totalChecked / totalItems) * 100) : 0;
+  const { total: totalItems, checked: totalChecked, percentage } = calculatePackingProgress(packing, checked);
 
   const hasPacking = packing && packing.length > 0;
   const hasPreTodos = preTodos && preTodos.length > 0;
@@ -234,7 +227,7 @@ export function ChecklistTab({ trip }: ChecklistTabProps) {
             trip={trip}
             suffix={
               <span className="text-sm font-normal text-text-secondary ml-2">
-                ({packingChecked}/{packingTotal})
+                ({totalChecked}/{totalItems})
               </span>
             }
           />

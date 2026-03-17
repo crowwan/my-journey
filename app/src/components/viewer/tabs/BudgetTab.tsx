@@ -7,11 +7,12 @@ import { CustomSelect } from '@/components/ui/custom-select';
 import type { Trip, BudgetSection, BudgetItem } from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
-import { formatCurrency, convertToKRW, calculateBudgetTotal } from '@/lib/budget-utils';
+import { formatCurrency, convertToKRW, calculateBudgetTotal, getBudgetSuffix } from '@/domain/budget';
 import { SectionEditHeader } from '../SectionEditHeader';
 import { SectionTitle } from '../shared/SectionTitle';
 import { TipsAccordion } from '../shared/TipsAccordion';
 import { DonutChart } from '../budget/DonutChart';
+import { CurrencyConverter } from '../CurrencyConverter';
 import { cn } from '@/lib/utils';
 
 interface BudgetTabProps {
@@ -300,6 +301,11 @@ function BudgetReadSection({ budget }: { budget: BudgetSection }) {
         </div>
       )}
 
+      {/* 환율 계산기 — 외화일 때만 표시 */}
+      {currency !== 'KRW' && (
+        <CurrencyConverter currency={currency} />
+      )}
+
       <SectionTitle icon={<Wallet className="size-4" />}>
         예산 항목
       </SectionTitle>
@@ -410,20 +416,12 @@ export function BudgetTab({ trip }: BudgetTabProps) {
   };
 
   // 헤더에 표시할 서브텍스트
-  const headerSuffix = (() => {
-    // 신 데이터: total 기반 표시 (우선)
-    if (budgetTotal && budgetTotal.amount > 0) {
-      const krwStr = budgetTotal.amountKRW && budgetTotal.currency !== 'KRW'
-        ? ` ≈ ${formatCurrency(budgetTotal.amountKRW, 'KRW')}`
-        : '';
-      return (
-        <span className="text-sm font-normal text-text-secondary ml-2">
-          ({formatCurrency(budgetTotal.amount, budgetTotal.currency)}{krwStr})
-        </span>
-      );
-    }
-    return undefined;
-  })();
+  const suffixText = getBudgetSuffix(budgetTotal);
+  const headerSuffix = suffixText ? (
+    <span className="text-sm font-normal text-text-secondary ml-2">
+      ({suffixText})
+    </span>
+  ) : undefined;
 
   return (
     <div className="animate-fade-up">
