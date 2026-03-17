@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import { useChatStore } from '@/stores/useChatStore';
-import { useTripStore } from '@/stores/useTripStore';
+import { useTrip } from '@/queries/useTrips';
 import { useUIStore } from '@/stores/useUIStore';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
@@ -37,7 +37,7 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
   const sendMessage = useChatStore((s) => s.sendMessage);
   const clearMessages = useChatStore((s) => s.clearMessages);
   const setQuickSetupSkipped = useChatStore((s) => s.setQuickSetupSkipped);
-  const { trips, isLoaded, loadTrips } = useTripStore();
+  const { data: tripData } = useTrip(tripId);
   const aiViewMode = useUIStore((s) => s.aiViewMode);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -46,12 +46,7 @@ export function ChatContainer({ mode = 'create', tripId }: ChatContainerProps) {
     useChatStore.persist.rehydrate();
   }, []);
 
-  // 편집 모드일 때 trip 데이터 로드
-  useEffect(() => {
-    if (!isLoaded) loadTrips();
-  }, [isLoaded, loadTrips]);
-
-  const tripContext = tripId ? trips.get(tripId) : undefined;
+  const tripContext = tripData ?? undefined;
 
   // 새 메시지 시 자동 스크롤
   useEffect(() => {

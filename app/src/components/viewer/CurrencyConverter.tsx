@@ -8,7 +8,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { ArrowLeftRight, RefreshCw, AlertCircle } from 'lucide-react';
-import { useCurrency } from '@/lib/useCurrency';
+import { useCurrency } from '@/queries/useCurrency';
 import { formatNumber, getTimeAgo } from '@/domain/budget';
 
 interface CurrencyConverterProps {

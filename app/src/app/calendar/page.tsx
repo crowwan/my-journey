@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTripStore } from '@/stores/useTripStore';
+import { useState } from 'react';
+import { useAllTrips } from '@/queries/useTrips';
 import { getCalendarDays, getCalendarBars } from '@/lib/calendar-utils';
 import { Header } from '@/components/layout/Header';
 import { CalendarHeader } from '@/components/calendar/CalendarHeader';
@@ -9,16 +9,12 @@ import { CalendarGrid } from '@/components/calendar/CalendarGrid';
 import { MonthTripList } from '@/components/calendar/MonthTripList';
 
 export default function CalendarPage() {
-  const { isLoaded, loadTrips, trips } = useTripStore();
+  const { data: allTrips = [] } = useAllTrips();
 
   // 현재 표시 월 (기본: 오늘)
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
-
-  useEffect(() => {
-    if (!isLoaded) loadTrips();
-  }, [isLoaded, loadTrips]);
 
   // 이전/다음 월 이동
   const goToPrevMonth = () => {
@@ -48,8 +44,7 @@ export default function CalendarPage() {
 
   // 캘린더 데이터 계산
   const calendarDays = getCalendarDays(year, month);
-  const tripsArray = Array.from(trips.values());
-  const calendarBars = getCalendarBars(tripsArray, year, month);
+  const calendarBars = getCalendarBars(allTrips, year, month);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -67,7 +62,7 @@ export default function CalendarPage() {
 
         {/* 해당 월 여행 요약 리스트 */}
         <div className="mt-6 pb-8">
-          <MonthTripList trips={tripsArray} year={year} month={month} />
+          <MonthTripList trips={allTrips} year={year} month={month} />
         </div>
       </main>
     </div>

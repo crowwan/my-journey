@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, X } from 'lucide-react';
 import type { Trip } from '@/types/trip';
-import { useTripStore } from '@/stores/useTripStore';
+import { useSaveTrip } from '@/queries/useTrips';
 import { useUIStore } from '@/stores/useUIStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,12 +19,12 @@ interface TripPreviewCardProps {
 
 export function TripPreviewCard({ trip, isLatest = true }: TripPreviewCardProps) {
   const router = useRouter();
-  const saveTrip = useTripStore((s) => s.saveTrip);
+  const saveTripMutation = useSaveTrip();
   const closeAIDrawer = useUIStore((s) => s.closeAIDrawer);
   const [showPreview, setShowPreview] = useState(false);
 
   const handleSave = () => {
-    saveTrip(trip);
+    saveTripMutation.mutate(trip);
     closeAIDrawer();
     router.push(`/trips/${trip.id}`);
   };

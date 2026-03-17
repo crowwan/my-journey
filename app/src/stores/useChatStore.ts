@@ -1,6 +1,7 @@
 // ============================================================
 // Chat Store
-// 채팅 메시지 관리, API 호출, 에러 처리
+// 채팅 메시지 관리, 로딩/에러 상태, 세션 영속화
+// fetch 로직은 api/chat.ts로 분리
 // sessionStorage로 세션 영속화 (탭 닫으면 초기화)
 // ============================================================
 'use client';
@@ -8,15 +9,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { ChatMessage, Trip } from '@/types/trip';
-
-// -- API 응답 타입 -----------------------------------------------
-// edit 모드도 create와 동일하게 trip 필드를 반환 (replace_trip 방식)
-interface ChatApiResponse {
-  success: boolean;
-  message?: string;
-  trip?: Trip;
-  error?: string;
-}
+import { sendChatMessage } from '@/api/chat';
 
 // -- Store 타입 --------------------------------------------------
 interface ChatState {
@@ -64,26 +57,16 @@ export const useChatStore = create<ChatState>()(
         set({ messages: [...messages, userMessage], isLoading: true, error: null });
 
         try {
-          const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              messages: [...messages, userMessage],
-              mode,
-              tripContext,
-            }),
-          });
-
-          const data: ChatApiResponse = await res.json();
-
-          if (!data.success) {
-            throw new Error(data.error ?? 'AI 응답 실패');
-          }
+          const data = await sendChatMessage(
+            [...messages, userMessage],
+            mode,
+            tripContext,
+          );
 
           const assistantMessage: ChatMessage = {
             id: `msg-${Date.now()}-ai`,
             role: 'assistant',
-            content: data.message ?? '',
+            content: data.message,
             timestamp: Date.now(),
             tripPreview: data.trip,
           };

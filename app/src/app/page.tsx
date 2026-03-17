@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useTripStore } from '@/stores/useTripStore';
+import { useEffect, useState, useMemo } from 'react';
+import { useTrips, useAllTrips, useDeleteTrip } from '@/queries/useTrips';
 import { useUIStore } from '@/stores/useUIStore';
 import { groupTrips } from '@/domain/trip';
 import { Header } from '@/components/layout/Header';
@@ -23,9 +23,10 @@ function getGreeting(): { text: string; icon: React.ReactNode } {
 }
 
 export default function Home() {
-  const { isLoaded, loadTrips, getTripSummaries, deleteTrip } = useTripStore();
+  const { data: summaries = [] } = useTrips();
+  const { data: allTrips = [] } = useAllTrips();
+  const deleteTripMutation = useDeleteTrip();
   const openAIDrawer = useUIStore((s) => s.openAIDrawer);
-  const trips = useTripStore((s) => s.trips);
   const [showSplash, setShowSplash] = useState(true);
 
   // 서버/클라이언트 일치를 위해 useEffect에서 sessionStorage 확인 (hydration 안전)
@@ -37,20 +38,19 @@ export default function Home() {
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  useEffect(() => {
-    if (!isLoaded) {
-      loadTrips();
-    }
-  }, [isLoaded, loadTrips]);
-
-  const summaries = getTripSummaries();
   const { upcoming, ongoing, past } = groupTrips(summaries);
+
+  // Trip ID로 전체 데이터를 빠르게 조회하기 위한 Map
+  const tripsMap = useMemo(
+    () => new Map(allTrips.map((t) => [t.id, t])),
+    [allTrips],
+  );
 
   // 최근 생성한 여행 (createdAt 기준 가장 최근 1개, 미래 여행만 히어로로 표시)
   const latestTripRaw = summaries.length > 0
     ? summaries.reduce((latest, current) => {
-        const latestFull = trips.get(latest.id);
-        const currentFull = trips.get(current.id);
+        const latestFull = tripsMap.get(latest.id);
+        const currentFull = tripsMap.get(current.id);
         if (!latestFull || !currentFull) return latest;
         return currentFull.createdAt > latestFull.createdAt ? current : latest;
       })
@@ -125,7 +125,7 @@ export default function Home() {
             <NewTripButton />
           </div>
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8">
-            <TripHeroCard trip={latestTrip} onDelete={deleteTrip} />
+            <TripHeroCard trip={latestTrip} onDelete={(id: string) => deleteTripMutation.mutate(id)} />
           </div>
         </section>
       )}
@@ -143,7 +143,7 @@ export default function Home() {
           </div>
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
             {[...ongoingFiltered, ...upcomingFiltered].map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} index={index} onDelete={deleteTrip} />
+              <TripCard key={trip.id} trip={trip} index={index} onDelete={(id: string) => deleteTripMutation.mutate(id)} />
             ))}
           </div>
         </section>
@@ -160,7 +160,7 @@ export default function Home() {
           </div>
           <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
             {pastFiltered.map((trip, index) => (
-              <TripCard key={trip.id} trip={trip} index={index} onDelete={deleteTrip} />
+              <TripCard key={trip.id} trip={trip} index={index} onDelete={(id: string) => deleteTripMutation.mutate(id)} />
             ))}
           </div>
         </section>

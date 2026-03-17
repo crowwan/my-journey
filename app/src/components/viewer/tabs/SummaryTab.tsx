@@ -7,7 +7,7 @@ import type { Trip, Flight, Accommodation } from '@/types/trip';
 import { useEditStore } from '@/stores/useEditStore';
 
 import { EmojiIcon } from '@/lib/emoji-to-icon';
-import { useWeather } from '@/lib/useWeather';
+import { useWeather } from '@/queries/useWeather';
 import { getTodayISO } from '@/lib/date-utils';
 import { SectionEditHeader } from '../SectionEditHeader';
 import { SectionTitle } from '../shared/SectionTitle';

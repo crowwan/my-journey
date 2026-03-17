@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR, Outfit } from "next/font/google";
 import { AIDrawerProvider } from "@/components/ai/AIDrawerProvider";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const notoSansKR = Noto_Sans_KR({
@@ -45,8 +46,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${notoSansKR.variable} ${outfit.variable} antialiased`}>
-        {children}
-        <AIDrawerProvider />
+        <Providers>
+          {children}
+          <AIDrawerProvider />
+        </Providers>
       </body>
     </html>
   );

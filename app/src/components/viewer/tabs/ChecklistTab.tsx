@@ -87,6 +87,8 @@ function AddItemInput({
 export function ChecklistTab({ trip }: ChecklistTabProps) {
   const { packing, preTodos, id: tripId } = trip;
   const togglePackingItem = useTripStore((state) => state.togglePackingItem);
+  // packingVersion 구독으로 체크 토글 시 리렌더링 트리거
+  useTripStore((state) => state.packingVersion);
   const editingSection = useEditStore((s) => s.editingSection);
   const updateEditingTrip = useEditStore((s) => s.updateEditingTrip);
   const checked = storage.getPackingChecked(tripId);

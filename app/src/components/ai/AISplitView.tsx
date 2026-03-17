@@ -6,7 +6,7 @@ import { X, Save } from 'lucide-react';
 import type { Trip } from '@/types/trip';
 import { RotateCcw } from 'lucide-react';
 import { useChatStore } from '@/stores/useChatStore';
-import { useTripStore } from '@/stores/useTripStore';
+import { useTrip, useSaveTrip } from '@/queries/useTrips';
 import { useUIStore } from '@/stores/useUIStore';
 import { TripViewer } from '@/components/viewer/TripViewer';
 import { ChatContainer } from '@/components/chat/ChatContainer';
@@ -23,12 +23,12 @@ export function AISplitView({ mode, tripId }: AISplitViewProps) {
   const generatedTrip = useChatStore((s) => s.generatedTrip);
   const messages = useChatStore((s) => s.messages);
   const clearMessages = useChatStore((s) => s.clearMessages);
-  const saveTrip = useTripStore((s) => s.saveTrip);
+  const saveTripMutation = useSaveTrip();
   const closeAIDrawer = useUIStore((s) => s.closeAIDrawer);
-  const trips = useTripStore((s) => s.trips);
+  const { data: existingTripData } = useTrip(tripId);
 
   // edit 모드일 때 기존 여행 데이터를 초기값으로 사용
-  const existingTrip = tripId ? trips.get(tripId) : undefined;
+  const existingTrip = existingTripData ?? undefined;
   // generatedTrip이 있으면 그것을, 없으면 기존 여행 사용
   const displayTrip: Trip | undefined = generatedTrip ?? existingTrip;
 
@@ -54,10 +54,10 @@ export function AISplitView({ mode, tripId }: AISplitViewProps) {
     const tripToSave = generatedTrip ?? existingTrip;
     if (!tripToSave) return;
 
-    saveTrip(tripToSave);
+    saveTripMutation.mutate(tripToSave);
     closeAIDrawer();
     router.push(`/trips/${tripToSave.id}`);
-  }, [generatedTrip, existingTrip, saveTrip, closeAIDrawer, router]);
+  }, [generatedTrip, existingTrip, saveTripMutation, closeAIDrawer, router]);
 
   // 닫기 핸들러
   const handleClose = useCallback(() => {

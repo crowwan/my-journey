@@ -1,9 +1,9 @@
 # 환율 계산기 + 실시간 날씨 - 컨텍스트 & 결정사항
 
 ## 상태
-- 단계: **날씨 구현 완료, 환율 미착수**
-- 진행률: 날씨 7/7 완료, 환율 0/5 미착수
-- 최종 수정: 2026-03-15
+- 단계: **날씨 구현 완료, 환율 구현 완료**
+- 진행률: 날씨 7/7 완료, 환율 4/4 완료
+- 최종 수정: 2026-03-16
 
 ## 이번 세션 구현 완료 (날씨)
 
@@ -23,13 +23,20 @@
 | `app/src/types/trip.ts` | `weather` optional 변경 + 레거시 주석 | ✅ 완료 |
 | `app/src/api/gemini.ts` | create/edit 프롬프트에서 날씨 생성 제거 | ✅ 완료 |
 
-### 미구현 (환율)
+### 구현 완료 (환율, 2026-03-16)
+
+#### 생성된 파일
 | 파일 | 용도 | 상태 |
 |------|------|------|
-| `app/src/app/api/currency/route.ts` | ExchangeRate-API 환율 API Route | ❌ 미착수 |
-| `app/src/lib/currency-utils.ts` | 목적지 → 통화 코드 매핑 | ❌ 미착수 |
-| `app/src/lib/useCurrency.ts` | 환율 데이터 fetch 훅 | ❌ 미착수 |
-| `app/src/components/viewer/CurrencyConverter.tsx` | 환율 변환 위젯 | ❌ 미착수 |
+| `app/src/app/api/currency/route.ts` | ExchangeRate-API v6 환율 API Route (6시간 캐시) | ✅ 완료 |
+| `app/src/lib/currency-utils.ts` | 목적지 → 통화 코드 매핑 (100+개 도시) | ✅ 완료 |
+| `app/src/lib/useCurrency.ts` | `useCurrency()` 커스텀 훅 | ✅ 완료 |
+| `app/src/components/viewer/CurrencyConverter.tsx` | 환율 변환 위젯 (양방향, 스왑, 로딩/에러) | ✅ 완료 |
+
+#### 수정된 파일
+| 파일 | 변경 내용 | 상태 |
+|------|----------|------|
+| `app/src/components/viewer/tabs/BudgetTab.tsx` | CurrencyConverter 통합 (도넛 차트 아래, KRW 아닐 때만) | ✅ 완료 |
 
 ---
 
@@ -71,7 +78,7 @@
 - ✅ "Jeju" 에티오피아 우선 반환 → country_code 필터링으로 해결
 
 ### 미해결
-- ExchangeRate-API 키 미발급 → 환율 구현 시작 전 필요
+- ExchangeRate-API 키 미발급 → Vercel 환경변수 `EXCHANGE_RATE_API_KEY` 설정 필요 (미설정 시 503 → UI에서 에러 메시지 표시)
 - ShareModal.tsx ESLint 경고 (useEffect 내 setState) — 기존 이슈
 
 ---
@@ -94,7 +101,11 @@ GET https://geocoding-api.open-meteo.com/v1/search
 ```
 주의: 한글 검색 미지원. CITY_NAME_MAP으로 영문 변환 필요.
 
-### ExchangeRate-API v6 (미구현)
+### ExchangeRate-API v6 (구현 완료)
 ```
-GET https://v6.exchangerate-api.com/v6/{API_KEY}/pair/KRW/JPY/10000
+GET https://v6.exchangerate-api.com/v6/{API_KEY}/pair/KRW/JPY
+응답: { result: "success", base_code: "KRW", target_code: "JPY", conversion_rate: 0.1098 }
 ```
+- 환경변수: `EXCHANGE_RATE_API_KEY`
+- 캐시: 6시간 TTL (api-cache.ts 재사용)
+- API 키 미설정 시: 503 반환 → UI에서 에러 메시지 표시
