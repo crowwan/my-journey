@@ -10,11 +10,13 @@ import * as tripApi from '@/lib/supabase/trip-api';
 import { useAuth } from '@/hooks/useAuth';
 import type { Trip, TripSummary } from '@/types/trip';
 
-// 쿼리 키 팩토리 (일관된 캐시 키 관리)
+// 쿼리 키 팩토리 (userId로 캐시 분리 — 로그인/비로그인 캐시 혼재 방지)
 export const tripKeys = {
-  all: ['trips'] as const,
-  lists: () => [...tripKeys.all, 'list'] as const,
-  detail: (id: string) => [...tripKeys.all, 'detail', id] as const,
+  all: (userId?: string) => ['trips', userId ?? 'anonymous'] as const,
+  lists: (userId?: string) => [...tripKeys.all(userId), 'list'] as const,
+  details: (userId?: string) => [...tripKeys.all(userId), 'detail'] as const,
+  detail: (userId: string | undefined, id: string) =>
+    [...tripKeys.details(userId), id] as const,
 };
 
 // Supabase 쿼리용 설정 (서버 데이터는 외부 변경 가능)
@@ -26,9 +28,10 @@ const LOCAL_STALE_TIME = Infinity;
 export function useTrips() {
   const { data: user } = useAuth();
   const isLoggedIn = !!user;
+  const userId = user?.id;
 
   return useQuery({
-    queryKey: tripKeys.lists(),
+    queryKey: tripKeys.lists(userId),
     queryFn: (): Promise<TripSummary[]> =>
       isLoggedIn
         ? tripApi.getTripSummaries()
@@ -42,9 +45,10 @@ export function useTrips() {
 export function useAllTrips() {
   const { data: user } = useAuth();
   const isLoggedIn = !!user;
+  const userId = user?.id;
 
   return useQuery({
-    queryKey: tripKeys.all,
+    queryKey: tripKeys.all(userId),
     queryFn: (): Promise<Trip[]> =>
       isLoggedIn
         ? tripApi.getAllTrips()
@@ -58,9 +62,10 @@ export function useAllTrips() {
 export function useTrip(tripId: string | undefined) {
   const { data: user } = useAuth();
   const isLoggedIn = !!user;
+  const userId = user?.id;
 
   return useQuery({
-    queryKey: tripKeys.detail(tripId!),
+    queryKey: tripKeys.detail(userId, tripId!),
     queryFn: (): Promise<Trip | null> =>
       isLoggedIn
         ? tripApi.getTrip(tripId!)
@@ -75,6 +80,7 @@ export function useTrip(tripId: string | undefined) {
 export function useSaveTrip() {
   const queryClient = useQueryClient();
   const { data: user } = useAuth();
+  const userId = user?.id;
 
   return useMutation({
     mutationFn: async (trip: Trip) => {
@@ -89,10 +95,10 @@ export function useSaveTrip() {
     },
     onSuccess: (trip) => {
       // 목록과 전체 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: tripKeys.all });
+      queryClient.invalidateQueries({ queryKey: tripKeys.lists(userId) });
+      queryClient.invalidateQueries({ queryKey: tripKeys.all(userId) });
       // 단일 여행 캐시 즉시 업데이트
-      queryClient.setQueryData(tripKeys.detail(trip.id), trip);
+      queryClient.setQueryData(tripKeys.detail(userId, trip.id), trip);
     },
   });
 }
@@ -101,6 +107,7 @@ export function useSaveTrip() {
 export function useDeleteTrip() {
   const queryClient = useQueryClient();
   const { data: user } = useAuth();
+  const userId = user?.id;
 
   return useMutation({
     mutationFn: async (tripId: string) => {
@@ -112,9 +119,9 @@ export function useDeleteTrip() {
       return tripId;
     },
     onSuccess: (tripId) => {
-      queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: tripKeys.all });
-      queryClient.removeQueries({ queryKey: tripKeys.detail(tripId) });
+      queryClient.invalidateQueries({ queryKey: tripKeys.lists(userId) });
+      queryClient.invalidateQueries({ queryKey: tripKeys.all(userId) });
+      queryClient.removeQueries({ queryKey: tripKeys.detail(userId, tripId) });
     },
   });
 }

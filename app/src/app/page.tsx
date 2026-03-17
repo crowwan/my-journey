@@ -11,7 +11,8 @@ import { TripCard } from '@/components/home/TripCard';
 import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Sun, CloudSun, Moon, MoonStar, Plane, Plus, Cloud } from 'lucide-react';
+import { Sun, CloudSun, Moon, MoonStar, Plane, Plus, MapPin, Calendar, Sparkles } from 'lucide-react';
+import { useSignInWithKakao } from '@/hooks/useAuth';
 
 // 시간대별 인사말 텍스트와 아이콘을 반환
 function getGreeting(): { text: string; icon: React.ReactNode } {
@@ -21,6 +22,87 @@ function getGreeting(): { text: string; icon: React.ReactNode } {
   if (hour >= 12 && hour <= 17) return { text: '좋은 오후예요', icon: <CloudSun size={18} className={iconClass} /> };
   if (hour >= 18 && hour <= 22) return { text: '좋은 저녁이에요', icon: <Moon size={18} className={iconClass} /> };
   return { text: '늦은 밤이에요', icon: <MoonStar size={18} className={iconClass} /> };
+}
+
+// 비로그인 사용자용 랜딩 화면
+function LandingSection() {
+  const signInWithKakao = useSignInWithKakao();
+
+  const features = [
+    { icon: <MapPin className="size-5 text-primary-500" />, title: '맞춤 일정', desc: '목적지와 기간만 알려주세요' },
+    { icon: <Calendar className="size-5 text-secondary-500" />, title: '상세 계획', desc: '시간대별 일정을 자동 생성' },
+    { icon: <Sparkles className="size-5 text-cat-shopping" />, title: 'AI 수정', desc: '대화로 일정을 자유롭게 수정' },
+  ];
+
+  return (
+    <div className="min-h-dvh flex flex-col">
+      <Header title="My Journey" />
+
+      {/* 히어로 영역 */}
+      <main className="flex-1 flex flex-col items-center justify-center px-5 sm:px-8">
+        <div className="max-w-md w-full text-center space-y-8">
+          {/* 아이콘 + 타이틀 */}
+          <div className="space-y-4 animate-fade-up">
+            <div className="inline-flex items-center justify-center size-20 rounded-full bg-primary-50">
+              <Plane className="size-10 text-primary-500" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-text-primary leading-tight">
+              AI와 함께<br />여행을 계획하세요
+            </h2>
+            <p className="text-text-secondary text-sm sm:text-base leading-relaxed">
+              목적지, 기간만 알려주면<br />
+              AI가 맞춤 일정을 만들어드려요
+            </p>
+          </div>
+
+          {/* 기능 소개 카드 */}
+          <div className="flex flex-col gap-3 animate-fade-up" style={{ animationDelay: '0.15s' }}>
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="flex items-center gap-3 bg-surface rounded-xl border border-border-light p-4 text-left"
+              >
+                <div className="flex-shrink-0 size-10 rounded-lg bg-bg-secondary flex items-center justify-center">
+                  {f.icon}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-text-primary">{f.title}</p>
+                  <p className="text-xs text-text-secondary">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 카카오 로그인 버튼 */}
+          <div className="animate-fade-up" style={{ animationDelay: '0.3s' }}>
+            <button
+              onClick={() => signInWithKakao.mutate()}
+              disabled={signInWithKakao.isPending}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#FEE500] text-[#391B1B] font-semibold text-sm py-3.5 hover:brightness-95 active:scale-[0.98] transition-all disabled:opacity-50"
+            >
+              {/* 카카오 로고 SVG */}
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M9 0.6C4.03 0.6 0 3.713 0 7.534c0 2.447 1.626 4.6 4.076 5.82-.18.67-.65 2.428-.744 2.805-.116.467.171.46.36.335.148-.098 2.36-1.6 3.316-2.252.322.047.652.072.992.072 4.97 0 9-3.113 9-6.78C18 3.713 13.97.6 9 .6Z"
+                  fill="#391B1B"
+                />
+              </svg>
+              카카오로 시작하기
+            </button>
+          </div>
+        </div>
+      </main>
+
+      {/* 빌드 버전 */}
+      <footer className="px-5 pb-4 pt-8 text-center">
+        <p className="text-[10px] text-text-tertiary">
+          Build {process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 7)} · {process.env.NEXT_PUBLIC_BUILD_TIME?.slice(0, 16).replace('T', ' ')}
+        </p>
+      </footer>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -86,6 +168,23 @@ export default function Home() {
 
   const hasNoTrips = summaries.length === 0;
   const greeting = getGreeting();
+
+  // 비로그인 사용자에게 랜딩 화면 표시
+  // isAuthLoading 중에는 판단 보류 (빈 화면)
+  if (isAuthLoading) {
+    return (
+      <div>
+        <Header title="My Journey" showCalendar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="size-8 border-2 border-primary-300 border-t-primary-500 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LandingSection />;
+  }
 
   return (
     <div>
@@ -164,18 +263,6 @@ export default function Home() {
             {pastFiltered.map((trip, index) => (
               <TripCard key={trip.id} trip={trip} index={index} onDelete={(id: string) => deleteTripMutation.mutate(id)} />
             ))}
-          </div>
-        </section>
-      )}
-
-      {/* 비로그인 시 클라우드 저장 안내 배너 */}
-      {!isAuthLoading && !user && summaries.length > 0 && (
-        <section className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-6">
-          <div className="flex items-center gap-3 rounded-xl bg-secondary-50 border border-secondary-200 p-4">
-            <Cloud className="size-5 text-secondary-500 flex-shrink-0" />
-            <p className="text-sm text-text-secondary">
-              로그인하면 여행 데이터가 클라우드에 저장되어 어디서든 접근할 수 있어요.
-            </p>
           </div>
         </section>
       )}

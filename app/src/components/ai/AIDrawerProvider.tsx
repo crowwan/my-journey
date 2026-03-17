@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { useUIStore } from '@/stores/useUIStore';
 import { useChatStore } from '@/stores/useChatStore';
+import { useAuth } from '@/hooks/useAuth';
 import { AIFloatingButton } from './AIFloatingButton';
 import { AIDrawer } from './AIDrawer';
 import { AISplitView } from './AISplitView';
@@ -31,6 +32,7 @@ function useIsDesktop() {
 
 // 레이아웃 레벨에서 FAB + 드로어/Split View를 제공하는 클라이언트 컴포넌트
 export function AIDrawerProvider() {
+  const { data: user } = useAuth();
   const isOpen = useUIStore((s) => s.isAIDrawerOpen);
   const mode = useUIStore((s) => s.aiDrawerMode);
   const tripId = useUIStore((s) => s.aiDrawerTripId);
@@ -61,6 +63,9 @@ export function AIDrawerProvider() {
 
   // Split View 모드 + 데스크탑 + 열린 상태 → AISplitView 렌더링
   const showSplitView = isOpen && aiViewMode === 'split' && isDesktop;
+
+  // 비로그인 시 AI 기능 숨김
+  if (!user) return null;
 
   return (
     <>
