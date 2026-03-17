@@ -30,13 +30,16 @@ my-journey/
 │       │   ├── layout/     # Header, SplashScreen
 │       │   ├── shared/     # EmptyState, emoji-to-icon 등
 │       │   └── ui/         # shadcn 컴포넌트
-│       ├── stores/         # Zustand (useTripStore, useChatStore, useUIStore)
-│       ├── api/            # gemini.ts (Gemini SDK 래퍼)
-│       ├── lib/            # 유틸 (trip-utils, emoji-to-icon, utils)
-│       └── types/          # trip.ts (Trip, ChatMessage 등)
+│       ├── stores/         # Zustand (클라이언트 상태만: useChatStore, useUIStore, useEditStore, useTripStore)
+│       ├── queries/        # React Query 훅 (useTrips, useWeather, useCurrency)
+│       ├── api/            # API 레이어 (gemini.ts, weather.ts, currency.ts, chat.ts)
+│       ├── domain/         # 순수 도메인 함수 (budget.ts, trip.ts)
+│       ├── lib/            # 인프라 유틸 (storage, date-utils, emoji-to-icon 등)
+│       └── types/          # trip.ts, weather.ts
 ├── dev/active/             # 작업 문서
-│   ├── ai-enhancement/     # AI 고도화 계획서/태스크/컨텍스트
-│   └── calendar-view/      # 캘린더 뷰 계획서/태스크/컨텍스트
+│   ├── supabase-migration/ # Supabase 마이그레이션 (Phase 0 완료)
+│   ├── trip-sharing/       # 여행 공유 (Supabase 시)
+│   └── weather-currency/   # 날씨+환율 (완료)
 ├── docs/                   # 디자인 시스템, 계획서
 └── trips/                  # 레거시 HTML 여행 (2025-osaka 등)
 ```
@@ -112,6 +115,7 @@ my-journey/
 ## 참조 파일
 
 - 디자인 시스템: `docs/design-system.md`
-- AI 고도화 계획서: `dev/active/ai-enhancement/ai-enhancement-plan.md`
-- 캘린더 뷰 계획서: `dev/active/calendar-view/calendar-view-plan.md`
-- 계획서: `docs/01-plan/features/my-journey-project-setup.plan.md`
+- 리팩토링 가이드: `docs/refactoring-guide.md`
+- Supabase 마이그레이션: `dev/active/supabase-migration/supabase-migration-context.md`
+- 날씨+환율: `dev/active/weather-currency/weather-currency-context.md`
+- 여행 공유: `dev/active/trip-sharing/trip-sharing-plan.md`
