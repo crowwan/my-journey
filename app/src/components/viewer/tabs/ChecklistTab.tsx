@@ -5,6 +5,7 @@ import { Luggage, CheckCircle, Plus, Minus, Trash2 } from 'lucide-react';
 import type { Trip, PackingEntry, PreTodoItem } from '@/types/trip';
 import { useTripStore } from '@/stores/useTripStore';
 import { useEditStore } from '@/stores/useEditStore';
+import { useAuth } from '@/hooks/useAuth';
 import { storage } from '@/lib/storage';
 import { EmojiIcon } from '@/lib/emoji-to-icon';
 import { calculatePackingProgress } from '@/domain/trip';
@@ -86,6 +87,7 @@ function AddItemInput({
 
 export function ChecklistTab({ trip }: ChecklistTabProps) {
   const { packing, preTodos, id: tripId } = trip;
+  const { data: user } = useAuth();
   const togglePackingItem = useTripStore((state) => state.togglePackingItem);
   // packingVersion 구독으로 체크 토글 시 리렌더링 트리거
   useTripStore((state) => state.packingVersion);
@@ -285,7 +287,7 @@ export function ChecklistTab({ trip }: ChecklistTabProps) {
                     return (
                       <div
                         key={item.name}
-                        onClick={() => togglePackingItem(tripId, category.category, item.name)}
+                        onClick={() => togglePackingItem(tripId, category.category, item.name, user?.id)}
                         className={cn(
                           'flex items-center gap-3 px-5 py-3.5 rounded-xl cursor-pointer transition-all',
                           isChecked

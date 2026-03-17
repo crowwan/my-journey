@@ -1,7 +1,7 @@
 # Supabase 마이그레이션 — 컨텍스트
 
-**최종 갱신**: 2026-03-17 (Phase 2 DB 스키마 + Auth UI 구현 완료)
-**상태**: Phase 2 완료 (SQL 대시보드 실행 대기) → Phase 3 대기 (데이터 접근 레이어)
+**최종 갱신**: 2026-03-17 (Phase 3 데이터 접근 레이어 구현 완료)
+**상태**: Phase 3 완료 → Phase 4 대기 (localStorage 마이그레이션)
 
 ---
 
@@ -58,26 +58,32 @@
 
 ---
 
-## 현재 데이터 흐름 (Phase 0 완료 상태)
+## 현재 데이터 흐름 (Phase 3 완료 상태)
 
+### 로그인 시 (Supabase)
 ```
 [컴포넌트] → useTrips() / useTrip(id)
-              → React Query 캐시 확인
+              → React Query 캐시 확인 (staleTime: 2분)
+              → cache miss → tripApi.getTripSummaries() / tripApi.getTrip(id)
+                → Supabase PostgreSQL (RLS 자동 필터)
+
+[컴포넌트] → useSaveTrip().mutate(trip)
+              → tripApi.saveTrip(trip, userId)
+                → trips upsert + 하위 테이블 replace
+              → queryClient.invalidateQueries / setQueryData
+```
+
+### 비로그인 시 (Guest Mode — localStorage)
+```
+[컴포넌트] → useTrips() / useTrip(id)
+              → React Query 캐시 확인 (staleTime: Infinity)
               → cache miss → storage.getAllTrips() / storage.getTrip(id)
                 → localStorage
 
 [컴포넌트] → useSaveTrip().mutate(trip)
               → storage.saveTrip(trip)
                 → localStorage.setItem(...)
-              → queryClient.invalidateQueries(['trips'])
-              → queryClient.setQueryData(['trip', id], trip)
-```
-
-### Phase 1~3에서 할 일: queryFn만 교체
-
-```
-[컴포넌트] → useTrips() / useTrip(id)  ← 변경 없음!
-              → queryFn: storage.getAllTrips() → supabase.from('trips').select()
+              → queryClient.invalidateQueries / setQueryData
 ```
 
 ---
@@ -112,19 +118,34 @@
 - RLS 간소화 — 공유 뷰어는 비로그인 읽기 전용이므로 API Route에서 service_role로 처리
 - profiles RLS — 본인 SELECT/UPDATE만 (INSERT는 트리거가 SECURITY DEFINER로 처리)
 
-### Phase 3에서 생성 예정
-| 파일 | 역할 | Phase |
-|------|------|-------|
-| `src/types/supabase.ts` | DB 타입 정의 | 3 |
-| `src/lib/supabase/trip-api.ts` | Trip 데이터 접근 함수 | 3 |
-| `src/lib/supabase/trip-mapper.ts` | Trip ↔ DB 변환 함수 | 3 |
+## Phase 3 구현 완료 (2026-03-17)
 
-### Phase 3 핵심 변경 (계획 유지)
+### 생성된 파일
+| 파일 | 역할 |
+|------|------|
+| `src/types/supabase.ts` | DB 테이블 행 타입 정의 (9개 인터페이스) |
+| `src/lib/supabase/trip-mapper.ts` | Trip ↔ DB 변환 함수 (tripToDb, dbToTrip) |
+| `src/lib/supabase/trip-api.ts` | Supabase 데이터 접근 모듈 (8개 함수) |
+| `src/lib/supabase/__tests__/trip-mapper.test.ts` | trip-mapper 단위 테스트 (13개) |
+
+### 수정된 파일
 | 파일 | 변경 내용 |
 |------|----------|
-| `src/queries/useTrips.ts` | queryFn 내부: storage.xxx → tripApi.xxx |
-| `src/types/trip.ts` | userId 필드 추가 (optional) |
-| `src/app/page.tsx` | 인증 분기 추가 |
+| `src/queries/useTrips.ts` | queryFn 분기 (로그인→Supabase, 비로그인→localStorage) |
+| `src/stores/useTripStore.ts` | togglePackingItem에 userId 파라미터 추가 |
+| `src/components/viewer/tabs/ChecklistTab.tsx` | useAuth 추가, togglePackingItem에 user?.id 전달 |
+
+### 변경 없음 (계획대로)
+| 파일 | 이유 |
+|------|------|
+| `src/app/page.tsx` | hooks 시그니처 변경 없으므로 |
+| `src/app/trips/[tripId]/page.tsx` | hooks 시그니처 변경 없으므로 |
+| `src/types/trip.ts` | userId 필드 불필요 (useAuth에서 별도 관리) |
+
+### 설계 결정
+- Supabase SDK에 Database 제네릭 미적용: 부분 select 시 타입 추론 이슈로 unwrap 헬퍼 패턴 사용
+- storage.ts 삭제하지 않음: Guest Mode에서 계속 사용
+- togglePackingItem: 동기(localStorage) + 비동기(Supabase) 이중 저장으로 UX 유지
 
 ---
 

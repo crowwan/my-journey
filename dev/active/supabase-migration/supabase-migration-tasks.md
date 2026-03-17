@@ -1,6 +1,6 @@
 # Supabase 마이그레이션 — 작업 체크리스트
 
-**최종 갱신**: 2026-03-17 (Phase 2 DB 스키마 + Auth UI 구현 반영)
+**최종 갱신**: 2026-03-17 (Phase 3 데이터 접근 레이어 구현 완료)
 
 ---
 
@@ -107,14 +107,51 @@
 
 ---
 
-## Phase 3: Supabase 데이터 접근 레이어 [XL]
+## Phase 3: Supabase 데이터 접근 레이어 [XL] ✅ 완료
 
-### 3-1. queryFn 교체 — 핵심 변경
-- [ ] `src/queries/useTrips.ts` — queryFn: storage.xxx → tripApi.xxx
-- [ ] QueryClient staleTime 변경 (Infinity → 2분)
-- [ ] 인증 연동 (hooks에서 userId 자동 주입)
+### 3-1. Supabase 타입 정의 ✅
+- [x] `src/types/supabase.ts` — DB 테이블 행 타입 (DbTrip, DbTripDay, 등 9개)
 
-(나머지 Phase 3~6은 기존 계획 유지)
+### 3-2. Trip 변환 함수 ✅
+- [x] `src/lib/supabase/trip-mapper.ts` — tripToDb / dbToTrip
+- [x] `src/lib/supabase/__tests__/trip-mapper.test.ts` — 13개 테스트 (왕복 변환 포함)
+  - overview에서 weather 제외
+  - packing items에서 checked 제외
+  - budget total 자동 계산
+  - sort_order 기반 정렬
+
+### 3-3. Supabase 데이터 접근 모듈 ✅
+- [x] `src/lib/supabase/trip-api.ts` — 8개 함수
+  - getTripSummaries, getAllTrips, getTrip
+  - saveTrip (upsert + replace 전략)
+  - deleteTrip (CASCADE)
+  - getPackingChecks, setPackingCheck
+
+### 3-4. queryFn 교체 — 핵심 변경 ✅
+- [x] `src/queries/useTrips.ts` — 인증 상태에 따라 분기
+  - 로그인 → tripApi.xxx (Supabase)
+  - 비로그인 → storage.xxx (localStorage)
+- [x] staleTime: Infinity → 2분 (로그인 시), 비로그인은 Infinity 유지
+- [x] retry: 2 (로그인 시)
+- [x] hooks 시그니처 변경 없음 (useTrips, useTrip, useSaveTrip, useDeleteTrip)
+- [x] useAuth()로 사용자 정보 자동 주입
+
+### 3-5. useTripStore 패킹 체크 Supabase 전환 ✅
+- [x] togglePackingItem에 userId 파라미터 추가
+- [x] 로그인 시 Supabase에도 비동기 저장 (localStorage도 유지)
+- [x] ChecklistTab에서 user?.id 전달
+
+### 3-6. 검증 ✅
+- [x] `next build` 성공
+- [x] `vitest run` 47개 테스트 통과 (기존 34 + 신규 13)
+- [x] 비로그인 시 기존대로 localStorage 동작 (hooks 시그니처 변경 없으므로)
+- [ ] 로그인 상태 E2E 테스트 (Supabase SQL 실행 후)
+
+### 설계 결정
+- storage.ts 유지: Guest Mode에서 계속 사용
+- DB weather 미저장: 실시간 API
+- budget.total DB 미저장: 조립 시 calculateBudgetTotal 계산
+- Supabase SDK에 Database 제네릭 미적용: 부분 select 타입 추론 이슈로 unwrap 헬퍼 사용
 
 ---
 
@@ -125,7 +162,7 @@
 | Phase 0: React Query 도입 | L | ✅ 완료 | 없음 |
 | Phase 1: Supabase 설정 | S | ✅ 완료 | Phase 0 ✅ |
 | Phase 2: DB + Auth | L | ✅ 완료 (SQL 실행 대기) | Phase 1 ✅ |
-| Phase 3: 데이터 레이어 교체 | XL | ⬜ 미시작 | Phase 2 |
+| Phase 3: 데이터 레이어 교체 | XL | ✅ 완료 | Phase 2 ✅ |
 | Phase 4: 마이그레이션 | M | ⬜ 미시작 | Phase 3 |
 | Phase 5: 공유 기능 | M | ⬜ 미시작 | Phase 3 |
 | Phase 6: 비로그인/오프라인 | M | ⬜ 미시작 | Phase 4 |
