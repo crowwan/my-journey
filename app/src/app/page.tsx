@@ -11,6 +11,7 @@ import { TripCard } from '@/components/home/TripCard';
 import { TripHeroCard } from '@/components/home/TripHeroCard';
 import { NewTripButton } from '@/components/home/NewTripButton';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { TripCardSkeleton } from '@/components/shared/Skeleton';
 import { Sun, CloudSun, Moon, MoonStar, Plane, Plus, MapPin, Calendar, Sparkles } from 'lucide-react';
 import { useSignInWithKakao } from '@/hooks/useAuth';
 
@@ -107,7 +108,7 @@ function LandingSection() {
 
 export default function Home() {
   const { data: user, isLoading: isAuthLoading } = useAuth();
-  const { data: summaries = [] } = useTrips();
+  const { data: summaries = [], isLoading: isTripsLoading } = useTrips();
   const { data: allTrips = [] } = useAllTrips();
   const deleteTripMutation = useDeleteTrip();
   const openAIDrawer = useUIStore((s) => s.openAIDrawer);
@@ -200,8 +201,19 @@ export default function Home() {
       </section>
 
 
-      {/* 여행 없을 때 빈 상태 */}
-      {hasNoTrips && (
+      {/* 여행 로딩 중 스켈레톤 */}
+      {isTripsLoading && (
+        <section className="pt-6 pb-2">
+          <div className="max-w-[1100px] mx-auto px-5 sm:px-8 flex flex-col gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <TripCardSkeleton key={i} index={i} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 여행 없을 때 빈 상태 (로딩 완료 후에만 표시) */}
+      {!isTripsLoading && hasNoTrips && (
         <EmptyState
           icon={<Plane size={48} className="text-primary" />}
           title="아직 여행이 없어요"
