@@ -25,6 +25,7 @@ export function HeroSection({ trip, packingProgress, readOnly = false }: HeroSec
   const openAISplitView = useUIStore((s) => s.openAISplitView);
   const clearMessages = useChatStore((s) => s.clearMessages);
   const addSystemMessage = useChatStore((s) => s.addSystemMessage);
+  const isLoading = useChatStore((s) => s.isLoading);
   const editingSection = useEditStore((s) => s.editingSection);
   const status = getTripStatus(trip.startDate, trip.endDate);
   const dday = getDDay(trip.startDate, trip.endDate);
@@ -43,6 +44,13 @@ export function HeroSection({ trip, packingProgress, readOnly = false }: HeroSec
 
   // AI로 수정 버튼 핸들러
   const handleAIEdit = () => {
+    // AI가 여행 생성 중이면 사용자에게 확인
+    if (isLoading) {
+      const confirmed = window.confirm(
+        'AI가 여행을 생성 중입니다. 현재 생성을 취소하고 이 여행을 수정할까요?'
+      );
+      if (!confirmed) return;
+    }
     // 기존 대화 초기화 후 edit 모드 시작
     clearMessages();
     openAISplitView('edit', trip.id);

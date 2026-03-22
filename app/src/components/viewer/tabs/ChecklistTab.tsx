@@ -75,7 +75,7 @@ function AddItemInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') handleSubmit();
+          if (e.key === 'Enter' && !e.nativeEvent.isComposing) handleSubmit();
         }}
         onBlur={handleSubmit}
         className="flex-1 bg-transparent text-sm text-text-primary outline-none placeholder:text-text-tertiary"

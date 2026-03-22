@@ -93,7 +93,7 @@ export function AISplitView({ mode, tripId }: AISplitViewProps) {
         {/* 뷰어 영역 */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto">
           {displayTrip ? (
-            <TripViewer trip={displayTrip} scrollContainerRef={scrollRef} />
+            <TripViewer trip={displayTrip} scrollContainerRef={scrollRef} readOnly />
           ) : (
             <div className="flex items-center justify-center h-full text-text-secondary">
               <p className="text-sm">AI가 여행 계획을 생성하면 여기에 표시됩니다</p>
