@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
-import { Button } from '@/components/ui/button';
 
 interface ChatInputProps {
   onSend: (text: string) => void;
@@ -12,7 +11,6 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   const [text, setText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // textarea 높이 자동 조절 (최대 4줄)
   const adjustHeight = useCallback(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -39,8 +37,8 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="shrink-0 bg-white border-t border-border px-4 py-3">
-      <div className="max-w-[1100px] mx-auto flex items-end gap-2">
+    <div className="shrink-0 glass-strong border-t border-border px-4 py-3 shadow-[var(--shadow-up)]">
+      <div className="max-w-[1100px] mx-auto flex items-end gap-2.5">
         <textarea
           ref={textareaRef}
           value={text}
@@ -52,15 +50,15 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="여행 계획을 알려주세요..."
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-card text-text text-sm rounded-xl px-4 py-3 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200"
+          className="flex-1 bg-surface-elevated text-text text-sm rounded-xl px-4 py-3 resize-none outline-none placeholder:text-text-tertiary disabled:opacity-50 border border-border focus:border-accent focus:ring-2 focus:ring-accent/15 transition-all duration-200 shadow-[var(--shadow-sm)]"
         />
-        <Button
+        <button
           onClick={handleSend}
           disabled={disabled || !text.trim()}
-          className="rounded-xl px-5 py-3 bg-accent text-white hover:bg-accent/90 shadow-sm hover:shadow-md shrink-0"
+          className="gradient-accent text-white rounded-xl px-5 py-3 text-sm font-bold shadow-sm hover:shadow-md transition-all shrink-0 disabled:opacity-40 active:scale-[0.97]"
         >
           전송
-        </Button>
+        </button>
       </div>
     </div>
   );

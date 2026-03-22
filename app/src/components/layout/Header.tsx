@@ -1,33 +1,53 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface HeaderProps {
   title?: string;
   showBack?: boolean;
+  transparent?: boolean;
 }
 
-export function Header({ title = 'My Journey', showBack = false }: HeaderProps) {
+export function Header({ title = 'My Journey', showBack = false, transparent = false }: HeaderProps) {
   const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!transparent) return;
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [transparent]);
+
+  const isTransparent = transparent && !scrolled;
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border px-4 py-4 pt-[calc(0.75rem+var(--safe-area-top,0px))] flex items-center gap-3 shadow-none">
+    <header
+      className={`sticky top-0 z-50 px-5 py-3.5 pt-[calc(0.875rem+var(--safe-area-top,0px))] flex items-center gap-3 transition-all duration-300 ${
+        isTransparent
+          ? 'bg-transparent shadow-none border-b border-transparent'
+          : 'glass-strong border-b border-border shadow-[var(--shadow-sm)]'
+      }`}
+    >
       {showBack && (
         <button
           onClick={() => router.back()}
-          className="text-text-secondary hover:text-accent transition-colors text-lg"
+          className="w-9 h-9 flex items-center justify-center rounded-xl text-text-secondary hover:text-accent hover:bg-accent/10 transition-all"
         >
-          &larr;
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
         </button>
       )}
-      <h1 className="font-sans text-lg font-bold text-text tracking-wide flex-1">
+      <h1 className={`text-lg font-bold tracking-tight flex-1 transition-colors ${isTransparent ? 'text-text' : 'text-text'}`}>
         {title}
       </h1>
       {/* 홈에서만 채팅 버튼 표시 */}
       {!showBack && (
         <button
           onClick={() => router.push('/chat')}
-          className="w-9 h-9 flex items-center justify-center rounded-full text-text-secondary hover:text-accent hover:bg-accent/10 transition-all"
+          className="w-9 h-9 flex items-center justify-center rounded-xl text-text-secondary hover:text-accent hover:bg-accent/10 transition-all"
           aria-label="AI 여행 플래너"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

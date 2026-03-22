@@ -3,15 +3,12 @@
 import { useRouter } from 'next/navigation';
 import type { Trip } from '@/types/trip';
 import { useTripStore } from '@/stores/useTripStore';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 
 interface TripPreviewCardProps {
   trip: Trip;
 }
 
-// 날짜 범위를 읽기 좋은 형식으로 변환
 function formatDateRange(startDate: string, endDate: string): string {
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -30,24 +27,23 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
   };
 
   return (
-    <Card className="rounded-[16px] py-0 gap-0 shadow-[var(--shadow-card)]">
-      <CardContent className="p-4 space-y-3">
-        {/* 제목 + 목적지 */}
-        <div>
-          <h3 className="text-text font-bold text-sm">{trip.title}</h3>
-          <p className="text-text-secondary text-xs mt-0.5">
-            {trip.destination} &middot; {formatDateRange(trip.startDate, trip.endDate)} &middot; {trip.days.length}일
-          </p>
-        </div>
+    <div className="bg-surface-elevated border border-border rounded-2xl shadow-[var(--shadow-card)] overflow-hidden">
+      {/* 헤더 바 */}
+      <div className="gradient-accent-soft px-4 py-3 border-b border-border">
+        <h3 className="text-text font-bold text-sm">{trip.title}</h3>
+        <p className="text-text-secondary text-xs mt-0.5">
+          {trip.destination} &middot; {formatDateRange(trip.startDate, trip.endDate)} &middot; {trip.days.length}일
+        </p>
+      </div>
 
-        {/* 태그 */}
+      <div className="p-4 space-y-3">
         {trip.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {trip.tags.map((tag) => (
               <Badge
                 key={tag}
-                variant="secondary"
-                className="text-[0.65rem] px-2 py-0.5 bg-accent/10 text-accent"
+                variant="accent"
+                className="text-[0.65rem] px-2 py-0.5"
               >
                 {tag}
               </Badge>
@@ -55,14 +51,13 @@ export function TripPreviewCard({ trip }: TripPreviewCardProps) {
           </div>
         )}
 
-        {/* 저장 버튼 */}
-        <Button
+        <button
           onClick={handleSave}
-          className="w-full rounded-xl bg-accent text-white hover:bg-accent-warm shadow-sm hover:shadow-md"
+          className="w-full gradient-accent text-white rounded-xl py-2.5 text-sm font-bold shadow-sm hover:shadow-md transition-all active:scale-[0.97]"
         >
           여행 저장하기
-        </Button>
-      </CardContent>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }

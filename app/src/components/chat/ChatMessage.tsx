@@ -7,13 +7,11 @@ interface ChatMessageProps {
   message: ChatMessageType;
 }
 
-// 타임스탬프를 HH:MM 형식으로 변환
 function formatTime(timestamp: number): string {
   const date = new Date(timestamp);
   return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-// 인라인 마크다운 파싱: **bold**, *italic*
 function parseInline(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
   const regex = /(\*\*(.+?)\*\*|\*(.+?)\*)/g;
@@ -22,23 +20,19 @@ function parseInline(text: string): React.ReactNode[] {
   let key = 0;
 
   while ((match = regex.exec(text)) !== null) {
-    // 매치 전 일반 텍스트
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
 
     if (match[2]) {
-      // **bold**
-      parts.push(<strong key={key++} className="font-semibold">{match[2]}</strong>);
+      parts.push(<strong key={key++} className="font-bold">{match[2]}</strong>);
     } else if (match[3]) {
-      // *italic*
       parts.push(<em key={key++}>{match[3]}</em>);
     }
 
     lastIndex = regex.lastIndex;
   }
 
-  // 나머지 텍스트
   if (lastIndex < text.length) {
     parts.push(text.slice(lastIndex));
   }
@@ -46,19 +40,17 @@ function parseInline(text: string): React.ReactNode[] {
   return parts.length > 0 ? parts : [text];
 }
 
-// 경량 마크다운 파싱: 줄 단위 처리 + 인라인 마크다운
 function parseMarkdown(text: string): React.ReactNode[] {
   const lines = text.split('\n');
 
   return lines.map((line, i) => {
     const isLast = i === lines.length - 1;
 
-    // 리스트 아이템: - 또는 • 로 시작
     const listMatch = line.match(/^[-•]\s+(.+)/);
     if (listMatch) {
       return (
-        <span key={i} className="flex gap-1.5">
-          <span className="text-accent shrink-0">•</span>
+        <span key={i} className="flex gap-2">
+          <span className="text-accent shrink-0 font-bold">•</span>
           <span>{parseInline(listMatch[1])}</span>
           {!isLast && '\n'}
         </span>
@@ -72,11 +64,10 @@ function parseMarkdown(text: string): React.ReactNode[] {
 export function ChatMessage({ message }: ChatMessageProps) {
   const { role, content, timestamp, tripPreview } = message;
 
-  // 시스템/에러 메시지
   if (role === 'system') {
     return (
       <div className="flex justify-center py-2">
-        <span className="text-text-tertiary text-xs px-3 py-1 bg-card-secondary/50 rounded-full">
+        <span className="text-text-tertiary text-xs px-3.5 py-1.5 bg-surface-sunken rounded-full font-medium">
           {content}
         </span>
       </div>
@@ -87,26 +78,23 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
-      <div className={`max-w-[85%] ${isUser ? 'order-1' : 'order-1'}`}>
-        {/* 메시지 버블 */}
+      <div className="max-w-[85%]">
         <div
-          className={`px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+          className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
-              ? 'bg-accent text-white rounded-2xl rounded-br-md'
-              : 'bg-white text-text rounded-2xl rounded-bl-md border border-border/60 shadow-[var(--shadow-card)]'
+              ? 'gradient-accent text-white rounded-2xl rounded-br-md shadow-sm'
+              : 'bg-surface-elevated text-text rounded-2xl rounded-bl-md border border-border shadow-[var(--shadow-card)]'
           }`}
         >
           {parseMarkdown(content)}
         </div>
 
-        {/* 여행 프리뷰 카드 */}
         {tripPreview && (
           <div className="mt-2">
             <TripPreviewCard trip={tripPreview} />
           </div>
         )}
 
-        {/* 타임스탬프 */}
         <div className={`text-[0.65rem] text-text-tertiary mt-1 ${isUser ? 'text-right' : 'text-left'}`}>
           {formatTime(timestamp)}
         </div>

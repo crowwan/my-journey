@@ -26,10 +26,10 @@ export function TripViewer({ trip, onEdit }: TripViewerProps) {
   const packingProgress = getPackingProgress(trip.packing, checkedMap);
 
   return (
-    <div>
+    <div className="min-h-screen bg-bg">
       <HeroSection trip={trip} packingProgress={packingProgress} onEdit={onEdit} />
       <TabBar activeTab={activeTab} onChange={setActiveTab} />
-      <div className="max-w-[1100px] mx-auto px-5 py-8">
+      <div className="max-w-[1100px] mx-auto px-5 py-6">
         {activeTab === 'overview' && <OverviewTab trip={trip} />}
         {activeTab === 'schedule' && <ScheduleTab days={trip.days} />}
         {activeTab === 'restaurant' && <RestaurantTab restaurants={trip.restaurants} />}

@@ -63,10 +63,10 @@ export function getPackingProgress(
 export function getDDayBadgeStyle(status: TripStatus): string {
   switch (status) {
     case 'upcoming':
-      return 'bg-blue-50 text-blue-600 border border-blue-200';
+      return 'bg-info-bg text-info border border-info/15';
     case 'ongoing':
-      return 'bg-green-50 text-green-600 border border-green-200';
+      return 'bg-trip-green/10 text-trip-green border border-trip-green/15';
     case 'completed':
-      return 'bg-gray-100 text-gray-500 border border-gray-200';
+      return 'bg-surface-sunken text-text-tertiary border border-border';
   }
 }

@@ -6,19 +6,17 @@ interface RestaurantTabProps {
 }
 
 export function RestaurantTab({ restaurants }: RestaurantTabProps) {
-  // 빈 상태 처리
   if (!restaurants || restaurants.length === 0) {
     return (
       <div className="animate-fade-up">
-        <div className="text-center py-12 text-text-tertiary">
-          <div className="text-3xl mb-2">🍜</div>
-          <p className="text-sm">AI가 이 섹션을 아직 생성하지 않았습니다</p>
+        <div className="text-center py-16 text-text-tertiary">
+          <div className="text-4xl mb-3">🍜</div>
+          <p className="text-sm font-medium">AI가 이 섹션을 아직 생성하지 않았습니다</p>
         </div>
       </div>
     );
   }
 
-  // dayNumber별 그룹핑
   const grouped = new Map<number, Restaurant[]>();
   restaurants.forEach((r) => {
     const list = grouped.get(r.dayNumber) ?? [];
@@ -26,7 +24,6 @@ export function RestaurantTab({ restaurants }: RestaurantTabProps) {
     grouped.set(r.dayNumber, list);
   });
 
-  // dayNumber 순서대로 정렬
   const sortedDays = Array.from(grouped.entries()).sort(([a], [b]) => a - b);
 
   return (
@@ -36,20 +33,20 @@ export function RestaurantTab({ restaurants }: RestaurantTabProps) {
           <SectionTitle icon="🍜" bgColor="#f472b6">
             Day {dayNumber}
           </SectionTitle>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
             {dayRestaurants.map((restaurant) => (
               <div
                 key={`${dayNumber}-${restaurant.name}`}
-                className="bg-white border border-border rounded-[16px] p-5 transition-all hover:border-trip-pink/30 hover:-translate-y-0.5"
+                className="bg-surface-elevated border border-border rounded-2xl p-5 shadow-[var(--shadow-sm)] transition-all duration-200 hover:border-trip-pink/25 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
               >
                 {/* 카테고리 + 평점 */}
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs bg-trip-pink/15 text-trip-pink px-2 py-0.5 rounded-md font-semibold">
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-xs bg-trip-pink/10 text-trip-pink px-2.5 py-1 rounded-lg font-bold border border-trip-pink/12">
                     {restaurant.category}
                   </span>
-                  <span className="text-sm text-amber-500 font-semibold">
+                  <span className="text-sm text-amber-500 font-bold">
                     {'★'.repeat(Math.round(restaurant.rating))}{' '}
-                    <span className="text-text-secondary">{restaurant.rating}</span>
+                    <span className="text-text-secondary font-medium">{restaurant.rating}</span>
                     {restaurant.reviewCount && (
                       <span className="text-text-tertiary text-xs ml-1">
                         ({restaurant.reviewCount})
@@ -57,14 +54,11 @@ export function RestaurantTab({ restaurants }: RestaurantTabProps) {
                     )}
                   </span>
                 </div>
-                {/* 가게명 */}
-                <h4 className="text-base font-bold text-text mb-1">{restaurant.name}</h4>
-                {/* 설명 */}
-                <p className="text-sm text-text-secondary leading-relaxed mb-2">
+                <h4 className="text-[15px] font-bold text-text mb-1.5">{restaurant.name}</h4>
+                <p className="text-[13px] text-text-secondary leading-relaxed mb-2">
                   {restaurant.description}
                 </p>
-                {/* 가격대 */}
-                <div className="text-xs text-text-tertiary font-semibold">
+                <div className="text-xs text-text-tertiary font-bold">
                   {restaurant.priceRange}
                 </div>
               </div>

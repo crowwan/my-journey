@@ -5,35 +5,65 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* === Project Custom Colors === */
-  --color-bg:              #ffffff;
-  --color-card:            #fafafa;
-  --color-card-secondary:  #f5f5f5;
-  --color-glass:           rgba(0, 0, 0, 0.015);
+  /* === Surface System (Trip.com inspired layered backgrounds) === */
+  --color-surface:           #f5f6f8;
+  --color-surface-elevated:  #ffffff;
+  --color-surface-sunken:    #eef0f3;
+  --color-surface-overlay:   rgba(0, 0, 0, 0.45);
+
+  /* Legacy aliases */
+  --color-bg:              #f5f6f8;
+  --color-card:            #ffffff;
+  --color-card-secondary:  #f0f1f4;
+  --color-glass:           rgba(0, 0, 0, 0.02);
+
+  /* === Accent System (Orange gradient) === */
   --color-accent:          #f97316;
   --color-accent-light:    #fb923c;
   --color-accent-warm:     #ea580c;
   --color-accent-bg:       #fff7ed;
   --color-accent-bg-hover: #ffedd5;
+
+  /* === Secondary CTA (Blue - links, info) === */
+  --color-info:            #0770E3;
+  --color-info-light:      #2E90FA;
+  --color-info-bg:         #eff6ff;
+
+  /* === Trip Category Colors === */
   --color-trip-blue:       #3b82f6;
   --color-trip-cyan:       #06b6d4;
   --color-trip-green:      #10b981;
   --color-trip-pink:       #ec4899;
   --color-trip-purple:     #8b5cf6;
   --color-trip-red:        #ef4444;
+
+  /* === Status Colors === */
+  --color-success:         #10b981;
+  --color-warning:         #f59e0b;
+  --color-error:           #ef4444;
+
+  /* === Text System === */
   --color-text:            #111827;
   --color-text-secondary:  #6b7280;
   --color-text-tertiary:   #9ca3af;
-  --color-border:          rgba(0, 0, 0, 0.07);
+  --color-text-inverse:    #ffffff;
 
-  /* Shadows */
-  --shadow-card:      0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.03);
+  /* === Border === */
+  --color-border:          rgba(0, 0, 0, 0.06);
+  --color-border-strong:   rgba(0, 0, 0, 0.12);
 
-  /* Border Radius */
+  /* === Shadow System (3 levels) === */
+  --shadow-sm:     0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
+  --shadow-card:   0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-float:  0 12px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-up:     0 -4px 12px rgba(0,0,0,0.06);
+
+  /* === Border Radius === */
   --radius-card: 16px;
+  --radius-button: 12px;
 
-  /* Fonts */
+  /* === Fonts === */
   --font-sans: 'Noto Sans KR', sans-serif;
   --font-display: 'Noto Sans KR', sans-serif;
 
@@ -80,7 +110,7 @@
 /* === shadcn/ui Base Tokens (light) === */
 :root {
   --radius: 0.75rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.97 0.003 250);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -88,15 +118,15 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.702 0.183 55.093);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.96 0.003 250);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
+  --muted: oklch(0.96 0.003 250);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.96 0.003 250);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: oklch(0.91 0.003 250);
+  --input: oklch(0.91 0.003 250);
   --ring: oklch(0.702 0.183 55.093);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -162,17 +192,19 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  line-height: 1.7;
+  line-height: 1.6;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Neutral scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -184,54 +216,68 @@ body {
   background: #9ca3af;
 }
 
-/* Timeline Styles (pseudo-elements not easily done in Tailwind) */
+/* Timeline Styles */
 @layer components {
   .timeline {
     position: relative;
-    padding-left: 26px;
+    padding-left: 28px;
   }
 
   .timeline::before {
     content: '';
     position: absolute;
-    left: 7px;
-    top: 6px;
-    bottom: 6px;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
     width: 2px;
-    background: #d1d5db;
+    background: linear-gradient(to bottom, #d1d5db 0%, #e5e7eb 100%);
     border-radius: 2px;
-    opacity: 0.25;
+    opacity: 0.4;
   }
 
   .tl-item {
     position: relative;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    background: var(--color-surface-elevated);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s ease;
+  }
+
+  .tl-item:hover {
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
   }
 
   .tl-item::before {
     content: '';
     position: absolute;
-    left: -21px;
-    top: 8px;
-    width: 9px;
-    height: 9px;
+    left: -23px;
+    top: 16px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    border: 2px solid var(--color-accent);
-    background: var(--color-bg);
+    border: 2.5px solid var(--color-accent);
+    background: var(--color-surface-elevated);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
   }
 
   .tl-item.food::before {
     border-color: var(--color-trip-pink);
     background: var(--color-trip-pink);
+    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
   }
 
   .tl-item.move::before {
     border-color: var(--color-trip-blue);
     background: var(--color-trip-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
   }
 
   .tl-item.spot::before {
     border-color: var(--color-trip-green);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
   }
 }
 
@@ -239,7 +285,7 @@ body {
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -248,7 +294,7 @@ body {
 }
 
 @keyframes staggerReveal {
-  0% { opacity: 0; transform: translateY(20px); }
+  0% { opacity: 0; transform: translateY(16px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
@@ -257,18 +303,59 @@ body {
   100% { background-position: 200% 0; }
 }
 
+@keyframes tabFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
 .animate-fade-up {
-  animation: fadeUp 0.5s ease-out;
+  animation: fadeUp 0.4s ease-out;
 }
 
 .animate-stagger-reveal {
-  animation: staggerReveal 0.5s ease-out forwards;
+  animation: staggerReveal 0.45s ease-out forwards;
   opacity: 0;
 }
 
 .animate-shimmer {
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
+}
+
+.animate-tab-fade {
+  animation: tabFade 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
 /* Splash Screen Animations */
@@ -330,4 +417,30 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* === Trip.com Style Gradient Utilities === */
+.gradient-accent {
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+}
+
+.gradient-accent-soft {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%);
+}
+
+.gradient-hero {
+  background: linear-gradient(180deg, #fff7ed 0%, #f5f6f8 100%);
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }

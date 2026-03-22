@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface TipProps {
@@ -9,15 +8,16 @@ interface TipProps {
 
 export function Tip({ variant = 'tip', children }: TipProps) {
   return (
-    <Card
+    <div
       className={cn(
-        'rounded-xl border px-4 py-3.5 text-sm leading-relaxed shadow-none gap-0',
+        'rounded-xl px-4 py-3.5 text-sm leading-relaxed flex items-start gap-2.5',
         variant === 'warn'
-          ? 'bg-trip-red/10 border-trip-red/25 text-trip-red'
-          : 'bg-accent-bg border-accent/20 text-accent'
+          ? 'bg-error/5 border border-error/15 text-error'
+          : 'bg-accent-bg border border-accent/15 text-accent-warm'
       )}
     >
-      {children}
-    </Card>
+      <span className="shrink-0 text-base mt-[-1px]">{variant === 'warn' ? '⚠️' : '💡'}</span>
+      <span>{children}</span>
+    </div>
   );
 }

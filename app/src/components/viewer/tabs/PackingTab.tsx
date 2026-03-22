@@ -16,13 +16,12 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
   const togglePackingItem = useTripStore((state) => state.togglePackingItem);
   const checked = storage.getPackingChecked(tripId);
 
-  // 빈 상태 처리
   if (!packing || packing.length === 0) {
     return (
       <div className="animate-fade-up">
-        <div className="text-center py-12 text-text-tertiary">
-          <div className="text-3xl mb-2">🧳</div>
-          <p className="text-sm">AI가 이 섹션을 아직 생성하지 않았습니다</p>
+        <div className="text-center py-16 text-text-tertiary">
+          <div className="text-4xl mb-3">🧳</div>
+          <p className="text-sm font-medium">AI가 이 섹션을 아직 생성하지 않았습니다</p>
         </div>
       </div>
     );
@@ -41,7 +40,7 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
           <div key={category.category}>
             <SectionTitle icon={category.categoryIcon} bgColor="#a78bfa">
               {category.category}
-              <span className="text-sm font-normal text-text-secondary ml-2">
+              <span className="text-sm font-medium text-text-tertiary ml-2">
                 ({checkedCount}/{totalItems})
               </span>
             </SectionTitle>
@@ -53,10 +52,10 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
                     key={item.name}
                     onClick={() => togglePackingItem(tripId, category.category, item.name)}
                     className={cn(
-                      'flex items-center gap-3 px-5 py-3.5 rounded-xl cursor-pointer transition-all',
+                      'flex items-center gap-3 px-4 py-3.5 rounded-xl cursor-pointer transition-all duration-200',
                       isChecked
-                        ? 'bg-trip-green/10 border border-trip-green/20'
-                        : 'bg-card border border-border hover:border-border'
+                        ? 'bg-trip-green/5 border border-trip-green/15'
+                        : 'bg-surface-elevated border border-border hover:border-border-strong hover:shadow-[var(--shadow-sm)]'
                     )}
                   >
                     <Checkbox
@@ -67,12 +66,11 @@ export function PackingTab({ tripId, packing }: PackingTabProps) {
                       )}
                       tabIndex={-1}
                     />
-                    {/* 이름 + 참고사항 */}
                     <div className="flex-1">
                       <span
                         className={cn(
                           'text-sm font-medium',
-                          isChecked ? 'text-text-secondary line-through' : 'text-text'
+                          isChecked ? 'text-text-tertiary line-through' : 'text-text'
                         )}
                       >
                         {item.name}

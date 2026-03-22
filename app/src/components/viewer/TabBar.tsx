@@ -13,16 +13,18 @@ export function TabBar({ activeTab, onChange }: TabBarProps) {
   const router = useRouter();
 
   return (
-    <div className="sticky top-0 z-[100] bg-white/95 backdrop-blur-sm border-b border-border/50 pt-[var(--safe-area-top,0px)]">
-      <div className="max-w-[1100px] mx-auto px-3">
-        {/* 홈 뒤로가기 — 탭 위 별도 행 */}
+    <div className="sticky top-0 z-[100] glass-strong border-b border-border shadow-[var(--shadow-sm)] pt-[var(--safe-area-top,0px)]">
+      <div className="max-w-[1100px] mx-auto px-4">
+        {/* 홈 뒤로가기 */}
         <button
           onClick={() => router.push('/')}
-          className="flex items-center gap-1 px-1 pt-2 pb-1 text-sm text-text-secondary hover:text-accent transition-colors"
+          className="flex items-center gap-1.5 px-1 pt-2 pb-1 text-sm text-text-secondary hover:text-accent transition-colors"
           aria-label="홈으로"
         >
-          <span className="text-base">←</span>
-          <span>홈</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          <span className="font-medium">홈</span>
         </button>
         {/* 탭 스크롤 영역 */}
         <Tabs value={activeTab} onValueChange={(v) => onChange(v as TabId)}>
@@ -31,7 +33,7 @@ export function TabBar({ activeTab, onChange }: TabBarProps) {
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="px-4 py-3 text-[0.82rem] whitespace-nowrap data-[state=active]:text-accent data-[state=active]:font-semibold data-[state=active]:after:bg-accent"
+                className="px-3.5 py-3 text-[0.82rem] whitespace-nowrap"
               >
                 <span className="mr-1">{tab.icon}</span>
                 {tab.label}
