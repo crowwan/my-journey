@@ -1,0 +1,72 @@
+# =============================================================================
+# .vibe-video.yml — My Journey 프로젝트 매니페스트
+# vibe-videos 캡처 파이프라인이 이 파일을 읽어 빌드/부팅/캡처 경로를 결정한다.
+# 사람 판독용 보완 문서는 CAPTURE.md.
+# =============================================================================
+
+# ─── 프로젝트 메타 ──────────────────────────────────────────────────────────
+project:
+  id: my-journey
+  name: "My Journey — AI 여행 플래너"
+  summary: "대화로 여행을 짜고 계속 다듬는 플래너"
+  repo_url: git@github.com:jwkim-imago/my-journey.git   # 실제 remote 주소와 다르면 수정
+
+# ─── 실행 재현성 ────────────────────────────────────────────────────────────
+# 레포 루트 아래 `app/` 에 Next.js 프로젝트가 있는 모노레포 구조.
+runtime:
+  node: ">=20"                        # Next.js 16 + Turbopack 요구사항
+  install: "cd app && npm install"
+  dev: "cd app && npm run dev"
+  dev_url: "http://localhost:3000"    # TODO: 3000→7777 마이그레이션 예정 (별도 작업)
+  dev_ready_pattern: "Ready in"       # Next dev 부팅 로그 패턴
+  env_example: "app/.env.local"       # .env.example 파일이 아직 없음 — CAPTURE.md §3 참조
+  env_capture: "app/.env.capture"     # 모킹 토글 (현재 미구현, CAPTURE.md §6 참조)
+
+# ─── 시드 데이터 ────────────────────────────────────────────────────────────
+# 현재 시드 스크립트 없음 — CAPTURE.md §4의 "수동 씨드" 절차를 따른다.
+# 과거 커밋(b23efb5 이전)은 localStorage 기반이라 브라우저 수동 입력.
+# 현재 커밋은 Supabase 기반 — 로그인 후 AI로 여행 1건을 생성해야 홈 카드가 나타남.
+# seed:
+#   script: ""
+#   reset: ""
+#   fixtures: ""
+
+# ─── 캡처 대상 라우트 ──────────────────────────────────────────────────────
+routes:
+  - id: home
+    path: "/"
+    label: "홈 — 여행 카드 목록"
+  - id: trip_detail
+    path: "/trips/:tripId"
+    label: "여행 상세 — 4탭 뷰어"
+    example_params: { tripId: "trip-demo-osaka" }   # 로컬에서 생성한 오사카 시드 trip id로 교체
+  - id: calendar
+    path: "/calendar"
+    label: "캘린더 — 월별 일정"
+
+# ─── 뷰포트 프리셋 ──────────────────────────────────────────────────────────
+viewports:
+  desktop: { width: 1440, height: 900, device_scale_factor: 2 }
+  mobile:  { width: 390,  height: 844, device_scale_factor: 3 }
+
+# ─── 배포 환경 (현재 시점 캡처 전용) ────────────────────────────────────────
+deployed:
+  url: https://my-journey-jwkim.vercel.app   # 실제 Vercel URL과 다르면 수정
+  auth: oauth-kakao
+
+# ─── 민감정보 마스킹 ────────────────────────────────────────────────────────
+# Supabase/카카오 로그인 후 헤더에 사용자 이름/아바타가 노출된다.
+privacy:
+  mask:
+    - selector: "[data-user-email]"
+      method: blur
+    - selector: "[data-user-name]"
+      method: blur
+    - selector: "header img[alt*='프로필']"
+      method: blur
+  deny_routes: []
+
+# ─── 라이선스 / 크레딧 ──────────────────────────────────────────────────────
+credits:
+  author: "jwkim"
+  license: "영상 제작 한정 사용 허가"
