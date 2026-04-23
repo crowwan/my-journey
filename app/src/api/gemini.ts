@@ -7,6 +7,12 @@
 import { GoogleGenAI } from '@google/genai';
 import type { Trip, ChatMessage } from '@/types/trip';
 import { migrateBudget as migrateBudgetData } from '@/domain/budget';
+import { isMockLlmEnabled } from '@/lib/capture-flags';
+import {
+  stubChat,
+  stubCreateTrip,
+  stubEditTrip,
+} from '@/api/mocks/gemini-stub';
 
 // -- SDK 초기화 (lazy) --------------------------------------------
 // Vercel 빌드 시 환경변수 없이도 모듈 로드가 가능하도록 지연 초기화
@@ -347,6 +353,11 @@ export interface EditTripResult {
 export const geminiApi = {
   // 여행 계획 생성
   createTrip: async (messages: ChatMessage[]): Promise<CreateTripResult> => {
+    // 캡처용 모킹 모드: 네트워크 없이 고정 Trip 반환
+    if (isMockLlmEnabled()) {
+      return stubCreateTrip();
+    }
+
     const model = getModel();
     const contents = toGeminiContents(messages);
 
@@ -371,6 +382,11 @@ export const geminiApi = {
 
   // 기존 여행 수정 (replace_trip 방식: 수정된 전체 Trip JSON 반환)
   editTrip: async (messages: ChatMessage[], currentTrip: Trip): Promise<EditTripResult> => {
+    // 캡처용 모킹 모드: Day 1 제목에 접두사만 붙여 편집 UX 재현
+    if (isMockLlmEnabled()) {
+      return stubEditTrip(currentTrip);
+    }
+
     const model = getModel();
     const systemPrompt = getEditTripPrompt(JSON.stringify(currentTrip));
     const contents = toGeminiContents(messages);
@@ -400,6 +416,11 @@ export const geminiApi = {
 
   // 간단한 대화 (여행 생성 전 질문/응답)
   chat: async (messages: ChatMessage[]): Promise<string> => {
+    // 캡처용 모킹 모드: 고정 한국어 응답 즉시 반환
+    if (isMockLlmEnabled()) {
+      return stubChat();
+    }
+
     const model = getModel();
     const contents = toGeminiContents(messages);
 

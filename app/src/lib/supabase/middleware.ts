@@ -1,11 +1,18 @@
 // Middleware용 Supabase 세션 갱신 헬퍼
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isMockOAuthEnabled } from '@/lib/capture-flags'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
+
+  // 캡처용 모킹 모드: 실 Supabase 세션 갱신을 건너뛴다.
+  // 클라이언트의 useAuth가 MOCK_USER를 돌려주므로 서버 쿠키 조작도 불필요.
+  if (isMockOAuthEnabled()) {
+    return supabaseResponse
+  }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

@@ -3,11 +3,13 @@
 // 인증 상태에 따라 queryFn 분기:
 //   로그인 → Supabase (tripApi)
 //   비로그인 → localStorage (storage) — Guest Mode
+//   캡처용 모킹(MOCK_OAUTH)     → localStorage 강제 사용
 // ============================================================
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { storage } from '@/lib/storage';
 import * as tripApi from '@/lib/supabase/trip-api';
 import { useAuth } from '@/hooks/useAuth';
+import { isMockOAuthEnabled } from '@/lib/capture-flags';
 import type { Trip, TripSummary } from '@/types/trip';
 
 // 쿼리 키 팩토리 (userId로 캐시 분리 — 로그인/비로그인 캐시 혼재 방지)
@@ -27,52 +29,53 @@ const LOCAL_STALE_TIME = Infinity;
 // 전체 여행 목록 조회 (TripSummary[])
 export function useTrips() {
   const { data: user } = useAuth();
-  const isLoggedIn = !!user;
+  // 모킹 모드: Supabase 네트워크를 타지 않도록 localStorage 경로 사용
+  const useRemote = !!user && !isMockOAuthEnabled();
   const userId = user?.id;
 
   return useQuery({
     queryKey: tripKeys.lists(userId),
     queryFn: (): Promise<TripSummary[]> =>
-      isLoggedIn
+      useRemote
         ? tripApi.getTripSummaries()
         : Promise.resolve(storage.getTripSummaries()),
-    staleTime: isLoggedIn ? SUPABASE_STALE_TIME : LOCAL_STALE_TIME,
-    retry: isLoggedIn ? 2 : false,
+    staleTime: useRemote ? SUPABASE_STALE_TIME : LOCAL_STALE_TIME,
+    retry: useRemote ? 2 : false,
   });
 }
 
 // 전체 여행 목록 (Trip[] - 캘린더 등 전체 데이터 필요 시)
 export function useAllTrips() {
   const { data: user } = useAuth();
-  const isLoggedIn = !!user;
+  const useRemote = !!user && !isMockOAuthEnabled();
   const userId = user?.id;
 
   return useQuery({
     queryKey: tripKeys.all(userId),
     queryFn: (): Promise<Trip[]> =>
-      isLoggedIn
+      useRemote
         ? tripApi.getAllTrips()
         : Promise.resolve(storage.getAllTrips()),
-    staleTime: isLoggedIn ? SUPABASE_STALE_TIME : LOCAL_STALE_TIME,
-    retry: isLoggedIn ? 2 : false,
+    staleTime: useRemote ? SUPABASE_STALE_TIME : LOCAL_STALE_TIME,
+    retry: useRemote ? 2 : false,
   });
 }
 
 // 단일 여행 조회
 export function useTrip(tripId: string | undefined) {
   const { data: user } = useAuth();
-  const isLoggedIn = !!user;
+  const useRemote = !!user && !isMockOAuthEnabled();
   const userId = user?.id;
 
   return useQuery({
     queryKey: tripKeys.detail(userId, tripId!),
     queryFn: (): Promise<Trip | null> =>
-      isLoggedIn
+      useRemote
         ? tripApi.getTrip(tripId!)
         : Promise.resolve(storage.getTrip(tripId!)),
     enabled: !!tripId,
-    staleTime: isLoggedIn ? SUPABASE_STALE_TIME : LOCAL_STALE_TIME,
-    retry: isLoggedIn ? 2 : false,
+    staleTime: useRemote ? SUPABASE_STALE_TIME : LOCAL_STALE_TIME,
+    retry: useRemote ? 2 : false,
   });
 }
 
@@ -80,15 +83,16 @@ export function useTrip(tripId: string | undefined) {
 export function useSaveTrip() {
   const queryClient = useQueryClient();
   const { data: user } = useAuth();
+  const useRemote = !!user && !isMockOAuthEnabled();
   const userId = user?.id;
 
   return useMutation({
     mutationFn: async (trip: Trip) => {
-      if (user) {
-        // 로그인 → Supabase 저장
+      if (useRemote && user) {
+        // 로그인 & 실 Supabase → 원격 저장
         await tripApi.saveTrip(trip, user.id);
       } else {
-        // 비로그인 → localStorage 저장
+        // 비로그인 또는 모킹 → localStorage 저장
         storage.saveTrip(trip);
       }
       return trip;
@@ -107,11 +111,12 @@ export function useSaveTrip() {
 export function useDeleteTrip() {
   const queryClient = useQueryClient();
   const { data: user } = useAuth();
+  const useRemote = !!user && !isMockOAuthEnabled();
   const userId = user?.id;
 
   return useMutation({
     mutationFn: async (tripId: string) => {
-      if (user) {
+      if (useRemote) {
         await tripApi.deleteTrip(tripId);
       } else {
         storage.deleteTrip(tripId);

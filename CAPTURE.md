@@ -54,24 +54,38 @@ npm run dev              # next dev → http://localhost:3000
 [Kakao Developers](https://developers.kakao.com/)에서 발급한 REST API 키 + Client Secret을 Supabase 측에 등록한다.
 앱 코드에서 직접 Kakao 시크릿을 참조하지 않으므로 `.env.local`에 넣을 필요는 없다.
 
-### 3-2. 캡처용(모킹) — `app/.env.capture` (추후 추가 예정)
+### 3-2. 캡처용(모킹) — `app/.env.capture`
 
-외부 API 호출을 우회하려면 아래 토글을 `true`로 할 계획. **현재 코드에 모킹 스위치가 없으므로** 캡처 시에는
-실제 Gemini / Supabase / Kakao 호출이 발생한다. 모킹 도입 후 본 섹션을 채운다.
+`MOCK_OAUTH` / `MOCK_LLM` 토글 구현 완료. 사용법:
 
-| 이름 | 기본값 | 설명 (계획) |
+```bash
+cp app/.env.capture.example app/.env.capture
+# 필요 시 값 수정 후
+# vibe-videos 의 .vibe-video.yml `env_capture: app/.env.capture` 가 자동 주입
+```
+
+| 이름 | 기본값 | 설명 |
 |------|--------|------|
-| `MOCK_LLM` | false | Gemini 호출을 고정 응답으로 대체 |
-| `MOCK_OAUTH` | false | 카카오 로그인을 시드 사용자로 자동 통과 |
+| `NEXT_PUBLIC_MOCK_OAUTH` | (unset) | `1`이면 카카오 리다이렉트를 건너뛰고 고정 데모 유저(`demo@example.com`, `데모 사용자`)로 로그인 상태를 재현. `useAuth` 가 MOCK_USER 를 반환하고, `useTrips` 계열은 localStorage 경로를 강제. 미들웨어의 Supabase 세션 갱신도 건너뜀. |
+| `NEXT_PUBLIC_MOCK_LLM` | (unset) | `1`이면 `/api/chat`이 실제 Gemini 대신 `src/api/mocks/gemini-stub.ts` 응답 사용. `createTrip`은 오사카 3박 4일 고정 Trip, `editTrip`은 Day 1 제목에 "편집 적용됨 — " 접두 추가, `chat`은 고정 한국어 문장. |
+| `MOCK_LLM` | (unset) | 서버 전용으로만 LLM 모킹을 켜고 싶을 때 사용. `NEXT_PUBLIC_MOCK_LLM` 과 동일한 효과. |
+
+참고: 모킹 시 Gemini API 키 / Supabase URL / Kakao 설정 없이도 앱이 정상 기동한다. 캡처용 worktree에서는 `app/.env.local`에 위 두 변수만 있으면 충분.
 
 ## 4. 씨드 상태의 기대 화면
 
 자동 시드 스크립트가 없다. 현재 시점(Supabase 기반) 캡처를 위한 수동 절차:
 
+### 4-1. 실 API 모드 (토글 미사용)
 1. 브라우저에서 `http://localhost:3000` 접속 → 랜딩 화면
 2. 카카오 로그인 (또는 Supabase Auth가 허용한 다른 Provider)
 3. AI 플로팅 버튼 → Quick Setup 폼에 "오사카 / 2026-03-01 / 2026-03-05 / 2명" 입력
 4. 생성된 초안 저장 → 홈 카드 1건 표시 + `/trips/{tripId}` 이동 가능
+
+### 4-2. 캡처 모킹 모드 (`NEXT_PUBLIC_MOCK_OAUTH=1`, `NEXT_PUBLIC_MOCK_LLM=1`)
+1. `http://localhost:3000` 접속 → 랜딩 없이 곧바로 홈(trips 섹션) 노출
+2. AI 플로팅 버튼 → 생성 모드 → 스텁이 오사카 3박 4일 Trip 즉시 반환
+3. 저장 시 localStorage에 기록 (Supabase 호출 없음)
 
 성공 체크리스트:
 - [ ] `/` 접속 시 홈에 방금 생성한 오사카 여행 카드 1건 노출
@@ -99,9 +113,9 @@ API 라우트(`/api/chat`, `/api/weather`, `/api/currency`, `/api/shared`)는 UI
 - 시드 데이터로만 운영: 실제 일정/예산/연락처를 화면에 띄우지 말 것
 
 ### 외부 요청
-- **현재 모킹 스위치 미구현**. Gemini 호출은 실제 API를 때림 → 유료/쿼터 주의
-- 카카오 로그인도 실제 OAuth 플로우를 탄다
-- 모킹 도입 전까지는 **네트워크 끊긴 상태 캡처 금지** (앱이 깨짐: Supabase 세션 갱신 미들웨어가 매 요청마다 동작)
+- **`MOCK_OAUTH` / `MOCK_LLM` 토글 구현 완료**. `app/.env.capture.example` 을 복사해 사용하면 외부 호출이 발생하지 않는다.
+- 토글 미사용 시: Gemini는 실제 API 호출(유료/쿼터 주의), 카카오 로그인도 실제 OAuth 플로우를 탄다.
+- 미들웨어의 Supabase 세션 갱신은 `NEXT_PUBLIC_MOCK_OAUTH=1` 에서 건너뛰므로, 모킹 모드에서는 네트워크 단절 환경에서도 앱이 동작한다.
 
 ### 과거 커밋 재현
 - `git checkout {sha}`가 아니라 `git worktree add ../my-journey-{sha} {sha}`로 복제 (현재 작업 트리를 보존)
@@ -113,7 +127,7 @@ API 라우트(`/api/chat`, `/api/weather`, `/api/currency`, `/api/shared`)는 UI
 - **Next.js 16 + Turbopack은 Node 20+에서만 빌드**. Node 18 환경에서는 `npm run dev`가 즉시 실패
 - `.env.example` 파일이 레포에 없음 → 본 문서 §3 표를 단일 소스로 사용
 - 자동 시드 스크립트 없음 → 캡처 재현은 본 문서 §4 수동 절차
-- 캡처용 모킹(`MOCK_LLM`, `MOCK_OAUTH`) 미구현 → 실 API 호출됨
+- 캡처용 모킹(`NEXT_PUBLIC_MOCK_OAUTH`, `NEXT_PUBLIC_MOCK_LLM`) 구현 완료 (§3-2 참조)
 - dev 포트는 현재 `3000`. 다중 프로젝트 동시 캡처 시 충돌 가능 → 7777 대로 옮기는 별도 작업 예정
 
 ## 8. 문의 / 유지보수

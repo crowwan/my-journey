@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 캡처 파이프라인 example은 커밋 대상 — 실제 .env.capture 는 계속 무시
+!.env.capture.example
 
 # vercel
 .vercel
