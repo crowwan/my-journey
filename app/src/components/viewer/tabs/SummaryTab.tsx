@@ -298,8 +298,10 @@ export function SummaryTab({ trip }: SummaryTabProps) {
   const days = trip.days ?? [];
 
   // 실시간 날씨 데이터 (mapSpots 좌표를 폴백으로 사용)
-  const firstSpot = days[0]?.mapSpots?.[0];
-  const fallbackCoords = firstSpot ? { lat: firstSpot.lat, lng: firstSpot.lng } : undefined;
+  const firstValidSpot = days
+    .flatMap((day) => day.mapSpots ?? [])
+    .find((spot) => Number.isFinite(spot?.lat) && Number.isFinite(spot?.lng));
+  const fallbackCoords = firstValidSpot ? { lat: firstValidSpot.lat, lng: firstValidSpot.lng } : undefined;
   const { data: weatherData, loading: weatherLoading, error: weatherError, lastUpdated } = useWeather(
     trip.destination,
     trip.startDate,

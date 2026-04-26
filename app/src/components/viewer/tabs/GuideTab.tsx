@@ -423,6 +423,8 @@ function getPassColor(recommendation: TransportPass['recommendation']) {
       return { border: 'border-border-light', bg: 'bg-surface', text: 'text-text-secondary', badge: 'bg-bg-secondary text-text-secondary' };
     case 'not-recommended':
       return { border: 'border-border-light', bg: 'bg-surface', text: 'text-text-tertiary', badge: 'bg-bg-secondary text-text-tertiary' };
+    default:
+      return { border: 'border-border-light', bg: 'bg-surface', text: 'text-text-secondary', badge: 'bg-bg-secondary text-text-secondary' };
   }
 }
 
